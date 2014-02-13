@@ -1,0 +1,9 @@
+Copy of repository https://github.com/Esri/resource-proxy
+commit e071986ddb8050ed7aaee330a7bd0b55733bf1f0
+Merge: 8a94e76 9c5a3be
+Author: Kelly Hutchins <khutchins@esri.com>
+Date:   Wed Jan 29 14:37:38 2014 -0800
+
+    Merge pull request #74 from afili/master
+    
+    Enhanced support for allowedReferers
