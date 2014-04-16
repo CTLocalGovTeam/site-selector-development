@@ -16,14 +16,34 @@
 | limitations under the License.
 */
 define({
-        titles: {
-            informationDisplayText: "@@511 Information",
-            reRouteDisplayText: "@@Traffic Incidents found on this road"
-        },
-        messages: {
-            splashScreenContent: "Une application qui permet au public de trouver des informations sur l'état des routes, 511 alertes, les problèmes de circulation, et al."
-        },
-        notUsed: {
-            incidentInformationDisplayText: "@@Incident Information"
-        }
+    showNullValue: "@fr@ N/A",
+    buttons: {
+        okButtonText: "@fr@ OK",
+        link: "@fr@ Link",
+        email: "Email",  // Shown next to icon for sharing the current map extents via email; works with shareViaEmail tooltip
+        facebook: "Facebook",  // Shown next to icon for sharing the current map extents via a Facebook post; works with shareViaFacebook tooltip
+        twitter: "Twitter"  // Shown next to icon for sharing the current map extents via a Twitter tweet; works with shareViaTwitter tooltip
+    },
+    tooltips: {
+        search: "Rechercher",
+        reports: "@fr@ Reports",
+        locate: "Emplacement actuel",
+        share: "Partager",
+        help: "Aide",
+        clearEntry: "@fr@ Clear"
+    },
+    titles: {
+        areaOfInterestTabText: "@fr@ Area of Interest",
+        reportTabText: "Report",
+        webpageDisplayText: "@fr@ Copy/paste HTML into your web page"
+    },
+    errorMessages: {
+        invalidSearch: "Aucun résultat",
+        falseConfigParams: "Valeurs clés de configuration requis sont null ou pas exactement correspondant à des attributs de la couche. Ce message peut apparaître plusieurs fois.",
+        invalidLocation: "@fr@ Current location not found.",
+        invalidProjection: "@fr@ Unable to plot current location on the map.",
+        widgetNotLoaded: "@fr@ Unable to load widgets.",
+        shareLoadingFailed: "@fr@ Unable to load share options.",
+        shareFailed: "@fr@ Unable to share."
+    }
 });

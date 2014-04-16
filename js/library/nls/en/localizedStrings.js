@@ -16,14 +16,35 @@
 | limitations under the License.
 */
 define({
-        titles: {
-            informationDisplayText: "511 Information",
-            reRouteDisplayText: "Traffic Incidents found on this road"
-        },
-        messages: {
-            splashScreenContent: "An application that allows the public to find information about road conditions, 511 alerts, traffic incidents, et al."
-        },
-        notUsed: {
-            incidentInformationDisplayText: "Incident Information"
-        }
+    showNullValue: "N/A",
+    buttons: {
+        okButtonText: "OK",
+        link: "Link",
+        email: "Email",  // Shown next to icon for sharing the current map extents via email; works with shareViaEmail tooltip
+        facebook: "Facebook",  // Shown next to icon for sharing the current map extents via a Facebook post; works with shareViaFacebook tooltip
+        twitter: "Twitter"  // Shown next to icon for sharing the current map extents via a Twitter tweet; works with shareViaTwitter tooltip
+    },
+    tooltips: {
+        search: "Search",
+        reports: "Site Selector",
+        locate: "Locate",
+        share: "Share",
+        help: "Help",
+        clearEntry: "Clear"
+    },
+    titles: {
+        areaOfInterestTabText: "Area of Interest",
+        reportTabText: "Report",
+        webpageDisplayText: "Copy/paste HTML into your web page"
+    },
+    errorMessages: {
+        invalidSearch: "No results found",
+        falseConfigParams: "Required configuration key values are either null or not exactly matching with layer attributes. This message may appear multiple times.",
+        bufferSliderValue: "Please select nonzero value for proximity.",
+        invalidLocation: "Current location not found.",
+        invalidProjection: "Unable to project current location on map.",
+        widgetNotLoaded: "Unable to load widgets.",
+        shareLoadingFailed: "Unable to load share options.",
+        shareFailed: "Unable to share."
+    }
 });

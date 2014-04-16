@@ -16,14 +16,34 @@
 | limitations under the License.
 */
 define({
-        titles: {
-            informationDisplayText: "@@511 Information",
-            reRouteDisplayText: "@@Traffic Incidents found on this road"
-        },
-        messages: {
-            splashScreenContent: "Estaremos desgarrando los profesionales nunca se han detenido, ni desea Cilla consectetaur dinero, sino porque se producen de vez en cuando las circunstancias en las que trabajo y el dolor pueden procurarle algún gran . Para tomar un ejemplo trivial , lo que de nosotros se compromete ejercicio físico laborioso , excepto para obtener alguna ventaja de ello. Actualmente tenemos en el tren llega a encontrar defectos en que no produce placer resultante es que las aplicaciones en línea . Estos casos son perfectamente cuenta del sistema, que tienen la culpa taller quae dejar suaviza recomendamos . Libro Conscient para usted para hacer frente a los hechos y las leyes de castigo. Estaremos desgarrando los profesionales nunca se han detenido, ni desea Cilla consectetaur dinero, sino porque se producen de vez en cuando las circunstancias en las que trabajo y el dolor pueden procurarle algún gran . Para tomar un ejemplo trivial , lo que de nosotros se compromete ejercicio físico laborioso , excepto para obtener alguna ventaja de ello. Actualmente tenemos en el tren llega a encontrar defectos en que no produce placer resultante es que las aplicaciones en línea . Estos casos son perfectamente cuenta del sistema, que tienen la culpa taller quae dejar suaviza recomendamos . Libro Conscient para usted para hacer frente a los hechos y las leyes de castigo. Estaremos desgarrando los profesionales nunca se han detenido, ni desea Cilla consectetaur dinero, sino porque se producen de vez en cuando las circunstancias en las que trabajo y el dolor pueden procurarle algún gran . Para tomar un ejemplo trivial , lo que de nosotros se compromete ejercicio físico laborioso , excepto para obtener alguna ventaja de ello. Actualmente tenemos en el tren llega a encontrar defectos en que no produce placer resultante es que las aplicaciones en línea . Estos casos son perfectamente cuenta del sistema, que tienen la culpa taller quae dejar suaviza recomendamos . Libro Conscient para usted para hacer frente a los hechos y las leyes de castigo. Estaremos desgarrando los profesionales nunca se han detenido, ni desea Cilla consectetaur dinero, sino porque se producen de vez en cuando las circunstancias en las que trabajo y el dolor pueden procurarle algún gran . Para tomar un ejemplo trivial , lo que de nosotros se compromete ejercicio físico laborioso , excepto para obtener alguna ventaja de ello. Actualmente tenemos en el tren llega a encontrar defectos en que no produce placer resultante es que las aplicaciones en línea . Estos casos son perfectamente cuenta del sistema, que tienen la culpa taller quae dejar suaviza recomendamos . Libro Conscient para usted para hacer frente a los hechos y las leyes de castigo."
-        },
-        notUsed: {
-            incidentInformationDisplayText: "@@Incident Information"
-        }
+    showNullValue: "@es@ N/A",
+    buttons: {
+        okButtonText: "@es@ OK",
+        link: "@es@ Link",
+        email: "correo electrónico",  // Shown next to icon for sharing the current map extents via email; works with shareViaEmail tooltip
+        facebook: "Facebook",  // Shown next to icon for sharing the current map extents via a Facebook post; works with shareViaFacebook tooltip
+        twitter: "Twitter"  // Shown next to icon for sharing the current map extents via a Twitter tweet; works with shareViaTwitter tooltip
+    },
+    tooltips: {
+        search: "Buscar",
+        reports: "@es@ Reports",
+        locate: "Ubicación actual",
+        share: "Compartir",
+        help: "Ayuda",
+        clearEntry: "@es@ Clear"
+    },
+    titles: {
+        areaOfInterestTabText: "@es@ Area of Interest",
+        reportTabText: "Report",
+        webpageDisplayText: "@es@ Copy/paste HTML into your web page"
+    },
+    errorMessages: {
+        invalidSearch: "No hay resultados",
+        falseConfigParams: "Valores clave de configuración requeridos son null o no coincida exactamente con los atributos de capa, este mensaje puede aparecer varias veces.",
+        invalidLocation: "@es@ Current location not found.",
+        invalidProjection: "@es@ Unable to plot current location on the map.",
+        widgetNotLoaded: "@es@ Unable to load widgets.",
+        shareLoadingFailed: "@es@ Unable to load share options.",
+        shareFailed: "@es@ Unable to share."
+    }
 });

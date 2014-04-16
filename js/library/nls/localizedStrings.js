@@ -1,4 +1,5 @@
 ﻿/*global define */
+/*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true */
 /** @license
 | Version 10.2
 | Copyright 2013 Esri
@@ -17,15 +18,63 @@
 */
 define({
     root: {
+        showNullValue: "N/A",
+        buttons: {
+            okButtonText: "OK",
+            link: "Link",
+            email: "Email",  // Shown next to icon for sharing the current map extents via email; works with shareViaEmail tooltip
+            facebook: "Facebook",  // Shown next to icon for sharing the current map extents via a Facebook post; works with shareViaFacebook tooltip
+            twitter: "Twitter",  // Shown next to icon for sharing the current map extents via a Twitter tweet; works with shareViaTwitter tooltip
+            embedding: "Embedded URL"
+        },
+        tooltips: {
+            search: "Search",
+            reports:"Site Selector",
+            locate: "Locate",
+            share: "Share",
+            help: "Help",
+            clearEntry: "Clear"
+        },
         titles: {
-            informationDisplayText: "511 Information",
-            reRouteDisplayText: "Traffic incidents found on this road"
+            directionsDisplayTextBuilding: "Building",
+            directionsDisplayTextSites: "Sites",
+            directionsDisplayTextBusiness: "Business",
+            directionsDisplayTextCommunities: "Communities",
+            informationPanelTitle: "Information for current map view",
+            searchBuildingText: "Search building near an address",
+            buildingAreaText: "Building Area(sq ft)",
+            officeText: "Office",
+            industrialText: "Industrial",
+            retailText: "Retail",
+            agricultureText: "Agriculture",
+            vacantText: "Vacant",
+            noOfEmpText:"No of Employees",
+            saleText: "For sale",
+            leaseText:"For lease",
+            hideText: "Hide more options",
+            showText:"Show more options",
+            sliderDisplayText: "Show results within <b>20</b>",
+            communityText: "Search communities by city, country or region",
+            searchCommunityText: "Search communities in",
+            searchBusinessText: "Search business by name or near an address",
+            AnnualRevenueBusinessText: "Annual revenue",
+            serachSiteText: "Search sites near an address",
+            siteAreaText: "Sites area(acres) ",
+            CountStatus: "${s} - ${e} of ${t}",
+            webpageDisplayText: "Copy/paste HTML into your web page",
+//            resultBusinessInfo:"BusinessInformation",
+//            resultDemoInfo:"DemographicInformation",
+            textDownload:"Download"
+
         },
-        messages: {
-            splashScreenContent: "An application that allows the public to find information about road conditions, 511 alerts, traffic incidents, et al."
-        },
-        notUsed: {
-            incidentInformationDisplayText: "Incident information"
+        errorMessages: {
+            invalidSearch: "No results found",
+            falseConfigParams: "Required configuration key values are either null or not exactly matching with layer attributes. This message may appear multiple times.",
+            invalidLocation: "Current location not found.",
+            invalidProjection: "Unable to plot current location on the map.",
+            widgetNotLoaded: "Unable to load widgets.",
+            shareLoadingFailed: "Unable to load share options.",
+            shareFailed: "Unable to share."
         }
     },
     es: true,
