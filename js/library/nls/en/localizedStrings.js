@@ -1,4 +1,5 @@
 ﻿/*global define */
+/*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
 /** @license
 | Version 10.2
 | Copyright 2013 Esri
@@ -40,11 +41,12 @@ define({
     errorMessages: {
         invalidSearch: "No results found",
         falseConfigParams: "Required configuration key values are either null or not exactly matching with layer attributes. This message may appear multiple times.",
-        bufferSliderValue: "Please select nonzero value for proximity.",
         invalidLocation: "Current location not found.",
         invalidProjection: "Unable to project current location on map.",
         widgetNotLoaded: "Unable to load widgets.",
         shareLoadingFailed: "Unable to load share options.",
-        shareFailed: "Unable to share."
+        shareFailed: "Unable to share.",
+        disableTab: "Enable at least one tab.",
+        bufferSliderValue: "Buffer slider should not be set to zero distance"
     }
 });

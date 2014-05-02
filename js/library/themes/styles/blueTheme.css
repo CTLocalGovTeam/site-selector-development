@@ -1,4 +1,231 @@
-﻿/* Application Header Styles */
+﻿
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (-webkit-min-device-pixel-ratio: 2) {
+   
+    .esriCTHeaderSearch
+    {
+        background-image: url("../images/img2X/search@2X.png") !important;
+    }
+
+    .esriCTHelpImg
+    {
+        background-image: url("../images/img2X/help@2X.png") !important;
+    }
+
+    .esriCTHeaderSearchSelected
+    {
+        background-image: url("../images/img2X/search-select@2X.png") !important;
+    }
+
+    .esriCTGeolocation
+    {
+        background-image: url("../images/img2X/geo-location@2x.png") !important;
+    }
+
+    .esriCTImgSocialMediaSelected
+    {
+        background-image: url("../images/img2X/share-select@2X.png") !important;
+    }
+
+    .esriCTImgSocialMedia
+    {
+        background-image: url("../images/img2X/share@2X.png") !important;
+    }
+
+    .esriCTRouteImg
+    {
+        background-image: url("../images/img2X/get-route@2x.png") !important;
+    }
+
+    .esriCTRouteImg-select
+    {
+        background-image: url("../images/img2X/get-route-select@2x.png") !important;
+    }
+    .esriCTFacebook
+    {
+        background-image: url("../images/img2X/img_facebook@2x.png") !important;
+    }
+
+    .esriCTTwitter
+    {
+        background-image: url("../images/img2X/img_twitter@2x.png") !important;
+    }
+
+    .esriCTEmail
+    {
+        background-image: url("../images/img2X/img-email@2x.png") !important;
+    }
+}
+@media only screen and (min-device-width : 1024px) and (max-device-width : 1279px) /*if device wise @media only screen and (min-device-width : 1024px) and (max-device-width : 1280px)*/
+{
+.esriCTHeaderSearch
+{
+    background-image: url("../images/img44x44/search.png")!important;
+}
+
+.esriCTHeaderSearchSelected
+{
+    background-image: url("../images/img44x44/search-select.png")!important;
+}
+.esriCTHelpImg
+{
+    background-image: url("../images/img44x44/Help.png")!important;
+}
+
+.esriCTGeolocation
+{
+    background-image: url("../images/img44x44/imgGeolocation.png")!important;
+}
+
+.esriCTImgSocialMedia
+{
+    background-image: url("../images/img44x44/imgSocialMedia.png")!important;
+}
+.esriCTImgSocialMediaSelected
+{
+    background-image: url("../images/img44x44/imgSocialMedia-select.png")!important;
+}
+.esriCTRouteImg
+{
+    background-image: url("../images/img44x44/get-route.png")!important;
+}
+.esriCTRouteImg-select
+{
+    background-image: url("../images/img44x44/get-route-select.png")!important;
+}
+   .esriCTFacebook
+{
+    background-image: url("../images/img44x44/img_facebook.png") !important;
+}
+
+.esriCTTwitter
+{
+    background-image: url("../images/img44x44/img_twitter.png") !important;
+}
+
+.esriCTEmail
+{
+    background-image: url("../images/img44x44/img_email.png") !important;
+}
+.esriCTEmbedding
+{
+    background-image: url("../images/img44x44/embedding.png") !important;
+} 
+  .esriCTExitImg
+{
+     background-image: url("../images/img44x44/exit.png")!important;
+    }
+
+}
+@media screen and (max-width: 1024px)
+{
+.esriCTHeaderSearch
+{
+    background-image: url("../images/img44x44/search.png")!important;
+}
+
+.esriCTHeaderSearchSelected
+{
+    background-image: url("../images/img44x44/search-select.png")!important;
+}
+.esriCTHelpImg
+{
+    background-image: url("../images/img44x44/Help.png")!important;
+}
+
+.esriCTGeolocation
+{
+    background-image: url("../images/img44x44/imgGeolocation.png")!important;
+}
+
+.esriCTImgSocialMedia
+{
+    background-image: url("../images/img44x44/imgSocialMedia.png")!important;
+}
+.esriCTImgSocialMediaSelected
+{
+    background-image: url("../images/img44x44/imgSocialMedia-select.png")!important;
+}
+.esriCTRouteImg
+{
+    background-image: url("../images/img44x44/get-route.png")!important;
+}
+.esriCTRouteImg-select
+{
+    background-image: url("../images/img44x44/get-route-select.png")!important;
+}
+   .esriCTFacebook
+{
+    background-image: url("../images/img44x44/img_facebook.png") !important;
+}
+
+.esriCTTwitter
+{
+    background-image: url("../images/img44x44/img_twitter.png") !important;
+}
+
+.esriCTEmail
+{
+    background-image: url("../images/img44x44/img_email.png") !important;
+}
+.esriCTEmbedding
+{
+    background-image: url("../images/img44x44/embedding.png") !important;
+} 
+  .esriCTExitImg
+{
+     background-image: url("../images/img44x44/exit.png")!important;
+    }
+}
+    
+/*main browser theme*/   
+
+.esriCTHeaderSearch {
+    background-image: url("../images/img24x24/search-24.png");
+}
+
+.esriCTHelpImg {
+    background-image: url("../images/img24x24/Help-24.png");
+}
+
+.esriCTGeolocation {
+    background-image: url("../images/img24x24/imgGeolocation-24.png");
+}
+
+.esriCTImgSocialMedia {
+    background-image: url("../images/img24x24/imgSocialMedia-24.png");
+}
+
+.esriCTReportsImg {
+    background-image: url("../images/img24x24/reports-24.png");
+}
+
+.esriCTHeaderSearchSelected {
+    background-image: url("../images/img24x24/search-select-24.png");
+}
+
+.esriCTImgSocialMediaSelected {
+    background-image: url("../images/img24x24/imgSocialMedia-select-24.png");
+}
+
+.esriCTReportsImgSelected {
+    background-image: url("../images/img24x24/reportsSelected-24.png");
+}
+.esriCTFacebook {
+    background-image: url("../images/img24x24/img_facebook-24.png");
+}
+
+.esriCTTwitter {
+    background-image: url("../images/img24x24/img_twitter-24.png");
+}
+
+.esriCTEmail {
+    background-image: url("../images/img24x24/img_email-24.png");
+}
+
+.esriCTEmbedding {
+    background-image: url('../images/img24x24/embedding-24.png');
+}
+/* Application Header Styles */
 
 .esriCTApplicationHeader {
     border-bottom: 1px solid #007ac2;
@@ -6,18 +233,6 @@
 
 .esriCTApplicationHeaderText {
     color: #007AC2;
-}
-
-.esriCTHeaderSearchSelected {
-    background-image: url("../images/locateSelected.png");
-}
-
-.esriCTImgSocialMediaSelected {
-    background-image: url("../images/shareSelected.png");
-}
-
-.esriCTReportsImgSelected {
-    background-image: url("../images/reportsSelected.png");
 }
 
 /* Address container Styles */
@@ -56,21 +271,7 @@
     border: 1px solid #007AC2;
 }
 
-.esriCTFacebook {
-    background-image: url("../images/facebook.png");
-}
 
-.esriCTTwitter {
-    background-image: url("../images/twitter.png");
-}
-
-.esriCTEmail {
-    background-image: url("../images/email.png");
-}
-
-.esriCTEmbedding {
-    background-image: url('../images/embedding.png');
-}
 
 /* Slider */
 
@@ -122,7 +323,7 @@
     color: #007AC2;
 }
 
-/* End of AOI Panel */
+
 
 /*Splash Screen*/
 
@@ -144,6 +345,10 @@
     background: #007AC2;
 }
 
+.esriCTsearchContentBusiness
+{
+    float:left;
+    }
 .esriCTHeaderRouteContainer {
     border-left: 1px solid #007AC2;
     border-right: 1px solid #007AC2;
@@ -228,32 +433,3 @@
 }
 /*End of Site locator*/
 
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-    .esriCTHeaderSearchSelected {
-        background-image: url("../images/locateSelected@2x.png");
-    }
-
-    .esriCTImgSocialMediaSelected {
-        background-image: url("../images/shareSelected@2x.png");
-    }
-
-    .esriCTReportsImgSelected {
-        background-image: url("../images/reportsSelected@2x.png");
-    }
-
-    .esriCTFacebook {
-        background-image: url("../images/facebook@2x.png") !important;
-    }
-
-    .esriCTTwitter {
-        background-image: url("../images/twitter@2x.png") !important;
-    }
-
-    .esriCTEmail {
-        background-image: url("../images/email@2x.png") !important;
-    }
-
-    .esriCTEmbedding {
-        background-image: url('../images/embedding@2x.png') !important;
-    }
-}

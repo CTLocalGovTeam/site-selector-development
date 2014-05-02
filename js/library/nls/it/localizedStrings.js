@@ -1,4 +1,5 @@
 ﻿/*global define */
+/*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
 /** @license
 | Version 10.2
 | Copyright 2013 Esri
@@ -44,6 +45,8 @@ define({
         invalidProjection: "@it@ Unable to plot current location on the map.",
         widgetNotLoaded: "@it@ Unable to load widgets.",
         shareLoadingFailed: "@it@ Unable to load share options.",
-        shareFailed: "@it@ Unable to share."
+        shareFailed: "@it@ Unable to share.",
+        disableTab: "@it@ Enable at least one tab.",
+        bufferSliderValue: "@it@ Buffer slider should not be set to zero distance"
     }
 });

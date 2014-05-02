@@ -1,5 +1,5 @@
 ﻿/*global define */
-/*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true */
+/*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
 /** @license
 | Version 10.2
 | Copyright 2013 Esri
@@ -29,7 +29,7 @@ define({
         },
         tooltips: {
             search: "Search",
-            reports:"Site Selector",
+            reports: "Site Selector",
             locate: "Locate",
             share: "Share",
             help: "Help",
@@ -48,23 +48,21 @@ define({
             retailText: "Retail",
             agricultureText: "Agriculture",
             vacantText: "Vacant",
-            noOfEmpText:"No of Employees",
             saleText: "For sale",
-            leaseText:"For lease",
+            leaseText: "For lease",
             hideText: "Hide more options",
-            showText:"Show more options",
+            showText: "Show more options",
             sliderDisplayText: "Show results within <b>20</b>",
             communityText: "Search communities by city, country or region",
             searchCommunityText: "Search communities in",
-            searchBusinessText: "Search business by name or near an address",
+            searchBusinessText: "Search business near an address",
             AnnualRevenueBusinessText: "Annual revenue",
+            noOfEmpText: "No of employees",
             serachSiteText: "Search sites near an address",
             siteAreaText: "Sites area(acres) ",
             CountStatus: "${s} - ${e} of ${t}",
             webpageDisplayText: "Copy/paste HTML into your web page",
-//            resultBusinessInfo:"BusinessInformation",
-//            resultDemoInfo:"DemographicInformation",
-            textDownload:"Download"
+            textDownload: "Download"
 
         },
         errorMessages: {
@@ -74,7 +72,9 @@ define({
             invalidProjection: "Unable to plot current location on the map.",
             widgetNotLoaded: "Unable to load widgets.",
             shareLoadingFailed: "Unable to load share options.",
-            shareFailed: "Unable to share."
+            shareFailed: "Unable to share.",
+            disableTab: "Enable at least one tab.",
+            bufferSliderValue: "Buffer slider should not be set to zero distance"
         }
     },
     es: true,
