@@ -159,7 +159,7 @@ define([], function () {
         // GeoEnrichmentContents: Configure settings to display data collections or variables from geoenrichment.
         // DownloadSettings: Configure settings for downloading reports from geoprocessing service or geoenrichment.
 
-        WebMapId: "0f5fa27f5e1e46c6bc4857bb45a5c113",
+        WebMapId: "3006e5a6387242b39f50324db0a3f17e",
         Workflows: [
             {
                 Name: "Buildings",
@@ -168,48 +168,49 @@ define([], function () {
                 SearchSettings: [
                     {
                         Title: "Buildings",
-                        QueryLayerId: "51",
+                        QueryLayerId: "0",
                         SearchDisplayTitle: "Buildings",
                         SearchDisplayFields: "${sitename}, ${city}, Phone: ${phonenumber}",
                         SearchExpression: "UPPER(sitename) LIKE UPPER('${0}%') OR UPPER(city) LIKE UPPER('${0}%') OR UPPER(county) LIKE UPPER('${0}%')",
+
                         FilterSettings: {
                             LocatorFilterFieldName: "Addr_Type",
                             LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
                                     DisplayText: "Building area(sqft)",
-                                    FieldName: "BLDGAREA"
+                                    FieldName: "AreaSqFt"
                                 }
                             ],
                             FilterOptionFields: [
                                 {
                                     DisplayText: "For Sale",
-                                    FieldName: "SALE",
+                                    FieldName: "ForSale",
                                     FieldValue: "Yes"
                                 }, {
                                     DisplayText: "For Lease",
-                                    FieldName: "Lease",
-                                    FieldValue: "yes"
+                                    FieldName: "ForLease ",
+                                    FieldValue: "Yes"
                                 }, {
                                     DisplayText: "Agricultural",
-                                    FieldName: "SiteType",
+                                    FieldName: "BuildingType",
                                     FieldValue: "Agricultural"
                                 }, {
                                     DisplayText: "Vacant",
-                                    FieldName: "SiteType",
+                                    FieldName: "BuildingType",
                                     FieldValue: "Vacant"
                                 }, {
                                     DisplayText: "Industrial",
-                                    FieldName: "SiteType",
-                                    FieldValue: "Industrial"
+                                    FieldName: "BuildingType",
+                                    FieldValue: "industrial"
                                 }, {
                                     DisplayText: "Office",
-                                    FieldName: "SiteType",
-                                    FieldValue: "Office"
+                                    FieldName: "BuildingType",
+                                    FieldValue: "office"
                                 }, {
                                     DisplayText: "Retail",
-                                    FieldName: "SiteType",
-                                    FieldValue: "Retail"
+                                    FieldName: "BuildingType",
+                                    FieldValue: "retail"
                                 }
                             ]
                         }
@@ -221,19 +222,24 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "${NAME}"
+                                FieldName: "BuildingName",
+                                isSortingField: true
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "${ADDRESS}"
+                                FieldName: "Address",
+                                isSortingField: false
                             }, {
                                 DisplayText: "City:",
-                                FieldName: "${CITY}"
+                                FieldName: "City",
+                                isSortingField: true
                             }, {
-                                DisplayText: "County:",
-                                FieldName: "${COUNTY}"
+                                DisplayText: "State:",
+                                FieldName: "State",
+                                isSortingField: true
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "${ZIPCODE}"
+                                FieldName: "Zip",
+                                isSortingField: true
                             }
                         ]
                     },
@@ -243,27 +249,31 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "${NAME}"
+                                FieldName: "BuildingName"
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "${ADDRESS}"
+                                FieldName: "Address"
                             }, {
                                 DisplayText: "City:",
-                                FieldName: "${CITY}"
+                                FieldName: "City"
                             }, {
-                                DisplayText: "County:",
-                                FieldName: "${COUNTY}"
+                                DisplayText: "State:",
+                                FieldName: "State"
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "${ZIPCODE}"
+                                FieldName: "Zip"
                             }, {
                                 DisplayText: "Type:",
-                                FieldName: "${TYPE}"
+                                FieldName: "BuildingType"
                             }, {
                                 DisplayText: "Area (sqft):",
-                                FieldName: "${AREA}"
+                                FieldName: "AreaSqFt"
                             }
                         ]
+                    },
+                    GeoenrichmentDistance: {
+                        Unit: "UNIT_STATUTE_MILE",
+                        BufferDistance: 1
                     },
                     GeoEnrichmentContents: {
                         DisplayTitle: "Neighborhood Information",
@@ -331,8 +341,8 @@ define([], function () {
                 Enabled: true,
                 SearchSettings: [
                     {
-                        Title: "Sites",
-                        QueryLayerId: "51",
+                        Title: "SiteFinder",
+                        QueryLayerId: "1",
                         SearchDisplayTitle: "Sites",
                         SearchDisplayFields: "${sitename}, ${city}, Phone: ${phonenumber}",
                         SearchExpression: "UPPER(sitename) LIKE UPPER('${0}%') OR UPPER(city) LIKE UPPER('${0}%') OR UPPER(county) LIKE UPPER('${0}%')",

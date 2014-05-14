@@ -50,8 +50,9 @@ define([
             this.own(on(this.customButton, "click", lang.hitch(this, function () {
                 this._hideSplashScreenDialog();
             })));
-            this.domNode = domConstruct.create("div", { "class": "esriCTLoadingIndicator" }, dojo.body());
+            this.domNode = domConstruct.create("div", { "class": "esriGovtLoadSpashScreen" }, dojo.body());
             this.domNode.appendChild(this.splashScreenScrollBarOuterContainer);
+            domConstruct.create("div", { "class": "esriCTLoadingIndicator", "id": "splashscreenlodingIndicator" }, this.splashScreenScrollBarOuterContainer);
         },
 
         showSplashScreenDialog: function () {

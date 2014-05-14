@@ -48,6 +48,11 @@
 .esriCTDownload {
   color: #028D6A !important;
 }
+.esriCTBuildingDownloadDiv
+{
+    color:#028D6A;
+ }
+ .esriCTBackToResult{ color:#028D6A;}
 
 /* Share Container Styles */
 

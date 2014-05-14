@@ -36,33 +36,21 @@ define({
             clearEntry: "Clear"
         },
         titles: {
-            directionsDisplayTextBuilding: "Building",
-            directionsDisplayTextSites: "Sites",
-            directionsDisplayTextBusiness: "Business",
-            directionsDisplayTextCommunities: "Communities",
+
             informationPanelTitle: "Information for current map view",
             searchBuildingText: "Search building near an address",
-            buildingAreaText: "Building Area(sq ft)",
-            officeText: "Office",
-            industrialText: "Industrial",
-            retailText: "Retail",
-            agricultureText: "Agriculture",
-            vacantText: "Vacant",
-            saleText: "For sale",
-            leaseText: "For lease",
             hideText: "Hide more options",
             showText: "Show more options",
-            sliderDisplayText: "Show results within <b>20</b>",
+            sliderDisplayText: "Show results within ${initialValue}",
             communityText: "Search communities by city, country or region",
             searchCommunityText: "Search communities in",
             searchBusinessText: "Search business near an address",
-            AnnualRevenueBusinessText: "Annual revenue",
-            noOfEmpText: "No of employees",
             serachSiteText: "Search sites near an address",
-            siteAreaText: "Sites area(acres) ",
             CountStatus: "${s} - ${e} of ${t}",
             webpageDisplayText: "Copy/paste HTML into your web page",
-            textDownload: "Download"
+            textDownload: "Download",
+            result: "Back To Result",
+            sortBy: " Sort by"
 
         },
         errorMessages: {
@@ -74,7 +62,8 @@ define({
             shareLoadingFailed: "Unable to load share options.",
             shareFailed: "Unable to share.",
             disableTab: "Enable at least one tab.",
-            bufferSliderValue: "Buffer slider should not be set to zero distance"
+            bufferSliderValue: "Buffer slider should not be set to zero distance",
+            noData: "Data not found"
         }
     },
     es: true,
