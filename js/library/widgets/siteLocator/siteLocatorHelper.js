@@ -429,7 +429,7 @@ define([
             }));
         },
 
-       /**
+        /**
         * search address on every key press
         * @param {object} evt Keyup event
         * @param {string} locator text
@@ -669,6 +669,7 @@ define([
                 if (this.workflowCount === 0) {
                     domStyle.set(this.outerDivForPegination, "display", "block");
                     this.buildingResultSet = featureSet;
+                    this._peginationForResults();
 
                 } else {
                     this.sitesResultSet = featureSet;
@@ -804,7 +805,6 @@ define([
             }
             if (this.workflowCount === 0) {
                 this.buildingTabData = arrTabData;
-                this._peginationForResults();
                 this._createDisplayList(this.buildingTabData, this.outerResultContainerBuilding);
 
             } else {
@@ -818,11 +818,10 @@ define([
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _peginationForResults: function () {
-            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, separator, lastIndex, rightArrow, sortingDivBuilding, sortDivBuilding, spanBuilding, selectForBuilding, currentIndex, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage, total, lastCount, result, i, selectBusinessSortForBuilding;
+            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, separator, lastIndex, rightArrow, sortingDivBuilding, sortDivBuilding, spanBuilding, selectForBuilding, currentIndex, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForBuilding, timeOut;
             domConstruct.empty(this.outerDivForPegination);
-            if (!this.currentIndex) {
-                this.currentIndex = 0;
-            }
+
+            this.currentIndex = 0;
             rangeDiv = domConstruct.create("div", { "class": "esriCTRangeDiv" }, this.outerDivForPegination);
             currentIndex = domConstruct.create("div", { "class": "esriCTIndex" }, rangeDiv);
             hyphen = domConstruct.create("div", { "class": "esriCTIndex" }, rangeDiv);
@@ -850,19 +849,22 @@ define([
             domAttr.set(firstIndex, "contentEditable", true);
 
             total = this.buildingResultSet.length;
-            lastCount = this.currentIndex + 10;
-            result = Math.ceil(total / lastCount);
+            result = Math.ceil(total / 10);
             domAttr.set(lastIndex, "innerHTML", result);
 
             this.own(on(firstIndex, "keyup", lang.hitch(this, function (value) {
                 if (!isNaN(Number(firstIndex.innerHTML)) && Number(firstIndex.innerHTML) > 0 && Number(firstIndex.innerHTML) <= result) {
-                    this.currentIndex = Number(firstIndex.innerHTML) * 10 - 10;
-                    domAttr.set(currentIndex, "innerHTML", this.currentIndex + 1);
-                    domAttr.set(tenthIndex, "innerHTML", this.currentIndex + 10);
-                    this._turnPage();
+                    clearTimeout(timeOut);
+                    timeOut = setTimeout(lang.hitch(this, function () {
+                        this.currentIndex = Number(firstIndex.innerHTML) * 10 - 10;
+                        currentPage = Math.ceil((this.currentIndex / 10) + 1);
+                        domAttr.set(currentIndex, "innerHTML", this.currentIndex + 1);
+                        domAttr.set(tenthIndex, "innerHTML", this.currentIndex + 10);
+                        this._turnPage();
+                    }), 500);
+
                 } else {
-                    this.currentIndex = 0;
-                    domAttr.set(firstIndex, "innerHTML", "");
+                    domAttr.set(firstIndex, "innerHTML", currentPage);
 
                 }
 
@@ -902,12 +904,14 @@ define([
             })));
 
             this.own(on(rightArrow, "click", lang.hitch(this, function () {
-                this.currentIndex += 10;
-                this._turnPage();
-                domAttr.set(currentIndex, "innerHTML", this.currentIndex + 1);
-                domAttr.set(tenthIndex, "innerHTML", this.currentIndex + 10);
-                currentPage = Math.ceil((this.currentIndex / 10) + 1);
-                domAttr.set(firstIndex, "innerHTML", currentPage);
+                if (result >= Number(firstIndex.innerHTML) + 1) {
+                    this.currentIndex += 10;
+                    this._turnPage();
+                    domAttr.set(currentIndex, "innerHTML", this.currentIndex + 1);
+                    domAttr.set(tenthIndex, "innerHTML", this.currentIndex + 10);
+                    currentPage = Math.ceil((this.currentIndex / 10) + 1);
+                    domAttr.set(firstIndex, "innerHTML", currentPage);
+                }
             })));
         },
 
@@ -930,9 +934,8 @@ define([
             this.selectedValue = value;
             queryTask = new QueryTask(this.opeartionLayer.url);
             querySort = new esri.tasks.Query();
-            querySort.outFields = [this.opeartionLayer.fields[0].name];
             if (this.lastGeometry) {
-                querySort.geometry = this.lastGeometry;
+                querySort.geometry = this.lastGeometry[0];
             }
             if (this.queryArrayBuildingAND.length > 0) {
                 andString = this.queryArrayBuildingAND.join(" AND ");
@@ -960,7 +963,7 @@ define([
             querySort.where = queryString;
             querySort.returnGeometry = false;
             querySort.orderByFields = [this.selectedValue];
-            queryTask.execute(querySort, lang.hitch(this, this._queryLayerhandler));
+            queryTask.executeForIds(querySort, lang.hitch(this, this._queryLayerhandler));
 
         },
 
