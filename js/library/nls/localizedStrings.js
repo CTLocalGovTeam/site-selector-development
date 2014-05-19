@@ -1,4 +1,5 @@
 ﻿/*global define */
+/*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
 /** @license
 | Version 10.2
 | Copyright 2013 Esri
@@ -17,15 +18,52 @@
 */
 define({
     root: {
+        showNullValue: "N/A",
+        buttons: {
+            okButtonText: "OK",
+            link: "Link",
+            email: "Email",  // Shown next to icon for sharing the current map extents via email; works with shareViaEmail tooltip
+            facebook: "Facebook",  // Shown next to icon for sharing the current map extents via a Facebook post; works with shareViaFacebook tooltip
+            twitter: "Twitter",  // Shown next to icon for sharing the current map extents via a Twitter tweet; works with shareViaTwitter tooltip
+            embedding: "Embedded URL"
+        },
+        tooltips: {
+            search: "Search",
+            reports: "Site Selector",
+            locate: "Locate",
+            share: "Share",
+            help: "Help",
+            clearEntry: "Clear"
+        },
         titles: {
-            informationDisplayText: "511 Information",
-            reRouteDisplayText: "Traffic incidents found on this road"
+
+            informationPanelTitle: "Information for current map view",
+            searchBuildingText: "Search building near an address",
+            hideText: "Hide more options",
+            showText: "Show more options",
+            sliderDisplayText: "Show results within ${initialValue}",
+            communityText: "Search communities by city, country or region",
+            searchCommunityText: "Search communities in",
+            searchBusinessText: "Search business near an address",
+            serachSiteText: "Search sites near an address",
+            CountStatus: "${s} - ${e} of ${t}",
+            webpageDisplayText: "Copy/paste HTML into your web page",
+            textDownload: "Download",
+            result: "Back To Result",
+            sortBy: " Sort by"
+
         },
-        messages: {
-            splashScreenContent: "An application that allows the public to find information about road conditions, 511 alerts, traffic incidents, et al."
-        },
-        notUsed: {
-            incidentInformationDisplayText: "Incident information"
+        errorMessages: {
+            invalidSearch: "No results found",
+            falseConfigParams: "Required configuration key values are either null or not exactly matching with layer attributes. This message may appear multiple times.",
+            invalidLocation: "Current location not found.",
+            invalidProjection: "Unable to plot current location on the map.",
+            widgetNotLoaded: "Unable to load widgets.",
+            shareLoadingFailed: "Unable to load share options.",
+            shareFailed: "Unable to share.",
+            disableTab: "Enable at least one tab.",
+            bufferSliderValue: "Buffer slider should not be set to zero distance",
+            noData: "Data not found"
         }
     },
     es: true,

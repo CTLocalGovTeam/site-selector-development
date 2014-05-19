@@ -1,0 +1,471 @@
+﻿<div class="esriCTHeaderRouteContainer" data-dojo-attach-point="applicationHeaderRouteContainer">
+    <div class="esriCTTabContainer" data-dojo-attach-point="divDirectionContainer">
+        <div class="esriCTsearchContainerBuilding esriCTTab" data-dojo-attach-point="esriCTsearchContainerBuilding">
+            <span class="directionsDisplayTextBuilding" data-dojo-attach-point="buildingContent">
+            </span>
+        </div>
+        <div class="esriCTsearchContainerSites esriCTTab" data-dojo-attach-point="esriCTsearchContainerSites">
+            <span class="directionsDisplayTextSites" data-dojo-attach-point="sitesContent"></span>
+        </div>
+        <div class="esriCTsearchContainerBusiness esriCTTab" data-dojo-attach-point="esriCTsearchContainerBusiness">
+            <span class="directionsDisplayTextBusiness" data-dojo-attach-point="businessContent">
+            </span>
+        </div>
+        <div class="esriCTsearchContainerCommunities esriCTTab" data-dojo-attach-point="esriCTsearchContainerCommunities">
+            <span class="directionsDisplayTextCommunities" data-dojo-attach-point="communitiesContent">
+            </span>
+        </div>
+    </div>
+    <div class="esriCTTabContentContainer"   data-dojo-attach-point="TabContentContainer">
+        <div class="esriCTsearchContentBuilding" data-dojo-attach-point="searchContentBuilding">
+            <div class="esriCTMainDivBuilding" data-dojo-attach-point="mainDivBuilding">
+                <div class="esriOuterDiv">
+                    <div class="esriCTClear">
+                        <div class="esriCTCheckBox">
+                            <input type="checkbox" checked="checked" data-dojo-attach-point="chkSerachContentBuilding" />
+                        </div>
+                        <div class="esriCTChkLabel" data-dojo-attach-point="searchBuildingText">
+                        </div>
+                    </div>
+                    <div class="esriCTAddressClear">
+                        <div data-dojo-attach-point="divAddressSearchBuilding" class="esriCTCursorDefault"
+                            align="left">
+                            <div data-dojo-attach-point="divAddressPlaceHolderBuilding" class="esriCTAddressPlaceHolder">
+                                <div style="float: left; width: 275px;">
+                                    <input type="text" data-dojo-attach-point="txtAddressBuilding" class="esriCTTxtAddress"
+                                        onfocus="if(this.setSelectionRange)this.setSelectionRange(this.value.length, this.value.length);" />
+                                </div>
+                                <div class="esriCTSearchClose" data-dojo-attach-point="clearhideBuilding">
+                                    <span class="esriCTClearInput" data-dojo-attach-point="closeBuilding"></span><span>
+                                        <img data-dojo-attach-point="imgSearchLoaderBuilding" class="esriCTSearchLoader" /></span>
+                                </div>
+                            </div>
+                            <div class="esriCTSearch" data-dojo-attach-point="divSearchBuilding">
+                                <span class="esriCTSearchIcon" data-dojo-attach-point="esriCTimgLocateBuilding">
+                                </span>
+                            </div>
+                            <div data-dojo-attach-point="divAddressListBuilding" class="esriCTAddressList">
+                                <div data-dojo-attach-point="divAddressScrollContainerBuilding" class="esriCTAddressScrollContainer"
+                                    align="left">
+                                    <div data-dojo-attach-point="divAddressScrollContentBuilding" class="esriCTAddressScrollContent">
+                                        <div data-dojo-attach-point="divAddressResultsBuilding" class="esriCTFullWidth">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="esriCTClear">
+                        <div class="esriCTSliderContainer">
+                            <div class="esriCTSliderText" data-dojo-attach-point="sliderDisplayText">
+                            </div>
+                            <div class="esriCTSelect" data-dojo-attach-point="unitForSelectBuilding">
+                            </div>
+                            <div class="esriCTSlider">
+                                <div data-dojo-attach-point="horizontalRuleContainer" class="esriCTHorizontalRuleContainer">
+                                </div>
+                                <div class="esriCTHorizontalSliderContainer" data-dojo-attach-point="horizontalSliderContainerBuliding">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="esriCTClear">
+                        <div class="esriCTDivBusinessRevenue">
+                            <div class="esriCTLeft">
+                                <div class="esriCTCheckBox">
+                                    <input type="checkbox" data-dojo-attach-point="chkAreaBuilding" />
+                                </div>
+                                <div class="esriCTChkLabel" data-dojo-attach-point="buildingAreaText">
+                                </div>
+                            </div>
+                            <div class="esriCTRight">
+                                <span class="esriCTText">from</span> <span>
+                                    <input type="text" class="esriCTToTextBox" data-dojo-attach-point="txtBuildingFrom"
+                                        maxlength="5" /></span> <span class="esriCTText">to</span> <span>
+                                            <input type="text" class="esriCTToTextBox" data-dojo-attach-point="txtBuildingTo"
+                                                maxlength="5" /></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="esriCTClear esriCTHorizantalrule" data-dojo-attach-point="horizantalruleBuliding">
+                        <div class="esriCTDivBusinessRevenue">
+                            <div class="esriCTCheckBoxWithText">
+                                <div class="esriCTCheckBox">
+                                    <input type="checkbox" data-dojo-attach-point="chkSale" />
+                                </div>
+                                <div class="esriCTChkLabel" data-dojo-attach-point="saleContent">
+                                </div>
+                            </div>
+                            <div class="esriCTCheckBoxWithText">
+                                <div class="esriCTCheckBox">
+                                    <input type="checkbox" data-dojo-attach-point="chkLease" />
+                                </div>
+                                <div class="esriCTChkLabel" data-dojo-attach-point="leaseContent">
+                                </div>
+                            </div>
+                            <div class="esriCTshowhideText">
+                                <div class="esriCTTextRight" data-dojo-attach-point="divHideOptionTextBuilding">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="esriCTClear" data-dojo-attach-point="divHideOptionBuilding">
+                        <div class="esriCTDivBusinessRevenue">
+                            <div class="esriCTCheckBoxWithText">
+                                <div class="esriCTCheckBox">
+                                    <input type="checkbox" data-dojo-attach-point="chkOffice" />
+                                </div>
+                                <div class="esriCTChkLabel" data-dojo-attach-point="officeContent">
+                                </div>
+                            </div>
+                            <div class="esriCTCheckBoxWithText">
+                                <div class="esriCTCheckBox">
+                                    <input type="checkbox" data-dojo-attach-point="chkIndustrial" />
+                                </div>
+                                <div class="esriCTChkLabel" data-dojo-attach-point="industrialContent">
+                                </div>
+                            </div>
+                            <div class="esriCTCheckBoxWithText">
+                                <div class="esriCTCheckBox">
+                                    <input type="checkbox" data-dojo-attach-point="chkRetail" />
+                                </div>
+                                <div class="esriCTChkLabel" data-dojo-attach-point="reatilcontent">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTOuterDivForPagination" data-dojo-attach-point="outerDivForPegination">
+                </div>
+                 <div class="esriCTOuterResultDiv esriCTDemoInfoMainDiv" data-dojo-attach-point="outerResultContainerBuilding">
+                </div>
+            </div>
+            <div class="esriCTAttachmentOuterDiv" data-dojo-attach-point="attachmentOuterDiv">
+            </div>
+        </div>
+        <div class="esriCTsearchContentSites" data-dojo-attach-point="searchContentSites">
+            <div class="esriOuterDiv">
+                <div class="esriCTClear">
+                    <div class="esriCTCheckBox">
+                        <input type="checkbox" checked="checked" data-dojo-attach-point="chksearchContentSites" />
+                    </div>
+                    <div class="esriCTChkLabel" data-dojo-attach-point="serachSiteText">
+                    </div>
+                </div>
+                <div class="esriCTAddressClear">
+                    <div data-dojo-attach-point="divAddressSearchSites" class="esriCTCursorDefault" align="left">
+                        <div data-dojo-attach-point="divAddressPlaceHolderSites" class="esriCTAddressPlaceHolder">
+                            <div style="float: left; width: 275px;">
+                                <input type="text" data-dojo-attach-point="txtAddressSites" class="esriCTTxtAddress"
+                                    onfocus="if(this.setSelectionRange)this.setSelectionRange(this.value.length, this.value.length);" />
+                            </div>
+                            <div class="esriCTSearchClose" data-dojo-attach-point="clearhideSites">
+                                <span class="esriCTClearInput" data-dojo-attach-point="closeSites"></span><span>
+                                    <img data-dojo-attach-point="imgSearchLoaderSites" class="esriCTSearchLoader" /></span>
+                            </div>
+                        </div>
+                        <div class="esriCTSearch" data-dojo-attach-point="divSearchSites">
+                            <span class="esriCTSearchIcon" data-dojo-attach-point="esriCTimgLocateSites"></span>
+                        </div>
+                        <div data-dojo-attach-point="divAddressListSites" class="esriCTAddressList">
+                            <div data-dojo-attach-point="divAddressScrollContainerSites" class="esriCTAddressScrollContainer"
+                                align="left">
+                                <div data-dojo-attach-point="divAddressScrollContentSites" class="esriCTAddressScrollContent">
+                                    <div data-dojo-attach-point="divAddressResultsSites" class="esriCTFullWidth">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTClear">
+                    <div class="esriCTSliderContainer">
+                        <div class="esriCTSliderText" data-dojo-attach-point="sitesSliderText">
+                        </div>
+                        <div class="esriCTSelect" data-dojo-attach-point="unitForSelectSite">
+                        </div>
+                        <div class="esriCTSlider">
+                            <div class="esriCTHorizontalRuleContainer" data-dojo-attach-point="horizontalRuleContainerSites">
+                            </div>
+                            <div class="esriCTHorizontalSliderContainer" data-dojo-attach-point="horizontalSliderContainerSites">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTClear">
+                    <div class="esriCTDivBusinessRevenue">
+                        <div class="esriCTLeft">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" data-dojo-attach-point="chkAreaSites" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="siteAreaText">
+                            </div>
+                        </div>
+                        <div class="esriCTRight">
+                            <span class="esriCTText">from</span> <span>
+                                <input type="text" class="esriCTToTextBox" maxlength="5" data-dojo-attach-point="txtSitesFrom" /></span>
+                            <span class="esriCTText">to</span> <span>
+                                <input type="text" class="esriCTToTextBox" maxlength="5" data-dojo-attach-point="txtSitesTo" /></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTClear esriCTHorizantalrule" data-dojo-attach-point="horizantalruleSites">
+                    <div class="esriCTDivBusinessRevenue">
+                        <div class="esriCTCheckBoxWithText">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="saleContentSites">
+                            </div>
+                        </div>
+                        <div class="esriCTCheckBoxWithText">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="leaseContentSites">
+                            </div>
+                        </div>
+                        <div class="esriCTshowhideText">
+                            <div class="esriCTTextRight" data-dojo-attach-point="divHideOptionTextSites">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTClear" data-dojo-attach-point="divHideOptionSites">
+                    <div class="esriCTDivBusinessRevenue">
+                        <div class="esriCTCheckBoxWithText">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="officeContentSites">
+                            </div>
+                        </div>
+                        <div class="esriCTCheckBoxWithText">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="industrialContentSites">
+                            </div>
+                        </div>
+                        <div class="esriCTCheckBoxWithText">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="retailContentSites">
+                            </div>
+                        </div>
+                        <div class="esriCTCheckBoxWithText">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="agricultureContentSites">
+                            </div>
+                        </div>
+                        <div class="esriCTCheckBoxWithText">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="vacantTextsites">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="esriCTsearchContentBusiness" data-dojo-attach-point="searchContentBusiness">
+            <div class="esriOuterDiv">
+                <div class="esriCTClear">
+                    <div class="esriCTBussinessSearchLabel" data-dojo-attach-point="searchBusinessText">
+                    </div>
+                </div>
+                <div class="esriCTAddressClear">
+                    <div data-dojo-attach-point="divAddressSearchBusiness" class="esriCTCursorDefault"
+                        align="left">
+                        <div data-dojo-attach-point="divAddressPlaceHolderBusiness" class="esriCTAddressPlaceHolder">
+                            <div style="float: left; width: 275px;">
+                                <input type="text" data-dojo-attach-point="txtAddressBusiness" class="esriCTTxtAddress"
+                                    onfocus="if(this.setSelectionRange)this.setSelectionRange(this.value.length, this.value.length);" />
+                            </div>
+                            <div class="esriCTSearchClose" data-dojo-attach-point="clearhideBusiness">
+                                <span class="esriCTClearInput" data-dojo-attach-point="closeBusiness"></span><span>
+                                    <img data-dojo-attach-point="imgSearchLoaderBusiness" class="esriCTSearchLoader" /></span>
+                            </div>
+                        </div>
+                        <div class="esriCTSearch" data-dojo-attach-point="divSearchBusiness">
+                            <span class="esriCTSearchIcon" data-dojo-attach-point="esriCTimgLocateBusiness">
+                            </span>
+                        </div>
+                        <div data-dojo-attach-point="divAddressListBusiness" class="esriCTAddressList">
+                            <div data-dojo-attach-point="divAddressScrollContainerBusiness" class="esriCTAddressScrollContainer"
+                                align="left">
+                                <div data-dojo-attach-point="divAddressScrollContentBusiness" class="esriCTAddressScrollContent">
+                                    <div data-dojo-attach-point="divAddressResultsBusiness" class="esriCTFullWidth">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTClear">
+                    <div class="esriCTSliderContainer">
+                        <div class="esriCTSliderText" data-dojo-attach-point="businessSliderText">
+                        </div>
+                        <div class="esriCTSelect" data-dojo-attach-point="unitForSelectBusiness">
+                        </div>
+                        <div class="esriCTSlider">
+                            <div class="esriCTHorizontalRuleContainer" data-dojo-attach-point="horizontalRuleContainerBusiness">
+                            </div>
+                            <div class="esriCTHorizontalSliderContainer" data-dojo-attach-point="horizontalSliderContainerBusiness">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTClear">
+                    <div class="esriCTDivBusinessRevenue">
+                        <div class="esriCTLeft">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" data-dojo-attach-point="chkRevenue" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="annualRevenueBusinessText">
+                            </div>
+                        </div>
+                        <div class="esriCTRight">
+                            <span class="esriCTText">from</span> <span>
+                                <input type="text" class="esriCTToTextBox" data-dojo-attach-point="businessAnnualRevenueFrom" />
+                            </span><span class="esriCTText">to</span> <span>
+                                <input type="text" class="esriCTToTextBox" data-dojo-attach-point="businessAnnualRevenueTo" /></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTClearBusiness">
+                    <div class="esriCTDivBusinessRevenue">
+                        <div class="esriCTLeft">
+                            <div class="esriCTCheckBox">
+                                <input type="checkbox" data-dojo-attach-point="chkEmployee" />
+                            </div>
+                            <div class="esriCTChkLabel" data-dojo-attach-point="noOfEmpText">
+                            </div>
+                        </div>
+                        <div class="esriCTRight">
+                            <span class="esriCTText">from</span> <span>
+                                <input type="text" class="esriCTToTextBox" data-dojo-attach-point="businessNoOfEmpFrom" /></span>
+                            <span class="esriCTText">to</span> <span>
+                                <input type="text" class="esriCTToTextBox" data-dojo-attach-point="businessNoOfEmpTo" /></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="esriCTMainContainer" data-dojo-attach-point="resultDiv">
+                <div class="esriCTRightPanel">
+                    <div class="esriCTAreaOfInterestTab" data-dojo-attach-point="ResultBusinessTab">
+                        <span data-dojo-attach-point="ResultBusinessTabTitle"></span>
+                    </div>
+                    <div class="esriCTReportTab" data-dojo-attach-point="resultDemographicTab">
+                        <span data-dojo-attach-point="ResultDemographicTabTitle"></span>
+                    </div>
+                </div>
+                <div class="esriCTAreaOfInterestContainer esriCTHideContainerHeight" data-dojo-attach-point="businessContainer">
+                    <div class="esriCTDownload" data-dojo-attach-point="downloadDiv">
+                        <span data-dojo-attach-point="download"></span>
+                    </div>
+                    <div class="esriCTCollectionIdS" data-dojo-attach-point="collectionIdS">
+                        <div class="esriCTresultDivMain" data-dojo-attach-point="divBusinessResult">
+                            <div class="esriCTresultContaintDiv">
+                                <div class="esriCTCollectionNameDiv" data-dojo-attach-point="divBusiness">
+                                </div>
+                                <div class="esriCTCollectionValueDiv">
+                                </div>
+                            </div>
+                            <div class="esriCTresultContaintDiv">
+                                <div class="esriCTCollectionNameDiv" data-dojo-attach-point="divRevenue">
+                                </div>
+                                <div class="esriCTCollectionValueDiv">
+                                </div>
+                            </div>
+                            <div class="esriCTresultContaintDiv">
+                                <div class="esriCTCollectionNameDiv" data-dojo-attach-point="divEmployees">
+                                </div>
+                                <div class="esriCTNoOfEmployee">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="esriCTSortDiv" data-dojo-attach-point="sortByDiv">
+                        <div class="esriCTSpan">
+                            Sort By</div>
+                        <div class="esriCTSelect" data-dojo-attach-point="SortBy">
+                        </div>
+                    </div>
+                    <div class="esriCTmainResultDiv">
+                        <div class="esriCTresultPanel esriScrollBarPosition esriCTSplashScreenScrollBarContainer"
+                            data-dojo-attach-point="mainResultDiv">
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTReportContainer" data-dojo-attach-point="demographicContainer">
+                    <div class="esriCTDemoTitleDiv" data-dojo-attach-point="demographicContainerTitle">
+                    </div>
+                    <div class="esriCTDemoInfoMainDiv" data-dojo-attach-point="DemoInfoMainDiv">
+                        <div class="esriCTDemoInfoMainDivContent" data-dojo-attach-point="DemoInfoMainDivContent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="esriCTsearchContentCommunities" data-dojo-attach-point="searchContentCommunities">
+            <div class="esriOuterDiv">
+                <div class="esriCTClear" data-dojo-attach-point="searchBox">
+                    <div class="esriCTCheckBox">
+                        <input type="radio" name="rdoCommunities" checked="checked" data-dojo-attach-point="rdoCommunitiesAddressSearch" />
+                    </div>
+                    <div class="esriCTradiolabelTextInput" data-dojo-attach-point="communityText">
+                    </div>
+                </div>
+                <div class="esriCTAddressClear">
+                    <div data-dojo-attach-point="divAddressSearchCommunities" class="esriCTCursorDefault"
+                        align="left">
+                        <div data-dojo-attach-point="divAddressPlaceHolderCommunities" class="esriCTAddressPlaceHolder">
+                            <div style="float: left; width: 275px;">
+                                <input type="text" data-dojo-attach-point="txtAddressCommunities" class="esriCTTxtAddress"
+                                    onfocus="if(this.setSelectionRange)this.setSelectionRange(this.value.length, this.value.length);" />
+                            </div>
+                            <div class="esriCTSearchClose" data-dojo-attach-point="clearhideCommunities">
+                                <span class="esriCTClearInput" data-dojo-attach-point="closeCommunities"></span>
+                                <span>
+                                    <img data-dojo-attach-point="imgSearchLoaderCommunities" class="esriCTSearchLoader" /></span>
+                            </div>
+                        </div>
+                        <div class="esriCTSearch" data-dojo-attach-point="divSearchCommunities">
+                            <span class="esriCTSearchIcon" data-dojo-attach-point="esriCTimgLocateCommunities">
+                            </span>
+                        </div>
+                        <div data-dojo-attach-point="divAddressListCommunities" class="esriCTAddressList">
+                            <div data-dojo-attach-point="divAddressScrollContainerCommunities" class="esriCTAddressScrollContainer"
+                                align="left">
+                                <div data-dojo-attach-point="divAddressScrollContentCommunities" class="esriCTAddressScrollContent">
+                                    <div data-dojo-attach-point="divAddressResultsCommunities" class="esriCTFullWidth">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="esriCTClearCommunities" data-dojo-attach-point="divDropDownSearch">
+                    <div class="esriCTCheckBox">
+                        <input id="RadioDropSelection" type="radio" name="rdoCommunities" data-dojo-attach-point="rdoCommunityPlaceName" />
+                    </div>
+                    <div class="esriCTradiolabel" data-dojo-attach-point="searchCommunityText">
+                    </div>
+                    <div class="esriCTSearchContainerComm" data-dojo-attach-point="searchContainerComm">
+                    </div>
+                </div>
+            </div>
+            <div class="esriCTCommunityMainDiv">
+                <div class="esriCTCommunityTitleDiv" data-dojo-attach-point="communityTitle">
+                </div>
+                <div class="esriCTCommunityOuterDiv" data-dojo-attach-point="CommunityOuterDiv">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
