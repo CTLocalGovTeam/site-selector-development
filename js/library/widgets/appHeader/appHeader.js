@@ -1,7 +1,6 @@
-﻿/*global define,dojo,document,dojoConfig */
+﻿/*global define,dojo,dojoConfig */
 /*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
-/** @license
-| Version 10.2
+/*
 | Copyright 2013 Esri
 |
 | Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,11 +55,11 @@ define([
             * @private
             * @memberOf widgets/appHeader/appHeader
             */
-
+            var applicationHeaderDiv;
             topic.subscribe("showProgressIndicator", lang.hitch(this, this.showProgressIndicator));
             topic.subscribe("hideProgressIndicator", lang.hitch(this, this.hideProgressIndicator));
 
-            var applicationHeaderDiv = domConstruct.create("div", {}, dom.byId("esriCTParentDivContainer"));
+            applicationHeaderDiv = domConstruct.create("div", {}, dom.byId("esriCTParentDivContainer"));
             domConstruct.place(this.applicationHeaderParentContainer, applicationHeaderDiv);
             this._loadApplicationHeaderIcon();
             /**
@@ -83,7 +82,6 @@ define([
 
         loadHeaderWidgets: function (widgets) {
             var i;
-
             /**
             * applicationHeaderWidgetsContainer container for header panel widgets
             * @member {div} applicationHeaderWidgetsContainer
@@ -115,7 +113,8 @@ define([
         },
 
         _loadIcons: function (rel, iconPath) {
-            var icon = domConstruct.create("link");
+            var icon;
+            icon = domConstruct.create("link");
             icon.rel = rel;
             icon.type = "image/x-icon";
             icon.href = dojoConfig.baseURL + iconPath;
@@ -124,6 +123,9 @@ define([
 
         showProgressIndicator: function () {
             domClass.replace(this.divLoadingIndicator, "displayBlockAll", "displayNoneAll");
+            this.divLoadingIndicator.onclick = function (evt) {
+                evt.stopPropagation();
+            };
         },
 
         hideProgressIndicator: function () {

@@ -36,7 +36,7 @@ define({
     titles: {
         areaOfInterestTabText: "@fr@ Area of Interest",
         reportTabText: "Report",
-        webpageDisplayText: "@fr@ Copy/paste HTML into your web page"
+        webpageDisplayText: "@fr@ Copy/Paste HTML into your web page"
     },
     errorMessages: {
         invalidSearch: "Aucun résultat",

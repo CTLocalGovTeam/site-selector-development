@@ -1,7 +1,6 @@
-﻿/*global define,dojo,dojoConfig,Modernizr,navigator,alert */
+﻿/*global define,dojo,dojoConfig,Modernizr,alert */
 /*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
-/** @license
-| Version 10.2
+/*
 | Copyright 2013 Esri
 |
 | Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,12 +49,13 @@ define([
             * if browser is not supported, geolocation widget is not created
             */
             if (Modernizr.geolocation) {
-                this.domNode = domConstruct.create("div", { "title": sharedNls.tooltips.locate, "class": "esriCTHeaderIcons esriCTGeolocation" }, null);
+                this.domNode = domConstruct.create("div", { "title": sharedNls.tooltips.locate, "class": "esriCTTdGeolocation" }, null);
                 this.own(on(this.domNode, "click", lang.hitch(this, function () {
                     /**
                     * minimize other open header panel widgets and call geolocation service
                     */
                     topic.publish("toggleWidget", "geolocation");
+                    topic.publish("setMaxLegendLength");
                     this._showCurrentLocation();
                 })));
             }
@@ -68,9 +68,9 @@ define([
         */
 
         _showCurrentLocation: function () {
-            var mapPoint, self = this,
-                geometryServiceUrl = dojo.configData.GeometryService,
-                geometryService = new GeometryService(geometryServiceUrl);
+            var mapPoint, self = this, currentBaseMap, geometryServiceUrl, geometryService;
+            geometryServiceUrl = dojo.configData.GeometryService;
+            geometryService = new GeometryService(geometryServiceUrl);
 
             /**
             * get device location using geolocation service
@@ -88,6 +88,13 @@ define([
                 * @param {object} newPoint Map point of device location in spatialReference of map
                 */
                 geometryService.project([mapPoint], self.map.spatialReference).then(function (newPoint) {
+                    currentBaseMap = self.map.getLayer("defaultBasemap");
+                    if (currentBaseMap.visible) {
+                        if (!currentBaseMap.fullExtent.contains(newPoint[0])) {
+                            alert(sharedNls.errorMessages.invalidLocation);
+                            return;
+                        }
+                    }
                     mapPoint = newPoint[0];
                     self.map.centerAndZoom(mapPoint, dojo.configData.ZoomLevel);
                     self._addGraphic(mapPoint);
@@ -105,9 +112,10 @@ define([
         * @memberOf widgets/geoLocation/geoLocation
         */
         _addGraphic: function (mapPoint) {
-            var geoLocationPushpin = dojoConfig.baseURL + dojo.configData.LocatorSettings.DefaultLocatorSymbol,
-                locatorMarkupSymbol = new PictureMarkerSymbol(geoLocationPushpin, "35", "35"),
-                graphic = new Graphic(mapPoint, locatorMarkupSymbol, null, null);
+            var locatorMarkupSymbol, geoLocationPushpin, graphic;
+            geoLocationPushpin = dojoConfig.baseURL + dojo.configData.LocatorSettings.DefaultLocatorSymbol;
+            locatorMarkupSymbol = new PictureMarkerSymbol(geoLocationPushpin, "35", "35");
+            graphic = new Graphic(mapPoint, locatorMarkupSymbol, null, null);
             this.map.getLayer("esriGraphicsLayerMapSettings").clear();
             this.map.getLayer("esriGraphicsLayerMapSettings").add(graphic);
         }

@@ -1,7 +1,6 @@
 ﻿/*global require,dojo,dojoConfig,esri,esriConfig,alert */
 /*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
-/** @license
-| Version 10.2
+/*
 | Copyright 2013 Esri
 |
 | Licensed under the Apache License, Version 2.0 (the "License");

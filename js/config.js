@@ -90,6 +90,17 @@ define([], function () {
             }
         ],
 
+        // Specify URL to ArcGIS Portal REST API
+        PortalAPIURL: "http://www.arcgis.com/sharing/rest/",
+        // Specify URL to Search
+        SearchURL: "http://www.arcgis.com/sharing/rest/search?q=group:",
+        // Specify the title of group that contains basemaps
+        BasemapGroupTitle: "Basemaps", //CyberTech Systems and Software Limited
+        // Specify the user name of owner of the group that contains basemaps
+        BasemapGroupOwner: "GISITAdmin", //cybertechagol
+        // Specify path to image used to display the thumbnail for a basemap when portal does not provide it
+        NoThumbnail: "js/library/themes/images/not-available.png",
+
 
         // Set geometry service URL
         GeometryService: "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer",
@@ -98,7 +109,7 @@ define([], function () {
         GeoEnrichmentService: "http://geoenrich.arcgis.com/arcgis/rest/services/World/geoenrichmentserver",
 
         // Following zoom level will be set for the map upon searching an address
-        ZoomLevel: 10,
+        ZoomLevel: 13,
 
         //minimum height should be 310 for the info-popup in pixels
         InfoPopupHeight: 250,
@@ -134,6 +145,9 @@ define([], function () {
             LineSymbolTransparency: "0.30"
         },
 
+        RippleColor: "purple",
+        locatorRippleSize: 40,
+
         // Initial map extent. Use comma (,) to separate values and don't delete the last comma
         // The coordinates must be specified in the basemap's coordinate system, usually WKID:102100, unless a custom basemap is used
         DefaultExtent: "-9412951.815477943,4480918.013545, -7742344.125277582,5077738.330395495",
@@ -159,7 +173,7 @@ define([], function () {
         // GeoEnrichmentContents: Configure settings to display data collections or variables from geoenrichment.
         // DownloadSettings: Configure settings for downloading reports from geoprocessing service or geoenrichment.
 
-        WebMapId: "3006e5a6387242b39f50324db0a3f17e",
+        WebMapId: "993a4940bdb3436f8d57b777a4dbec33",
         Workflows: [
             {
                 Name: "Buildings",
@@ -167,11 +181,11 @@ define([], function () {
                 Enabled: true,
                 SearchSettings: [
                     {
-                        Title: "Buildings",
-                        QueryLayerId: "0",
+                        Title: "SitesandBuilding - Buildings",
+                        QueryLayerId: "2",
                         SearchDisplayTitle: "Buildings",
-                        SearchDisplayFields: "${sitename}, ${city}, Phone: ${phonenumber}",
-                        SearchExpression: "UPPER(sitename) LIKE UPPER('${0}%') OR UPPER(city) LIKE UPPER('${0}%') OR UPPER(county) LIKE UPPER('${0}%')",
+                        SearchDisplayFields: "${BUILDINGNAME}, ${ARC_City}, Phone: ${STATE}",
+                        SearchExpression: "UPPER(BUILDINGNAME) LIKE UPPER('${0}%') OR UPPER(ARC_City) LIKE UPPER('${0}%') OR UPPER(STATE) LIKE UPPER('${0}%')",
 
                         FilterSettings: {
                             LocatorFilterFieldName: "Addr_Type",
@@ -179,95 +193,100 @@ define([], function () {
                             FilterRangeFields: [
                                 {
                                     DisplayText: "Building area(sqft)",
-                                    FieldName: "AreaSqFt"
+                                    FieldName: "TOTALSQFT"
                                 }
                             ],
-                            FilterOptionFields: [
+                            RegularFilterOptionFields: [
                                 {
-                                    DisplayText: "For Sale",
-                                    FieldName: "ForSale",
-                                    FieldValue: "Yes"
-                                }, {
-                                    DisplayText: "For Lease",
-                                    FieldName: "ForLease ",
-                                    FieldValue: "Yes"
-                                }, {
-                                    DisplayText: "Agricultural",
-                                    FieldName: "BuildingType",
-                                    FieldValue: "Agricultural"
-                                }, {
-                                    DisplayText: "Vacant",
-                                    FieldName: "BuildingType",
-                                    FieldValue: "Vacant"
-                                }, {
-                                    DisplayText: "Industrial",
-                                    FieldName: "BuildingType",
-                                    FieldValue: "industrial"
-                                }, {
-                                    DisplayText: "Office",
-                                    FieldName: "BuildingType",
-                                    FieldValue: "office"
-                                }, {
-                                    DisplayText: "Retail",
-                                    FieldName: "BuildingType",
-                                    FieldValue: "retail"
+                                    DisplayText: "Active to users",
+                                    FieldName: "ACTIVETOUSERS",
+                                    FieldValue: "Y"
                                 }
-                            ]
+                            ],
+
+                            AdditionalFilterOptions: {
+                                Enabled: true,
+                                FilterFieldName: "ZONING",
+                                FilterOptions: [
+                                    {
+                                        DisplayText: "Agricultural",
+                                        FieldValue: "Agricultural"
+                                    }, {
+                                        DisplayText: "Industrial",
+                                        FieldValue: "Industrial"
+                                    }, {
+                                        DisplayText: "Office",
+                                        FieldValue: "Office"
+                                    }, {
+                                        DisplayText: "Retail",
+                                        FieldValue: "Retail"
+                                    }
+                                ]
+                            }
                         }
                     }
                 ],
                 InfoPanelSettings: {
                     ResultContents: {
-                        ShowAttachments: true,
+                        ShowAttachments: false,
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "BuildingName",
-                                isSortingField: true
+                                FieldName: "BUILDINGNAME",
+                                SortingEnabled: true
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "Address",
-                                isSortingField: false
+                                FieldName: "ADDRESS",
+                                SortingEnabled: false
                             }, {
                                 DisplayText: "City:",
-                                FieldName: "City",
-                                isSortingField: true
+                                FieldName: "ARC_City",
+                                SortingEnabled: true
                             }, {
                                 DisplayText: "State:",
-                                FieldName: "State",
-                                isSortingField: true
+                                FieldName: "STATE",
+                                SortingEnabled: true
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "Zip",
-                                isSortingField: true
+                                FieldName: "ZIP",
+                                SortingEnabled: true
+                            }, {
+                                DisplayText: "Building area(sqft):",
+                                FieldName: "TOTALSQFT",
+                                SortingEnabled: true
+                            }, {
+                                DisplayText: "Active to users:",
+                                FieldName: "ACTIVETOUSERS",
+                                SortingEnabled: false
                             }
+
                         ]
                     },
                     LayerContents: {
-                        ShowAttachments: true,
+                        ShowAttachments: false,
                         DisplayTitle: "Property Information",
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "BuildingName"
+                                FieldName: "BUILDINGNAME"
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "Address"
+                                FieldName: "ADDRESS"
                             }, {
                                 DisplayText: "City:",
-                                FieldName: "City"
+                                FieldName: "ARC_City"
                             }, {
                                 DisplayText: "State:",
-                                FieldName: "State"
+                                FieldName: "STATE"
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "Zip"
+                                FieldName: "ZIP"
                             }, {
                                 DisplayText: "Type:",
-                                FieldName: "BuildingType"
+                                FieldName: "ZONING"
                             }, {
                                 DisplayText: "Area (sqft):",
-                                FieldName: "AreaSqFt"
+                                FieldName: "TOTALSQFT"
                             }
                         ]
                     },
@@ -277,53 +296,49 @@ define([], function () {
                     },
                     GeoEnrichmentContents: {
                         DisplayTitle: "Neighborhood Information",
-                        DataCollection: "KeyUSFacts",
                         DisplayFields: [
                             {
                                 DisplayText: "Dominant Tapestry Segment",
-                                FieldName: "TAPSEGNAM"
+                                FieldName: "Policy.TAPSEGNAM"
                             }, {
                                 DisplayText: "Labor Force Participation Rate",
-                                FieldName: "CIVLBFR_CY"
-                            }, {
-                                DisplayText: "Consumer Spending",
-                                FieldName: "X15001_A"
+                                FieldName: "Industry.CIVLBFR_CY"
                             }, {
                                 DisplayText: "Total Population",
-                                FieldName: "TOTPOP_CY"
+                                FieldName: "KeyUSFacts.TOTPOP_CY"
                             }, {
                                 DisplayText: "Total Households",
-                                FieldName: "TOTHH_CY"
+                                FieldName: "KeyUSFacts.TOTHH_CY"
                             }, {
                                 DisplayText: "Average Household Size",
-                                FieldName: "AVGHHSZ_CY"
+                                FieldName: "KeyUSFacts.AVGHHSZ_CY"
                             }, {
                                 DisplayText: "Average Household Income",
-                                FieldName: "AVGHINC_CY"
+                                FieldName: "KeyUSFacts.AVGHINC_CY"
                             }, {
                                 DisplayText: "Median Household Income",
-                                FieldName: "MEDHINC_CY"
+                                FieldName: "KeyUSFacts.MEDHINC_CY"
                             }, {
                                 DisplayText: "Per Capita Income",
-                                FieldName: "PCI_CY"
+                                FieldName: "KeyUSFacts.PCI_CY"
                             }, {
                                 DisplayText: "Total Housing Units",
-                                FieldName: "TOTHU_FY"
+                                FieldName: "KeyUSFacts.TOTHU_FY"
                             }, {
                                 DisplayText: "Owner Occupied HUs",
-                                FieldName: "OWNER_CY"
+                                FieldName: "KeyUSFacts.OWNER_CY"
                             }, {
                                 DisplayText: "Renter Occupied HUs",
-                                FieldName: "RENTER_CY"
+                                FieldName: "KeyUSFacts.RENTER_CY"
                             }, {
                                 DisplayText: "Vacant Housing Units",
-                                FieldName: "VACANT_CY"
+                                FieldName: "KeyUSFacts.VACANT_CY"
                             }, {
                                 DisplayText: "Median Home Value",
-                                FieldName: "MEDVAL_CY"
+                                FieldName: "KeyUSFacts.MEDVAL_CY"
                             }, {
                                 DisplayText: "Average Home Value",
-                                FieldName: "AVGVAL_CY"
+                                FieldName: "KeyUSFacts.AVGVAL_CY"
                             }
                         ]
                     },
@@ -341,153 +356,166 @@ define([], function () {
                 Enabled: true,
                 SearchSettings: [
                     {
-                        Title: "SiteFinder",
+                        Title: "SitesandBuilding - Sites",
                         QueryLayerId: "1",
                         SearchDisplayTitle: "Sites",
-                        SearchDisplayFields: "${sitename}, ${city}, Phone: ${phonenumber}",
-                        SearchExpression: "UPPER(sitename) LIKE UPPER('${0}%') OR UPPER(city) LIKE UPPER('${0}%') OR UPPER(county) LIKE UPPER('${0}%')",
+                        SearchDisplayFields: "${SiteName}, ${ARC_City}, Phone: ${StreetAddress}",
+                        SearchExpression: "UPPER(SiteName) LIKE UPPER('${0}%') OR UPPER(ARC_City) LIKE UPPER('${0}%') OR UPPER(StreetAddress) LIKE UPPER('${0}%')",
                         FilterSettings: {
                             LocatorFilterFieldName: "Addr_Type",
                             LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
-                                    DisplayText: "Sites area(acres)",
-                                    FieldName: "SITEAREA"
+                                    DisplayText: "Site area(acres)",
+                                    FieldName: "SiteSizeAcres"
                                 }
                             ],
-                            FilterOptionFields: [
+                            RegularFilterOptionFields: [
                                 {
-                                    DisplayText: "For Sale",
-                                    FieldName: "SALE",
-                                    FieldValue: "Yes"
+                                    DisplayText: "Within city",
+                                    FieldName: "WithinCityLimits",
+                                    FieldValue: "Y"
                                 }, {
-                                    DisplayText: "For Lease",
-                                    FieldName: "Lease",
-                                    FieldValue: "yes"
-                                }, {
-                                    DisplayText: "Agricultural",
-                                    FieldName: "SiteType",
-                                    FieldValue: "Agricultural"
-                                }, {
-                                    DisplayText: "Vacant",
-                                    FieldName: "SiteType",
-                                    FieldValue: "Vacant"
-                                }, {
-                                    DisplayText: "Industrial",
-                                    FieldName: "SiteType",
-                                    FieldValue: "Industrial"
-                                }, {
-                                    DisplayText: "Office",
-                                    FieldName: "SiteType",
-                                    FieldValue: "Office"
-                                }, {
-                                    DisplayText: "Retail",
-                                    FieldName: "SiteType",
-                                    FieldValue: "Retail"
+                                    DisplayText: "Active to users",
+                                    FieldName: "SiteActivetoUsers",
+                                    FieldValue: "Y"
                                 }
-                            ]
+                            ],
+                            AdditionalFilterOptions: {
+                                Enabled: true,
+                                FilterFieldName: "Zoning",
+                                FilterOptions: [
+                                    {
+                                        DisplayText: "Residential",
+                                        FieldValue: "Residential"
+                                    }, {
+                                        DisplayText: "Industrial",
+                                        FieldValue: "Industrial"
+                                    }, {
+                                        DisplayText: "Office",
+                                        FieldValue: "Office"
+                                    }, {
+                                        DisplayText: "Retail",
+                                        FieldValue: "Retail"
+                                    }
+                                ]
+                            }
                         }
                     }
                 ],
                 InfoPanelSettings: {
                     ResultContents: {
-                        ShowAttachments: true,
+                        ShowAttachments: false,
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "${NAME}"
+                                FieldName: "SiteName",
+                                SortingEnabled: true
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "${ADDRESS}"
+                                FieldName: "StreetAddress",
+                                SortingEnabled: true
                             }, {
                                 DisplayText: "City:",
-                                FieldName: "${CITY}"
+                                FieldName: "ARC_City",
+                                SortingEnabled: false
                             }, {
-                                DisplayText: "County:",
-                                FieldName: "${COUNTY}"
+                                DisplayText: "Area (acres):",
+                                FieldName: "SiteSizeAcres",
+                                SortingEnabled: true
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "${ZIPCODE}"
+                                FieldName: "ZipCode",
+                                SortingEnabled: false
+                            },  {
+                                DisplayText: "Within city:",
+                                FieldName: "WithinCityLimits",
+                                SortingEnabled: false
+                            }, {
+                                DisplayText: "Active to users:",
+                                FieldName: "SiteActivetoUsers",
+                                SortingEnabled: false
                             }
                         ]
                     },
                     LayerContents: {
-                        ShowAttachments: true,
+                        ShowAttachments: false,
                         DisplayTitle: "Site Information",
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "${NAME}"
+                                FieldName: "SiteName"
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "${ADDRESS}"
+                                FieldName: "StreetAddress"
+                            }, {
+                                DisplayText: "State:",
+                                FieldName: "State"
                             }, {
                                 DisplayText: "City:",
-                                FieldName: "${CITY}"
-                            }, {
-                                DisplayText: "County:",
-                                FieldName: "${COUNTY}"
+                                FieldName: "ARC_City"
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "${ZIPCODE}"
+                                FieldName: "ZipCode"
                             }, {
                                 DisplayText: "Type:",
-                                FieldName: "${TYPE}"
+                                FieldName: "Zoning"
                             }, {
-                                DisplayText: "Area (sqft):",
-                                FieldName: "${AREA}"
+                                DisplayText: "Area (acres):",
+                                FieldName: "SiteSizeAcres"
                             }
                         ]
                     },
+                    GeoenrichmentDistance: {
+                        Unit: "UNIT_STATUTE_MILE",
+                        BufferDistance: 1
+                    },
                     GeoEnrichmentContents: {
                         DisplayTitle: "Neighborhood Information",
-                        DataCollection: "KeyUSFacts",
+
                         DisplayFields: [
                             {
                                 DisplayText: "Dominant Tapestry Segment",
-                                FieldName: "TAPSEGNAM"
+                                FieldName: "Policy.TAPSEGNAM"
                             }, {
                                 DisplayText: "Labor Force Participation Rate",
-                                FieldName: "CIVLBFR_CY"
-                            }, {
-                                DisplayText: "Consumer Spending",
-                                FieldName: "X15001_A"
+                                FieldName: "Industry.CIVLBFR_CY"
                             }, {
                                 DisplayText: "Total Population",
-                                FieldName: "TOTPOP_CY"
+                                FieldName: "KeyUSFacts.TOTPOP_CY"
                             }, {
                                 DisplayText: "Total Households",
-                                FieldName: "TOTHH_CY"
+                                FieldName: "KeyUSFacts.TOTHH_CY"
                             }, {
                                 DisplayText: "Average Household Size",
-                                FieldName: "AVGHHSZ_CY"
+                                FieldName: "KeyUSFacts.AVGHHSZ_CY"
                             }, {
                                 DisplayText: "Average Household Income",
-                                FieldName: "AVGHINC_CY"
+                                FieldName: "KeyUSFacts.AVGHINC_CY"
                             }, {
                                 DisplayText: "Median Household Income",
-                                FieldName: "MEDHINC_CY"
+                                FieldName: "KeyUSFacts.MEDHINC_CY"
                             }, {
                                 DisplayText: "Per Capita Income",
-                                FieldName: "PCI_CY"
+                                FieldName: "KeyUSFacts.PCI_CY"
                             }, {
                                 DisplayText: "Total Housing Units",
-                                FieldName: "TOTHU_FY"
+                                FieldName: "KeyUSFacts.TOTHU_FY"
                             }, {
                                 DisplayText: "Owner Occupied HUs",
-                                FieldName: "OWNER_CY"
+                                FieldName: "KeyUSFacts.OWNER_CY"
                             }, {
                                 DisplayText: "Renter Occupied HUs",
-                                FieldName: "RENTER_CY"
+                                FieldName: "KeyUSFacts.RENTER_CY"
                             }, {
                                 DisplayText: "Vacant Housing Units",
-                                FieldName: "VACANT_CY"
+                                FieldName: "KeyUSFacts.VACANT_CY"
                             }, {
                                 DisplayText: "Median Home Value",
-                                FieldName: "MEDVAL_CY"
+                                FieldName: "KeyUSFacts.MEDVAL_CY"
                             }, {
                                 DisplayText: "Average Home Value",
-                                FieldName: "AVGVAL_CY"
+                                FieldName: "KeyUSFacts.AVGVAL_CY"
                             }
                         ]
                     },
@@ -531,64 +559,65 @@ define([], function () {
                             BusinessSummaryFields: [
                                 {
                                     DisplayText: "Businesses",
-                                    FieldName: "N01_BUS"
+                                    FieldName: "IndustryByNAICSCode.N01_BUS"
                                 }, {
                                     DisplayText: "Revenue",
-                                    FieldName: "N01_SALES"
+                                    FieldName: "IndustryByNAICSCode.N01_SALES"
                                 }, {
                                     DisplayText: "Employees",
-                                    FieldName: "N01_TOTEMP"
+                                    FieldName: "IndustryByNAICSCode.N01_TOTEMP"
+                                }, {
+                                    DisplayText: "Unemployment",
+                                    FieldName: "Industry.UNEMPRT_CY"
                                 }
                             ]
                         }, {
                             DisplayTitle: "Demographic Information",
-                            DataCollection: "KeyUSFacts",
+
                             DisplayFields: [
                                 {
                                     DisplayText: "Dominant Tapestry Segment",
-                                    FieldName: "TAPSEGNAM"
+                                    FieldName: "Policy.TAPSEGNAM"
                                 }, {
                                     DisplayText: "Labor Force Participation Rate",
-                                    FieldName: "CIVLBFR_CY"
-                                }, {
-                                    DisplayText: "Consumer Spending",
-                                    FieldName: "X15001_A"
-                                }, {
+                                    FieldName: "Industry.CIVLBFR_CY"
+                                },
+                                {
                                     DisplayText: "Total Population",
-                                    FieldName: "TOTPOP_CY"
+                                    FieldName: "KeyUSFacts.TOTPOP_CY"
                                 }, {
                                     DisplayText: "Total Households",
-                                    FieldName: "TOTHH_CY"
+                                    FieldName: "KeyUSFacts.TOTHH_CY"
                                 }, {
                                     DisplayText: "Average Household Size",
-                                    FieldName: "AVGHHSZ_CY"
+                                    FieldName: "KeyUSFacts.AVGHHSZ_CY"
                                 }, {
                                     DisplayText: "Average Household Income",
-                                    FieldName: "AVGHINC_CY"
+                                    FieldName: "KeyUSFacts.AVGHINC_CY"
                                 }, {
                                     DisplayText: "Median Household Income",
-                                    FieldName: "MEDHINC_CY"
+                                    FieldName: "KeyUSFacts.MEDHINC_CY"
                                 }, {
                                     DisplayText: "Per Capita Income",
-                                    FieldName: "PCI_CY"
+                                    FieldName: "KeyUSFacts.PCI_CY"
                                 }, {
                                     DisplayText: "Total Housing Units",
-                                    FieldName: "TOTHU_FY"
+                                    FieldName: "KeyUSFacts.TOTHU_FY"
                                 }, {
                                     DisplayText: "Owner Occupied HUs",
-                                    FieldName: "OWNER_CY"
+                                    FieldName: "KeyUSFacts.OWNER_CY"
                                 }, {
                                     DisplayText: "Renter Occupied HUs",
-                                    FieldName: "RENTER_CY"
+                                    FieldName: "KeyUSFacts.RENTER_CY"
                                 }, {
                                     DisplayText: "Vacant Housing Units",
-                                    FieldName: "VACANT_CY"
+                                    FieldName: "KeyUSFacts.VACANT_CY"
                                 }, {
                                     DisplayText: "Median Home Value",
-                                    FieldName: "MEDVAL_CY"
+                                    FieldName: "KeyUSFacts.MEDVAL_CY"
                                 }, {
                                     DisplayText: "Average Home Value",
-                                    FieldName: "AVGVAL_CY"
+                                    FieldName: "KeyUSFacts.AVGVAL_CY"
                                 }
                             ]
                         }
@@ -626,53 +655,51 @@ define([], function () {
                     InfoPanelSettings: {
                         GeoEnrichmentContents: {
                             DisplayTitle: "Community Information",
-                            DataCollection: "KeyUSFacts",
+
                             DisplayFields: [
                                 {
                                     DisplayText: "Dominant Tapestry Segment",
-                                    FieldName: "TAPSEGNAM"
+                                    FieldName: "Policy.TAPSEGNAM"
                                 }, {
                                     DisplayText: "Labor Force Participation Rate",
-                                    FieldName: "CIVLBFR_CY"
-                                }, {
-                                    DisplayText: "Consumer Spending",
-                                    FieldName: "X15001_A"
-                                }, {
+                                    FieldName: "Industry.CIVLBFR_CY"
+                                },
+                                {
                                     DisplayText: "Total Population",
-                                    FieldName: "TOTPOP_CY"
+                                    FieldName: "KeyUSFacts.TOTPOP_CY"
                                 }, {
                                     DisplayText: "Total Households",
-                                    FieldName: "TOTHH_CY"
+                                    FieldName: "KeyUSFacts.TOTHH_CY"
                                 }, {
                                     DisplayText: "Average Household Size",
-                                    FieldName: "AVGHHSZ_CY"
+                                    FieldName: "KeyUSFacts.AVGHHSZ_CY"
                                 }, {
                                     DisplayText: "Average Household Income",
-                                    FieldName: "AVGHINC_CY"
+                                    FieldName: "KeyUSFacts.AVGHINC_CY"
                                 }, {
                                     DisplayText: "Median Household Income",
-                                    FieldName: "MEDHINC_CY"
+                                    FieldName: "KeyUSFacts.MEDHINC_CY"
                                 }, {
                                     DisplayText: "Per Capita Income",
-                                    FieldName: "PCI_CY"
+                                    FieldName: "KeyUSFacts.PCI_CY"
                                 }, {
                                     DisplayText: "Total Housing Units",
-                                    FieldName: "TOTHU_FY"
+                                    FieldName: "KeyUSFacts.TOTHU_FY"
                                 }, {
                                     DisplayText: "Owner Occupied HUs",
-                                    FieldName: "OWNER_CY"
+                                    FieldName: "KeyUSFacts.OWNER_CY"
                                 }, {
                                     DisplayText: "Renter Occupied HUs",
-                                    FieldName: "RENTER_CY"
+                                    FieldName: "KeyUSFacts.RENTER_CY"
                                 }, {
                                     DisplayText: "Vacant Housing Units",
-                                    FieldName: "VACANT_CY"
+                                    FieldName: "KeyUSFacts.VACANT_CY"
                                 }, {
                                     DisplayText: "Median Home Value",
-                                    FieldName: "MEDVAL_CY"
+                                    FieldName: "KeyUSFacts.MEDVAL_CY"
                                 }, {
                                     DisplayText: "Average Home Value",
-                                    FieldName: "AVGVAL_CY"
+                                    FieldName: "KeyUSFacts.AVGVAL_CY"
                                 }
                             ]
                         },
