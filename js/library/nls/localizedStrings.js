@@ -42,15 +42,19 @@ define({
             hideText: "Hide more options",
             showText: "Show more options",
             sliderDisplayText: "Show results within ${initialValue}",
-            communityText: "Search communities by city, country or region",
+            communityText: "Search communities by city, county or region",
             searchCommunityText: "Search communities in",
             searchBusinessText: "Search business near an address",
             serachSiteText: "Search sites near an address",
             CountStatus: "${s} - ${e} of ${t}",
-            webpageDisplayText: "Copy/paste HTML into your web page",
+            webpageDisplayText: "Copy/Paste HTML into your web page",
             textDownload: "Download",
             result: "Back To Result",
-            sortBy: " Sort by"
+            sortBy: " Sort by",
+            select: "Select",
+            toText: "to",
+            fromText: "from"
+
 
         },
         errorMessages: {
@@ -63,7 +67,7 @@ define({
             shareFailed: "Unable to share.",
             disableTab: "Enable at least one tab.",
             bufferSliderValue: "Buffer slider should not be set to zero distance",
-            noData: "Data not found"
+            invalidInput: "Plese enter valid input"
         }
     },
     es: true,

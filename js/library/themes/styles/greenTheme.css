@@ -4,7 +4,7 @@
     border-bottom: 1px solid #028D6A;
 }
 
-.esriCTApplicationHeaderText {
+.esriCTApplicationHeaderTextTD {
     color: #028D6A;
 }
 
@@ -132,7 +132,9 @@
 
 /*Splash Screen*/
 
-.esriCTCustomButton {
+.customButton 
+{
+    color: #fff;
     background: #028D6A;
 }
 
@@ -142,6 +144,10 @@
 
 .esriCTBoxShadow {
     border: 2px solid #028D6A;
+}
+.esriCTRoundedCorner
+{
+    behavior: url("esri_template/core_library/PIE.htc");
 }
 
 /* End of CSS for shadow effect*/

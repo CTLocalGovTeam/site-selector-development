@@ -16,7 +16,7 @@
         background-image: url("../images/img2X/search-select@2X.png") !important;
     }
 
-    .esriCTGeolocation
+    .esriCTTdGeolocation
     {
         background-image: url("../images/img2X/geo-location@2x.png") !important;
     }
@@ -71,7 +71,7 @@
     background-image: url("../images/img44x44/Help.png")!important;
 }
 
-.esriCTGeolocation
+.esriCTTdGeolocation
 {
     background-image: url("../images/img44x44/imgGeolocation.png")!important;
 }
@@ -132,7 +132,7 @@
     background-image: url("../images/img44x44/Help.png")!important;
 }
 
-.esriCTGeolocation
+.esriCTTdGeolocation
 {
     background-image: url("../images/img44x44/imgGeolocation.png")!important;
 }
@@ -187,7 +187,7 @@
     background-image: url("../images/img24x24/Help-24.png");
 }
 
-.esriCTGeolocation {
+.esriCTTdGeolocation {
     background-image: url("../images/img24x24/imgGeolocation-24.png");
 }
 
@@ -252,6 +252,7 @@
 }
 
 /* End of Application Header Styles */
+
 
 /* Share Container Styles */
 
@@ -331,7 +332,9 @@
 
 /*Splash Screen*/
 
-.esriCTCustomButton {
+.customButton 
+{
+    color: #fff;
     background: #007ac2;
 }
 
@@ -342,7 +345,10 @@
 .esriCTBoxShadow {
     border: 2px solid #007AC2;
 }
-
+.esriCTRoundedCorner
+{
+    behavior: url("esri_template/core_library/PIE.htc");
+}
 /* End of CSS for shadow effect*/
 /*Site locator*/
 .esriCTsearchContainerSitesSelected {

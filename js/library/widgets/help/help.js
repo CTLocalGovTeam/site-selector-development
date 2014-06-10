@@ -1,7 +1,6 @@
 ﻿/*global define,dojo */
 /*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
-/** @license
-| Version 10.2
+/*
 | Copyright 2013 Esri
 |
 | Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +29,7 @@ define([
     //========================================================================================================================//
 
     return declare([_WidgetBase], {
+        sharedNls: sharedNls,
 
         /**
         * create help widget
@@ -38,7 +38,7 @@ define([
         * @name widgets/help/help
         */
         postCreate: function () {
-            this.domNode = domConstruct.create("div", { "title": sharedNls.tooltips.help, "class": "esriCTHeaderIcons esriCTHelpImg" }, null);
+            this.domNode = domConstruct.create("div", { "title": sharedNls.tooltips.help, "class": "esriCTHelpImg" }, null);
             this.own(on(this.domNode, "click", lang.hitch(this, function () {
 
                 /**
