@@ -253,13 +253,11 @@
 
 /* End of Application Header Styles */
 
-
 /* Share Container Styles */
 
 .esriCTDivAppHolder {
     border-right: 1px solid #007ac2;
     border-left: 1px solid #007ac2;
-    border-bottom: 1px solid #007ac2;
 }
 
 .esriCTDivShareContainer {
@@ -271,8 +269,6 @@
 .esriCTTxtShare {
     border: 1px solid #007AC2;
 }
-
-
 
 /* Slider */
 
@@ -316,7 +312,8 @@
 }
 
 .esriCTReportTabSelected {
-    border: 1px solid #007ac2;
+    border-left: 1px solid #007ac2;
+    border-bottom: 1px solid #007ac2;
     color: #007AC2;
 }
 
@@ -349,25 +346,24 @@
 {
     behavior: url("esri_template/core_library/PIE.htc");
 }
-/* End of CSS for shadow effect*/
-/*Site locator*/
-.esriCTsearchContainerSitesSelected {
-    background: #007AC2;
-}
 
-.esriCTsearchContentBusiness
-{
-    float:left;
-    }
+/* End of CSS for shadow effect*/
+
+/*Site locator*/
 .esriCTHeaderRouteContainer {
     border-left: 1px solid #007AC2;
     border-right: 1px solid #007AC2;
 }
 
 .esriCTTab {
-    border-bottom: 1px solid #007AC2;
-    border-right: 1px solid #007AC2;
-    color: #007AC2;
+    border-color: #007AC2;
+     color: #007AC2;
+    background:#fafafa;
+}
+
+.esriCTsearchContainerSitesSelected {
+    background: #fff;
+    color:#007AC2;
 }
 
 .esriOuterDiv {
@@ -423,14 +419,12 @@
 }
 
 .claro .dijitMenu .digitMenuItemSelected td, .claro .dijitComboBoxMenu .dijitMenuItemSelected {
-    background-color: #007AC2;
-    !important;
+    background-color: #007AC2 !important;
 }
 
 .claro .dijitMenu .dijitMenuItemHover td, .claro .dijitMenu .dijitMenuItemSelected td, .claro .dijitMenuItemHover, .claro .dijitComboBoxMenu .dijitMenuItemHover, .claro .digitMenuItemSelected {
     background-image: none !important;
-    background-color: #007AC2;
-    !important;
+    background-color: #007AC2 !important;
     color: white !important;
 }
 
@@ -442,4 +436,3 @@
     color: #007AC2 !important;
 }
 /*End of Site locator*/
-

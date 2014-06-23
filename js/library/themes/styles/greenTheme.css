@@ -59,7 +59,6 @@
 .esriCTDivAppHolder {
     border-right: 1px solid #028D6A;
     border-left: 1px solid #028D6A;
-    border-bottom: 1px solid #028D6A;
 }
 
 .esriCTDivShareContainer {
@@ -130,6 +129,30 @@
     background-color: #028D6A;
 }
 
+.esriCTAreaOfInterestTabSelected {
+    color: #028D6A;
+}
+
+.esriCTAreaOfInterestTab {
+    border-right: 1px solid #028D6A;
+    border-bottom: 1px solid #028D6A;
+    color: #028D6A;
+}
+
+.esriCTHeaderReportContainer {
+    border-left: 1px solid #028D6A;
+    border-right: 1px solid #028D6A;
+}
+
+.esriCTReportTabSelected {
+    border-left: 1px solid #028D6A;
+    border-bottom: 1px solid #028D6A;
+    color: #028D6A;
+}
+
+.esriCTReportTab {
+    color: #028D6A;
+}
 /*Splash Screen*/
 
 .customButton 
@@ -153,9 +176,6 @@
 /* End of CSS for shadow effect*/
 
 /*Site locator*/
-.esriCTsearchContainerSitesSelected {
-    background: #028D6A;
-}
 
 .esriCTHeaderRouteContainer {
     border-left: 1px solid #028D6A;
@@ -163,9 +183,14 @@
 }
 
 .esriCTTab {
-    border-bottom: 1px solid #028D6A;
-    border-right: 1px solid #028D6A;
-    color: #028D6A;
+    border-color: #028D6A;
+     color: #028D6A;
+    background:#fafafa;
+}
+
+.esriCTsearchContainerSitesSelected {
+    background: #fff;
+    color:#028D6A;
 }
 
 .esriOuterDiv {
@@ -192,16 +217,19 @@
     width: 16px !important;
     padding: 0px!important;
 }
+
 .claro .dijitSelectFocused .dijitArrowButton{ background-color: #fff !important; background-image: url("../images/green-arrow.png" )!important;  background-position: right center !important;  background-repeat: no-repeat !important;margin: 0px !important;    width: 16px !important;  padding: 0px!important;}
 
 .claro .dijitMenu .digitMenuItemSelected td, .claro .dijitComboBoxMenu .dijitMenuItemSelected {
     background-color: #028D6A !important;
 }
+
 .claro .dijitMenu .dijitMenuItemHover td, .claro .dijitMenu .dijitMenuItemSelected td, .claro .dijitMenuItemHover, .claro .dijitComboBoxMenu .dijitMenuItemHover, .claro .digitMenuItemSelected {
     background-image: none !important;
     background-color:  #028D6A !important;
     color: white !important;
 }
+
 .esriCTselectbox {
     border-color: #028D6A !important;
 }

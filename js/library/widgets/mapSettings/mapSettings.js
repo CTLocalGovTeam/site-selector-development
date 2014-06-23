@@ -172,7 +172,6 @@ define([
             * load esri 'Home Button' widget
             */
             home = this._addHomeButton();
-            //home.extent = mapDefaultExtent;
             domConstruct.place(home.domNode, query(".esriSimpleSliderIncrementButton")[0], "after");
             home.startup();
             this._showBasMapGallery();

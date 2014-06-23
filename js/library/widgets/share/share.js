@@ -71,19 +71,18 @@ define([
                     }
                 }
             }));
+            var applicationHeaderDiv;
             this.domNode = domConstruct.create("div", { "title": sharedNls.tooltips.share, "class": "esriCTHeaderIcons esriCTImgSocialMedia" }, null);
+            applicationHeaderDiv = domConstruct.create("div", { "class": "esriCTApplicationShareicon" }, dom.byId("esriCTParentDivContainer"));
+            applicationHeaderDiv.appendChild(this.divAppContainer);
             this.own(on(this.domNode, "click", lang.hitch(this, function () {
 
                 /**
                 * minimize other open header panel widgets and show share panel
                 */
                 topic.publish("toggleWidget", "share");
-                this._shareLink();
+                this._showHideShareContainer();
             })));
-
-            on(this.imgEmbedding, "click", lang.hitch(this, function () {
-                this._showEmbeddingContainer();
-            }));
         },
 
         _showEmbeddingContainer: function () {
@@ -127,33 +126,17 @@ define([
                     url: url,
                     callbackParamName: "callback",
                     load: lang.hitch(this, function (data) {
-                        var tinyUrl, attr, x, applicationHeaderDiv;
+                        var tinyUrl, attr, x;
 
                         tinyUrl = data;
                         attr = dojo.configData.MapSharingOptions.TinyURLResponseAttribute.split(".");
                         for (x = 0; x < attr.length; x++) {
                             tinyUrl = tinyUrl[attr[x]];
                         }
-                        applicationHeaderDiv = domConstruct.create("div", { "class": "esriCTApplicationShareicon" }, dom.byId("esriCTParentDivContainer"));
-                        applicationHeaderDiv.appendChild(this.divAppContainer);
-                        if (html.coords(this.divAppContainer).h > 0) {
 
-                            /**
-                            * when user clicks on share icon in header panel, close the sharing panel if it is open
-                            */
-                            domClass.replace(this.domNode, "esriCTImgSocialMedia", "esriCTImgSocialMediaSelected");
-                            domClass.replace(this.divAppContainer, "esriCTHideContainerHeight", "esriCTShowContainerHeight");
-                            domClass.replace(this.divAppContainer, "esriCTZeroHeight", "esriCTFullHeight");
-                        } else {
-
-                            /**
-                            * when user clicks on share icon in header panel, open the sharing panel if it is closed
-                            */
-                            domClass.replace(this.domNode, "esriCTImgSocialMediaSelected", "esriCTImgSocialMedia");
-                            domClass.replace(this.divAppContainer, "esriCTShowContainerHeight", "esriCTHideContainerHeight");
-                            domClass.replace(this.divAppContainer, "esriCTFullHeight", "esriCTZeroHeight");
-                        }
-
+                        domStyle.set(this.imgFacebook, "cursor", "pointer");
+                        domStyle.set(this.imgTwitter, "cursor", "pointer");
+                        domStyle.set(this.imgMail, "cursor", "pointer");
                         /**
                         * remove event handlers from sharing options
                         */
@@ -177,6 +160,30 @@ define([
                 });
             } catch (err) {
                 alert(sharedNls.errorMessages.shareLoadingFailed);
+            }
+        },
+
+        /**
+        * show and hide share container
+        * @memberOf widgets/share/share
+        */
+        _showHideShareContainer: function () {
+            if (html.coords(this.divAppContainer).h > 0) {
+
+                /**
+                * when user clicks on share icon in header panel, close the sharing panel if it is open
+                */
+                domClass.replace(this.domNode, "esriCTImgSocialMedia", "esriCTImgSocialMediaSelected");
+                domClass.replace(this.divAppContainer, "esriCTHideContainerHeight", "esriCTShowContainerHeight");
+                domClass.replace(this.divAppContainer, "esriCTZeroHeight", "esriCTFullHeight");
+            } else {
+
+                /**
+                * when user clicks on share icon in header panel, open the sharing panel if it is closed
+                */
+                domClass.replace(this.domNode, "esriCTImgSocialMediaSelected", "esriCTImgSocialMedia");
+                domClass.replace(this.divAppContainer, "esriCTShowContainerHeight", "esriCTHideContainerHeight");
+                domClass.replace(this.divAppContainer, "esriCTFullHeight", "esriCTZeroHeight");
             }
         },
 

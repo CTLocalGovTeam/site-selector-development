@@ -108,7 +108,7 @@ define([
             if (dojo.configData.ApplicationIcon && lang.trim(dojo.configData.ApplicationIcon).length !== 0) {
                 this._loadIcons("apple-touch-icon-precomposed", dojo.configData.ApplicationIcon);
                 this._loadIcons("apple-touch-icon", dojo.configData.ApplicationIcon);
-                domConstruct.create("img", { "class": "", "src": dojoConfig.baseURL + dojo.configData.ApplicationIcon }, this.divImgApplicationHeaderIcon);
+                domConstruct.create("img", { "class": "esriCTApplicationIcon", "src": dojoConfig.baseURL + dojo.configData.ApplicationIcon }, this.divImgApplicationHeaderIcon);
             }
         },
 
