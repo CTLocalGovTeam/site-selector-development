@@ -43,7 +43,7 @@ define([], function () {
         ApplicationName: "Site Selector",
 
         // Set application icon path
-        ApplicationIcon: "/js/library/themes/images/logoBlue.png",
+        ApplicationIcon: "/js/library/themes/images/site-selector-logo.png",
 
         // Set application Favicon path
         ApplicationFavicon: "/js/library/themes/images/faviconBlue.ico",
@@ -192,7 +192,7 @@ define([], function () {
                             LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
-                                    DisplayText: "Building area(sqft)",
+                                    DisplayText: "Area(sqft)",
                                     FieldName: "TOTALSQFT"
                                 }
                             ],
@@ -251,7 +251,7 @@ define([], function () {
                                 FieldName: "ZIP",
                                 SortingEnabled: true
                             }, {
-                                DisplayText: "Building area(sqft):",
+                                DisplayText: "Area(sqft):",
                                 FieldName: "TOTALSQFT",
                                 SortingEnabled: true
                             }, {
@@ -427,7 +427,7 @@ define([], function () {
                                 DisplayText: "Zipcode:",
                                 FieldName: "ZipCode",
                                 SortingEnabled: false
-                            },  {
+                            }, {
                                 DisplayText: "Within city:",
                                 FieldName: "WithinCityLimits",
                                 SortingEnabled: false
@@ -541,7 +541,7 @@ define([], function () {
                     BusinesSortOptions: { Option: "Count,Revenue,Employees" },
                     FilterRangeFields: [
                         {
-                            DisplayText: "Annual Revenue(USD)",
+                            DisplayText: "Annual Revenue($)",
                             VariableNameSuffix: "_SALES"
                         }, {
                             DisplayText: "Number of employees",

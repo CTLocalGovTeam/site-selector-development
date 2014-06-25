@@ -156,8 +156,11 @@
 
     .claro .dijitSelectLabel, .claro .dijitTextBox .dijitInputInner, .claro .dijitValidationTextBox .dijitValidationContainer
     {
-        padding: 0 0 5px !important;
         margin-left: 2px;
+    }
+    .esriCTChkLabel
+    {
+        margin-top: 1px;
     }
 }
 
@@ -268,9 +271,31 @@
 
     .claro .dijitSelectLabel, .claro .dijitTextBox .dijitInputInner, .claro .dijitValidationTextBox .dijitValidationContainer
     {
-        padding: 0 0 5px !important;
         margin-left: 2px;
     }
+
+    .esriCTFirstIndex
+    {
+        height: 16px !important;
+    }
+
+    .esriCTChkLabel
+    {
+        margin-top: 2px;
+    }
+
+.esriCTSelectCommon, .esriCTSelectCommunities
+   {
+    float:left;
+    margin-top:-3px;
+  }
+}
+
+#sortBy_dropdown
+{
+    height: 62px !important;
+    width: 68px !important;
+    overflow: hidden !important;
 }
 
 @media screen and (min-width: 681px) and (max-width: 767px)
@@ -385,13 +410,41 @@
 
     .claro .dijitSelectLabel, .claro .dijitTextBox .dijitInputInner, .claro .dijitValidationTextBox .dijitValidationContainer
     {
-        padding: 0 0 5px !important;
         margin-left: 2px;
     }
+
+    .esriCTFirstIndex
+    {
+        height: 16px !important;
+    }
+    .esriCTChkLabel
+    {
+        margin-top: 1px;
+    }
+
 }
 
-@media screen and (min-width: 321px) and (max-width: 680px)
+@media screen and (min-width:0px) and (max-width: 680px)
 {
+      html, body
+    {
+        font-size: 14px !important;
+    }
+
+    input
+    {
+        font-size: 14px !important;
+    }
+
+    .esriCTAreaOfInterestTab .esriCTReportTab
+    {
+        font-size: 14px !important;
+    }
+
+    .esriCTDisplayField, .esriCTValueField
+    {
+        font-size: 14px !important;
+    }
     .esriCTApplicationHeaderTextTD
     {
         display: none;
@@ -421,7 +474,7 @@
     {
         top: 61px !important;
     }
-      .esriCTSplashScreenDialog
+    .esriCTSplashScreenDialog
     {
         height: 90% !important;
         width: 93% !important;

@@ -2,15 +2,18 @@
 {
     background-color: #666666;
 }
+
 .esriSimpleSliderDecrementButton:hover, .esriSimpleSliderIncrementButton:hover
 {
     background-color: #666666;
 }
+
 .esriGovtLoadingIndicator, .esriCTLoadingIndicator
 {
     background-color: #000;
     filter: alpha(opacity = 40);
 }
+
 .divSplashContainer
 {
     background-color: #fff;
@@ -22,10 +25,12 @@
     -pie-background: rgba(0,0,0,0.65);
     behavior: url("../../library/core_library/PIE.htc");
 }
+
 .divAddressList, .esriCTRoundedCorner, .topRoundedCorner, .bottomRoundedCorner, .scrollbar_handle, .esriGovtLoadingIndicator
 {
     behavior: url("../../library/core_library/PIE.htc");
 }
+
 .selectedBaseMap
 {
     filter: progid:DXImageTransform.Microsoft.Glow(color='#8EAE21', Strength='4');
