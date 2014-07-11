@@ -41,7 +41,7 @@ define({
             searchBuildingText: "Search building near an address",
             hideText: "Hide more options",
             showText: "Show more options",
-            sliderDisplayText: "Show results within ${initialValue}",
+            sliderDisplayText: "Show results within ",
             communityText: "Search communities by city, county or region",
             searchCommunityText: "Search communities in",
             searchBusinessText: "Search business near an address",

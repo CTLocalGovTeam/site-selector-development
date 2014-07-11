@@ -74,51 +74,90 @@ define([
         selectedValue: null,
         areaSortBuilding: null,
         areaSortSites: null,
-        lastGeometry: null,
+        lastGeometry: [null, null, null, null],
 
         /**
         * create horizontal slider for all required tab
         * @param container node,horizontal rule node and slider value
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
-        _createHorizontalSlider: function (sliderContainer, horizontalRuleContainer, divSliderValue) {
-            var _self, horizontalSlider, sliderId, horizontalRule, sliderTimeOut;
+        _createHorizontalSlider: function (sliderContainer, horizontalRuleContainer, divSliderValue, unitContainer, tabCount) {
+            var _self, horizontalSlider, sliderId, horizontalRule, sliderTimeOut, count = 0, j, radioContent, radioSpanContent;
             sliderId = "slider" + domAttr.get(sliderContainer, "data-dojo-attach-point");
             horizontalRule = new HorizontalRule({ "class": "horizontalRule" }, horizontalRuleContainer);
-            horizontalRule.domNode.firstChild.innerHTML = dojo.configData.BufferDistanceSliderSettings.Minimum;
             horizontalRule.domNode.firstChild.style.border = "none";
-            horizontalRule.domNode.lastChild.innerHTML = dojo.configData.BufferDistanceSliderSettings.Maximum;
             horizontalRule.domNode.lastChild.style.border = "none";
-            horizontalRule.domNode.lastChild.style.right = "30" + "px";
+            horizontalRule.domNode.lastChild.style.right = "0" + "px";
             horizontalSlider = new HorizontalSlider({
-                units: dojo.configData.BufferDistanceSliderSettings.Units,
-                conversionFactor: dojo.configData.BufferDistanceSliderSettings.UnitConversionFactors,
-                minimum: dojo.configData.BufferDistanceSliderSettings.Minimum,
-                maximum: dojo.configData.BufferDistanceSliderSettings.Maximum,
-                value: dojo.configData.BufferDistanceSliderSettings.InitialValue,
-                showButtons: dojo.configData.BufferDistanceSliderSettings.ShowButtons,
-                intermediateChanges: dojo.configData.BufferDistanceSliderSettings.IntermediateChanges,
+                value: dojo.configData.BufferSliderSettings.defaultValue,
+                intermediateChanges: true,
                 "class": "horizontalSlider",
                 id: sliderId
             }, sliderContainer);
-            _self = this;
-            domAttr.set(divSliderValue, "innerHTML", string.substitute(sharedNls.titles.sliderDisplayText, { initialValue: dojo.configData.BufferDistanceSliderSettings.InitialValue }));
 
+            array.forEach(dojo.configData.DistanceUnitSettings, lang.hitch(this, function (DistanceUnit) {
+                count++;
+                radioContent = domConstruct.create("div", { "class": "esriCTRadioBtn " }, unitContainer);
+                domStyle.set(radioContent, "width", (100 / dojo.configData.DistanceUnitSettings.length).toString() + "%");
+                radioSpanContent = domConstruct.create("span", { "class": "esriCTRadioBtnContent esriCTCursorPointer" }, radioContent);
+                if (DistanceUnit.MaximumValue > 0) {
+                    domAttr.set(radioSpanContent, "MaximumValue", DistanceUnit.MaximumValue);
+                } else {
+                    domAttr.set(radioSpanContent, "MaximumValue", 1000);
+                }
+                if (DistanceUnit.MinimumValue >= 0) {
+                    domAttr.set(radioSpanContent, "MinimumValue", DistanceUnit.MinimumValue);
+                } else {
+                    domAttr.set(radioSpanContent, "MinimumValue", 0);
+                }
+                domAttr.set(radioSpanContent, "innerHTML", DistanceUnit.DistanceUnitName);
+                if (count === dojo.configData.DistanceUnitSettings.length) {
+                    domStyle.set(radioContent, "text-align", "right");
+                }
+
+                if (DistanceUnit.Checked) {
+                    for (j = 0; j < query(".esriCTSelectedDistanceUnit", unitContainer).length; j++) {
+                        domClass.remove(query(".esriCTSelectedDistanceUnit", unitContainer)[j], "esriCTSelectedDistanceUnit");
+                    }
+                    domClass.add(radioSpanContent, "esriCTSelectedDistanceUnit");
+                    this.unitValues[tabCount] = this._getDistanceUnit(DistanceUnit.DistanceUnitName);
+                    if (DistanceUnit.MaximumValue > 0) {
+                        horizontalRule.domNode.lastChild.innerHTML = DistanceUnit.MaximumValue;
+                        horizontalSlider.maximum = DistanceUnit.MaximumValue;
+                    } else {
+                        horizontalRule.domNode.lastChild.innerHTML = 1000;
+                        horizontalSlider.maximum = 1000;
+                    }
+                    if (DistanceUnit.MinimumValue >= 0) {
+                        horizontalRule.domNode.firstChild.innerHTML = DistanceUnit.MinimumValue;
+                        horizontalSlider.minimum = DistanceUnit.MinimumValue;
+                    } else {
+                        horizontalRule.domNode.firstChild.innerHTML = 0;
+                        horizontalSlider.minimum = 0;
+                    }
+                    domStyle.set(horizontalRule.domNode.lastChild, "text-align", "right");
+                    domStyle.set(horizontalRule.domNode.lastChild, "width", "334px");
+                    domStyle.set(horizontalRule.domNode.lastChild, "left", "0");
+                    domAttr.set(divSliderValue, "distanceUnit", DistanceUnit.DistanceUnitName.toString());
+                    domAttr.set(divSliderValue, "innerHTML", dojo.configData.BufferSliderSettings.defaultValue.toString() + " " + DistanceUnit.DistanceUnitName);
+                }
+                on(radioSpanContent, "click", lang.hitch(this, function (value) {
+                    this._selectionChangeForUnit(value, horizontalSlider, horizontalRule, divSliderValue);
+                }));
+
+            }));
+            _self = this;
             /**
             * Call back for slider change event
             * @param {object} Slider value
             * @memberOf widgets/Sitelocator/SitelocatorHelper
             */
             on(horizontalSlider, "change", function (value) {
-                var textNode;
-                textNode = query('.esriCTSliderText', this.domNode.parentElement.parentElement)[0];
-                domAttr.set(textNode, "innerHTML", string.substitute(sharedNls.titles.sliderDisplayText, { initialValue: Math.round(value) }));
+                domAttr.set(divSliderValue, "innerHTML", Math.round(value) + " " + domAttr.get(divSliderValue, "distanceUnit"));
                 clearTimeout(sliderTimeOut);
                 sliderTimeOut = setTimeout(function () {
-                    if (_self.map.graphics.graphics.length > 0) {
-                        if (_self.map.graphics.graphics[0].symbol && _self.featureGeometry[_self.workflowCount]) {
-                            _self._createBuffer(_self.featureGeometry[_self.workflowCount]);
-                        }
+                    if (_self.featureGeometry && _self.featureGeometry[_self.workflowCount]) {
+                        _self._createBuffer(_self.featureGeometry[_self.workflowCount]);
                     }
                 }, 500);
             });
@@ -197,11 +236,18 @@ define([
                 if (contentNode === this.TabContentContainer.children[i]) {
                     domStyle.set(this.TabContentContainer.children[i], "display", "block");
                     this.workflowCount = i;
-                    this.tabScrollbarCount++;
+                    this.map.graphics.clear();
+                    this.map.getLayer("esriFeatureGraphicsLayer").clear();
+                    this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                    if (this.lastGeometry[this.workflowCount]) {
+                        this.showBuffer(this.lastGeometry[this.workflowCount]);
+                    }
+                    if (this.featureGeometry[this.workflowCount]) {
+                        this.addPushPin(this.featureGeometry[this.workflowCount]);
+                    }
                     this.opeartionLayer = this.getCuerntOperatiobalLayer(this.workflowCount);
 
                 } else {
-                    this.tabScrollbarCount++;
                     domStyle.set(this.TabContentContainer.children[i], "display", "none");
                 }
                 if (this.arrTabClass.length !== this.divDirectionContainer.children.length) {
@@ -240,7 +286,7 @@ define([
 
             if (this.workflowCount === 3 && this.comunitiesDemoInfoMainScrollbar) {
                 srcContainer = query('.esriCTDemoInfoMainDiv', this.communityMainDiv)[0];
-                srcContent = srcContainer.childNodes[0];
+                srcContent = query('.esriCTDemoInfoMainDivBuildingContent')[0];
                 esriCTDemoResultStylesd = { height: document.documentElement.clientHeight - srcContainer.offsetTop + "px" };
                 domAttr.set(srcContainer, "style", esriCTDemoResultStylesd);
                 this.resizeScrollbar(this.comunitiesDemoInfoMainScrollbar, srcContainer, srcContent);
@@ -248,10 +294,25 @@ define([
         },
 
         /**
+        * Add pushpin on mappoint
+        * @param {object} mappoint for pushpin
+        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        */
+        addPushPin: function (mapPoint) {
+            var geoLocationPushpin, locatorMarkupSymbol, graphic;
+            geoLocationPushpin = dojoConfig.baseURL + dojo.configData.LocatorSettings.DefaultLocatorSymbol;
+            locatorMarkupSymbol = new esri.symbol.PictureMarkerSymbol(geoLocationPushpin, dojo.configData.LocatorSettings.MarkupSymbolSize.width, dojo.configData.LocatorSettings.MarkupSymbolSize.height);
+            graphic = new esri.Graphic(mapPoint, locatorMarkupSymbol, {}, null);
+            this.map.getLayer("esriFeatureGraphicsLayer").clear();
+            this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+            this.map.getLayer("esriGraphicsLayerMapSettings").add(graphic);
+        },
+
+        /**
         * Resize Building Panel
         * @param {object} Containernode for Building tab for Demographic container
         * @param {object} Contentnode for Building tab for Demographic container
-        * @memberOf widgets/Sitelocator/Sitelocator
+        * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _resizeBuildingPanel: function (geoenrichtOuterDiv, geoenrichtOuterDivContent) {
             var esriCTBuildingResultContainer, esriCTBuildingSitesResultStylesd;
@@ -281,8 +342,8 @@ define([
 
         /**
         * Resize Building Panel
-        * @param {object} Containernode for Building tab
-        * @param {object} Contentnode for Building tab
+        * @param {object} Containernode for Building tab 
+        * @param {object} Contentnode for Building tab 
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _resizeBuildingContainer: function (containerNode, contentNode) {
@@ -302,8 +363,8 @@ define([
 
         /**
         * Resize Sites Panel
-        * @param {object} Containernode for Sites tab
-        * @param {object} Contentnode for Sites tab
+        * @param {object} Containernode for Sites tab 
+        * @param {object} Contentnode for Sites tab 
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _resizeSitesContainer: function (containerNode, contentNode) {
@@ -322,7 +383,7 @@ define([
 
         /**
         * Show hide more option
-        * @param {object} show node
+        * @param {object} show node 
         * @param {object} text node
         * @param {object} rule node
         * @memberOf widgets/Sitelocator/Sitelocator
@@ -524,7 +585,9 @@ define([
             if (scrollbarName && containerNode.offsetTop > 0) {
                 domClass.remove(scrollbarName._scrollBarContent, "scrollbar_content");
                 domClass.add(scrollbarName._scrollBarContent, "esriCTZeroHeight");
-                scrollbarName.removeScrollBar();
+                if (scrollbarName) {
+                    scrollbarName.removeScrollBar();
+                }
                 if (containerNode) {
                     while (containerNode.hasChildNodes()) {
                         if (containerNode.lastChild) {
@@ -548,6 +611,7 @@ define([
         _getAttchmentImageAndInformation: function (value) {
             var index, dataSelected;
             index = domAttr.get(value.currentTarget, "index");
+            topic.publish("showProgressIndicator");
             if (this.workflowCount === 0) {
                 dataSelected = this.buildingTabData[index];
                 this._attachMentQuery(value, dataSelected, this.attachmentOuterDiv, this.mainDivBuilding, this.searchContentBuilding);
@@ -567,14 +631,14 @@ define([
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _attachMentQuery: function (value, dataSelected, attachmentNode, mainDivNode, searchContentNode) {
-            var backwardImage, backToResult, attachmentDiv, buildingDownloadDiv, attachmentImageClickDiv, imageCount = 0, prevNextdiv, prevdiv, nextdiv, outfields = [], resultSelectionQuerytask, resultSelectQuery, i, j, geometryService, params, propertyHeaderInfo, attributedata;
+            var backwardImage, backToResultDiv, backToResult, attachmentDiv, attachmentImageClickDiv, imageCount = 0, prevNextdiv, prevdiv, nextdiv, outfields = [], resultSelectionQuerytask, resultSelectQuery, i, j, geometryService, params, propertyHeaderInfo, attributedata;
             domConstruct.empty(attachmentNode);
             domStyle.set(attachmentNode, "display", "block");
             domStyle.set(mainDivNode, "display", "none");
             domConstruct.create("div", { "class": "esriCTAttachmentOuterDiv" }, searchContentNode);
-            domConstruct.create("div", { "class": "esriCTBackToResultImage" }, attachmentNode);
-            backwardImage = domConstruct.create("div", { "class": "esriCTBackwardImage" }, attachmentNode);
-            backToResult = domConstruct.create("div", { "class": "esriCTBackToResult" }, attachmentNode);
+            backToResultDiv = domConstruct.create("div", { "class": "esriCTBackToResultImage" }, attachmentNode);
+            backwardImage = domConstruct.create("div", { "class": "esriCTBackwardImage" }, backToResultDiv);
+            backToResult = domConstruct.create("div", { "class": "esriCTBackToResult" }, backToResultDiv);
             domAttr.set(backToResult, "innerHTML", sharedNls.titles.result);
             if (dataSelected.attachmentData) {
                 attachmentDiv = domConstruct.create("div", { "class": "esriCTAttachmentDiv" }, attachmentNode);
@@ -600,8 +664,7 @@ define([
                     })));
                 }
             }
-            buildingDownloadDiv = domConstruct.create("div", { "class": "esriCTBuildingDownloadDiv" }, attachmentNode);
-            domAttr.set(buildingDownloadDiv, "innerHTML", sharedNls.titles.textDownload);
+            this._downloadDropDown(dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.DownloadSettings, attachmentNode);
             resultSelectionQuerytask = new QueryTask(this.opeartionLayer.url);
             resultSelectQuery = new esri.tasks.Query();
             resultSelectQuery.returnGeometry = true;

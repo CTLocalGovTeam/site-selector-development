@@ -45,9 +45,9 @@
     color: #028D6A;
 }
 
-.esriCTDownload {
+/*.esriCTDownload {
   color: #028D6A !important;
-}
+}*/
 .esriCTBuildingDownloadDiv
 {
     color:#028D6A;
@@ -95,6 +95,11 @@
 
 .HomeButton .home, .HomeButton .home:hover {
     background-color: #028D6A;
+}
+.esriCTSelectedDistanceUnit
+{
+    color:#028D6A;
+    cursor:default;
 }
 
 /* End of Slider */
@@ -232,6 +237,10 @@
 
 .esriCTselectbox {
     border-color: #028D6A !important;
+}
+.esriCTsliderDisplayText
+{
+    color: #028D6A !important;
 }
 
 /*End of Site locator*/

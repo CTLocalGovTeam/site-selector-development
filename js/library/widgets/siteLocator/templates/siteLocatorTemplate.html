@@ -57,7 +57,9 @@
                     </div>
                     <div class="esriCTsliderNSelect">
                         <div class="esriCTSliderContainer">
-                            <div class="esriCTSliderText" data-dojo-attach-point="sliderDisplayText">
+                            <div class="esriCTSliderText" >
+                            <span>${sharedNls.titles.sliderDisplayText}</span>
+                            <span class="esriCTsliderDisplayText" data-dojo-attach-point="sliderDisplayText"></span>
                             </div>
                           <div class="esriCTSelectCommon">
                               <div class="esriCTSelect" data-dojo-attach-point="unitForSelectBuilding">
@@ -68,6 +70,8 @@
                                 </div>
                                 <div class="esriCTHorizontalSliderContainer" data-dojo-attach-point="horizontalSliderContainerBuliding">
                                 </div>
+                            </div>
+                            <div class="esriCTDistanceUnit" data-dojo-attach-point="bufferDistanceUnitBuilding">
                             </div>
                         </div>
                     </div>
@@ -124,7 +128,9 @@
                 </div>
                 <div class="esriCTsliderNSelect">
                     <div class="esriCTSliderContainer">
-                        <div class="esriCTSliderText" data-dojo-attach-point="sitesSliderText">
+                        <div class="esriCTSliderText">
+                        <span>${sharedNls.titles.sliderDisplayText}</span>
+                        <span class="esriCTsliderDisplayText" data-dojo-attach-point="sitesSliderText"></span>
                         </div>
                          <div class="esriCTSelectCommon">
                             <div class="esriCTSelect" data-dojo-attach-point="unitForSelectSite"> </div>
@@ -134,6 +140,8 @@
                             </div>
                             <div class="esriCTHorizontalSliderContainer" data-dojo-attach-point="horizontalSliderContainerSites">
                             </div>
+                        </div>
+                        <div class="esriCTDistanceUnit" data-dojo-attach-point="bufferDistanceUnitSites">
                         </div>
                     </div>
                 </div>
@@ -189,7 +197,9 @@
                 </div>
                 <div class="esriCTsliderNSelect">
                     <div class="esriCTSliderContainer">
-                        <div class="esriCTSliderText" data-dojo-attach-point="businessSliderText">
+                        <div class="esriCTSliderText">
+                        <span> ${sharedNls.titles.sliderDisplayText}</span>
+                        <span class="esriCTsliderDisplayText" data-dojo-attach-point="businessSliderText"></span>
                         </div>
                          <div class="esriCTSelectCommon">
                         <div class="esriCTSelect" data-dojo-attach-point="unitForSelectBusiness">
@@ -200,6 +210,8 @@
                             </div>
                             <div class="esriCTHorizontalSliderContainer" data-dojo-attach-point="horizontalSliderContainerBusiness">
                             </div>
+                        </div>
+                        <div class="esriCTDistanceUnit" data-dojo-attach-point="bufferDistanceUnitBusiness">
                         </div>
                     </div>
                 </div>
@@ -217,7 +229,6 @@
                 </div>
                 <div class="esriCTAreaOfInterestContainer esriCTHideContainerHeight" data-dojo-attach-point="businessContainer">
                     <div class="esriCTDownload" data-dojo-attach-point="downloadDiv">
-                        <span data-dojo-attach-point="download"></span>
                     </div>
                     <div class="esriCTCollectionIdS" data-dojo-attach-point="collectionIdS">
                         <div class="esriCTresultDivMain" data-dojo-attach-point="divBusinessResult">
