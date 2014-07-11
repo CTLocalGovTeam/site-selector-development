@@ -76,13 +76,11 @@ define([
         tooltip: null,
         logoContainer: null,
         featureGeometry: [null, null, null],
-        unitValues: ["UNIT_STATUTE_MILE", "UNIT_STATUTE_MILE", "UNIT_STATUTE_MILE", "UNIT_STATUTE_MILE"],
         totalArray: [],
         revenueData: [],
         employeeData: [],
         salesFinalData: [],
         employeFinalData: [],
-        tabScrollbarCount: 1,
         buldingShowOption: null,
         siteShowOption: null,
         arrTabClass: [],
@@ -95,6 +93,8 @@ define([
         businessData: [],
         enrichData: null,
         opeartionLayer: null,
+        unitValues: [null, null, null, null],
+        arrStudyAreas: [null, null, null],
 
         /**
         * create Site selector widget
@@ -103,7 +103,7 @@ define([
         * @name widgets/SiteSelector/SiteSelector
         */
         postCreate: function () {
-            var opt = [], arrSort = [], selectSites, selectBusinessTab, selectBuilding, selectSortOption;
+            var arrSort = [], selectSortOption;
             this.logoContainer = query(".esriControlsBR")[0];
             topic.subscribe("toggleWidget", lang.hitch(this, function (widgetID) {
                 if (widgetID !== "siteLocator") {
@@ -122,7 +122,7 @@ define([
             }));
             urlUtils.addProxyRule({
                 urlPrefix: dojo.configData.GeoEnrichmentService,
-                proxyUrl: dojoConfig.baseURL + dojo.configData.ProxyUrl
+                proxyUrl: dojo.configData.ProxyUrl
             });
             this.domNode = domConstruct.create("div", { "title": sharedNls.tooltips.reports, "class": "esriCTHeaderSearch" }, null);
             this._setDefaultTextboxValue(this.txtAddressBuilding);
@@ -139,14 +139,11 @@ define([
             this.txtAddressCommunities.value = domAttr.get(this.txtAddressCommunities, "defaultAddress");
             this.lastSearchStringCommunities = lang.trim(this.txtAddressCommunities.value);
             this._showHideInfoRouteContainer();
-            this._createHorizontalSlider(this.horizontalSliderContainerBuliding, this.horizontalRuleContainer, this.sliderDisplayText);
-            this._createHorizontalSlider(this.horizontalSliderContainerSites, this.horizontalRuleContainerSites, this.sitesSliderText);
-            this._createHorizontalSlider(this.horizontalSliderContainerBusiness, this.horizontalRuleContainerBusiness, this.businessSliderText);
+            this._createHorizontalSlider(this.horizontalSliderContainerBuliding, this.horizontalRuleContainer, this.sliderDisplayText, this.bufferDistanceUnitBuilding, 0);
+            this._createHorizontalSlider(this.horizontalSliderContainerSites, this.horizontalRuleContainerSites, this.sitesSliderText, this.bufferDistanceUnitSites, 1);
+            this._createHorizontalSlider(this.horizontalSliderContainerBusiness, this.horizontalRuleContainerBusiness, this.businessSliderText, this.bufferDistanceUnitBusiness, 2);
             arrSort = this._setSelectionOption(dojo.configData.Workflows[2].FilterSettings.BusinesSortOptions.Option.split(","));
-            opt = this._setSelectionOption(dojo.configData.BufferDistanceSliderSettings.Units.split(","));
-            selectBuilding = new SelectList({ options: opt, id: "selectBuildingUnit" }, this.unitForSelectBuilding);
-            selectBusinessTab = new SelectList({ options: opt, id: "selectBusinessUnit" }, this.unitForSelectBusiness);
-            selectSites = new SelectList({ options: opt, id: "selectSitesUnit" }, this.unitForSelectSite);
+            arrSort.splice(0, 0, { "label": sharedNls.titles.select, "value": sharedNls.titles.select });
             selectSortOption = new SelectList({ options: arrSort, id: "sortBy" }, this.SortBy);
             /**
             * minimize other open header panel widgets and show route
@@ -184,7 +181,6 @@ define([
             domAttr.set(this.searchBusinessText, "innerHTML", sharedNls.titles.searchBusinessText);
             domAttr.set(this.closeBusiness, "title", sharedNls.tooltips.clearEntry);
             domAttr.set(this.esriCTimgLocateBusiness, "title", sharedNls.tooltips.search);
-            domAttr.set(this.download, "innerHTML", sharedNls.titles.textDownload);
             domAttr.set(this.communityText, "innerHTML", sharedNls.titles.communityText);
             domAttr.set(this.closeCommunities, "title", sharedNls.tooltips.clearEntry);
             domAttr.set(this.esriCTimgLocateCommunities, "title", sharedNls.tooltips.search);
@@ -214,18 +210,6 @@ define([
             this.own(on(this.esriCTsearchContainerCommunities, "click", lang.hitch(this, function () {
                 this._showTab(this.esriCTsearchContainerCommunities, this.searchContentCommunities);
             })));
-            this.own(on(selectBuilding, "change", lang.hitch(this, function (value) {
-                this._selectionChangeForUnit(value);
-            })));
-
-            this.own(on(selectSites, "change", lang.hitch(this, function (value) {
-                this._selectionChangeForUnit(value);
-            })));
-
-            this.own(on(selectBusinessTab, "change", lang.hitch(this, function (value) {
-                this._selectionChangeForUnit(value);
-            })));
-
             this._showBusinessTab();
 
             this._searchCommunitySelectNames();
@@ -275,7 +259,7 @@ define([
                 this.divSearchBuilding.disabled = !this.chkSerachContentBuilding.checked;
                 this.esriCTimgLocateBuilding.disabled = !this.chkSerachContentBuilding.checked;
                 if (!this.chkSerachContentBuilding.checked) {
-                    delete this.lastGeometry;
+                    this.lastGeometry[this.workflowCount] = null;
                     this.featureGeometry[this.workflowCount] = null;
                     this.map.graphics.clear();
                     this.map.getLayer("esriFeatureGraphicsLayer").clear();
@@ -299,7 +283,7 @@ define([
                 this.esriCTimgLocateSites.disabled = !this.chksearchContentSites.checked;
                 this.divSearchSites.disabled = !this.chksearchContentSites.checked;
                 if (!this.chksearchContentSites.checked) {
-                    delete this.lastGeometry;
+                    this.lastGeometry[this.workflowCount] = null;
                     this.featureGeometry[this.workflowCount] = null;
                     this.map.graphics.clear();
                     this.map.getLayer("esriFeatureGraphicsLayer").clear();
@@ -343,37 +327,43 @@ define([
 
             array.forEach(arrFilter, lang.hitch(this, function (value) {
                 var divBusinessRevenue, leftDivSites, checkBoxAreaSites, chkAreaSites, areaText, rightDivSites, spanTextFrom, spanTextFromDes, txtFrom, spanTextTo, spanTextToDes, txtTo;
-                divBusinessRevenue = domConstruct.create("div", { "class": "esriCTDivBusinessRevenue" }, node);
+                divBusinessRevenue = domConstruct.create("div", { "class": "esriCTDivFromTo" }, node);
                 leftDivSites = domConstruct.create("div", { "class": "esriCTLeft" }, divBusinessRevenue);
                 checkBoxAreaSites = domConstruct.create("div", { "class": "esriCTCheckBox" }, leftDivSites);
                 if (value.FieldName) {
-                    chkAreaSites = domConstruct.create("input", { "type": "checkbox", "value": value.FieldName }, checkBoxAreaSites);
+                    chkAreaSites = domConstruct.create("input", { "class": "esriCTChkBox", "type": "checkbox", "value": value.FieldName }, checkBoxAreaSites);
                 } else {
-                    chkAreaSites = domConstruct.create("input", { "type": "checkbox", "value": value.VariableNameSuffix }, checkBoxAreaSites);
+                    chkAreaSites = domConstruct.create("input", { "class": "esriCTChkBox", "type": "checkbox", "value": value.VariableNameSuffix }, checkBoxAreaSites);
                 }
                 areaText = domConstruct.create("div", { "class": "esriCTChkLabel" }, leftDivSites);
                 rightDivSites = domConstruct.create("div", { "class": "esriCTRight" }, divBusinessRevenue);
                 spanTextFrom = domConstruct.create("span", { "class": "esriCTText" }, rightDivSites);
                 spanTextFromDes = domConstruct.create("span", {}, rightDivSites);
-                txtFrom = domConstruct.create("input", { "type": "text", "class": "esriCTToTextBox", "maxlength": "15" }, spanTextFromDes);
+                txtFrom = domConstruct.create("input", { "type": "text", "class": "esriCTToTextBoxFrom", "maxlength": "15" }, spanTextFromDes);
                 spanTextTo = domConstruct.create("span", { "class": "esriCTText" }, rightDivSites);
                 spanTextToDes = domConstruct.create("span", {}, rightDivSites);
-                txtTo = domConstruct.create("input", { "type": "text", "class": "esriCTToTextBox", "maxlength": "15" }, spanTextToDes);
+                txtTo = domConstruct.create("input", { "type": "text", "class": "esriCTToTextBoxTo", "maxlength": "15" }, spanTextToDes);
                 domAttr.set(spanTextFrom, "innerHTML", sharedNls.titles.fromText);
                 domAttr.set(spanTextTo, "innerHTML", sharedNls.titles.toText);
                 domAttr.set(areaText, "innerHTML", value.DisplayText);
                 txtFrom.disabled = true;
                 txtTo.disabled = true;
+                domClass.add(txtFrom, "esriCTDisabledAddressColorChange");
+                domClass.add(txtTo, "esriCTDisabledAddressColorChange");
                 this.own(on(chkAreaSites, "click", lang.hitch(this, function (value) {
-
                     txtFrom.disabled = !chkAreaSites.checked;
                     txtTo.disabled = !chkAreaSites.checked;
                     if (!chkAreaSites.checked) {
+                        domClass.add(txtFrom, "esriCTDisabledAddressColorChange");
+                        domClass.add(txtTo, "esriCTDisabledAddressColorChange");
                         if (this.workflowCount === 2) {
                             this._fromToDatachangeHandler(txtFrom, txtTo, chkAreaSites);
                         } else {
                             this._fromToQuery(txtFrom, txtTo, chkAreaSites);
                         }
+                    } else {
+                        domClass.remove(txtFrom, "esriCTDisabledAddressColorChange");
+                        domClass.remove(txtTo, "esriCTDisabledAddressColorChange");
                     }
                 })));
 
@@ -401,23 +391,23 @@ define([
         /**
         * Create Create Filter Option Field UI
         * @param {array} Number of fields
-        * @param {object} Container node
-        * @param {array} Additional fields
-        * @param {object} Additional fields node
+        * @param {object} Container node 
+        * @param {array} Additional fileds  
+        * @param {object} Additional fileds node 
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _createFilterOptionField: function (arrFields, node, arrAdditionalFields, additionalFieldsNode) {
-            var i, j, divBusinessRevenue, checkBoxWithText, divCheckBox, fieldContent, showHideText, divHideOptionText, divAdditionalField, checkBoxAdditionalWithText, additionalFieldCheckBox, additionalFieldDisplayText;
+            var i, j, divBusinessRevenue, checkBoxWithText, divCheckBox, checkBox, fieldContent, showHideText, divHideOptionText, divAdditionalField, checkBoxAdditionalWithText, additionalFieldCheckBox, additionalCheckBox, additionalFieldDisplayText;
             for (i = 0; i < arrFields.length; i++) {
                 divBusinessRevenue = domConstruct.create("div", { "class": "esriCTDivFilterOption" }, node);
                 checkBoxWithText = domConstruct.create("div", { "class": "esriCTCheckBoxWithText" }, divBusinessRevenue);
                 divCheckBox = domConstruct.create("div", { "class": "esriCTCheckBox" }, checkBoxWithText);
-                domConstruct.create("input", { "type": "checkbox", "name": arrFields[i].FieldName, "value": arrFields[i].FieldValue }, divCheckBox);
+                checkBox = domConstruct.create("input", { "type": "checkbox", "name": arrFields[i].FieldName, "value": arrFields[i].FieldValue }, divCheckBox);
                 divCheckBox.setAttribute("isRegularFilterOptionFields", true);
                 fieldContent = domConstruct.create("div", { "class": "esriCTChkLabel" }, checkBoxWithText);
                 domConstruct.create("div", { "class": "esriCTCheckBoxWithText" }, divBusinessRevenue);
                 domAttr.set(fieldContent, "innerHTML", arrFields[i].DisplayText);
-                this.own(on(divCheckBox, "click", lang.hitch(this, this.chkQueryHandler)));
+                this.own(on(checkBox, "click", lang.hitch(this, this.chkQueryHandler)));
             }
             if (arrAdditionalFields.Enabled && arrAdditionalFields.FilterOptions.length) {
                 showHideText = domConstruct.create("div", { "class": "esriCTshowhideText" }, divBusinessRevenue);
@@ -431,11 +421,11 @@ define([
                     divAdditionalField = domConstruct.create("div", { "class": "esriCTDivAdditionalOpt" }, additionalFieldsNode);
                     checkBoxAdditionalWithText = domConstruct.create("div", { "class": "esriCTCheckBoxWithText" }, divAdditionalField);
                     additionalFieldCheckBox = domConstruct.create("div", { "class": "esriCTCheckBox" }, checkBoxAdditionalWithText);
-                    domConstruct.create("input", { "type": "checkbox", "name": arrAdditionalFields.FilterFieldName, "value": arrAdditionalFields.FilterOptions[j].FieldValue }, additionalFieldCheckBox);
+                    additionalCheckBox = domConstruct.create("input", { "type": "checkbox", "name": arrAdditionalFields.FilterFieldName, "value": arrAdditionalFields.FilterOptions[j].FieldValue }, additionalFieldCheckBox);
                     additionalFieldCheckBox.setAttribute("isRegularFilterOptionFields", false);
                     additionalFieldDisplayText = domConstruct.create("div", { "class": "esriCTChkLabel" }, checkBoxAdditionalWithText);
                     domAttr.set(additionalFieldDisplayText, "innerHTML", arrAdditionalFields.FilterOptions[j].DisplayText);
-                    this.own(on(additionalFieldCheckBox, "click", lang.hitch(this, this.chkQueryHandler)));
+                    this.own(on(additionalCheckBox, "click", lang.hitch(this, this.chkQueryHandler)));
                 }
             }
         },
@@ -486,7 +476,7 @@ define([
         */
         _selectionChangeForSort: function (value) {
             this.strValueSort = value;
-            this.businessData.sort(lang.hitch(this, function (a, b) {
+            this.currentBussinessData.sort(lang.hitch(this, function (a, b) {
                 if (a[this.strValueSort] > b[this.strValueSort]) {
                     return 1;
                 }
@@ -494,9 +484,11 @@ define([
                     return -1;
                 }
                 // a must be equal to b
-                return 0;
+                if (a[this.strValueSort] !== 0 && b[this.strValueSort] !== 0) {
+                    return 0;
+                }
             }));
-            this._setBusinessValues(this.businessData, this.mainResultDiv, this.enrichData);
+            this._setBusinessValues(this.currentBussinessData, this.mainResultDiv, this.enrichData);
         },
 
         /**
@@ -520,26 +512,55 @@ define([
         /**
         * Set unit to be used to create buffer
         * @param {string} Selected unit
+        * @param {object} slider object
         * @memberOf widgets/Sitelocator/Sitelocator
         */
-        _selectionChangeForUnit: function (value) {
-            var resBuilding, sliderUnitValue;
-            resBuilding = value;
-            if (resBuilding === " Miles") {
+        _selectionChangeForUnit: function (value, slider, horizontalRule, divSliderValue) {
+            var sliderValue;
+
+            array.forEach(value.target.parentNode.parentNode.children, function (item) {
+                if (domClass.contains(item.children[0], "esriCTSelectedDistanceUnit")) {
+                    domClass.remove(item.children[0], "esriCTSelectedDistanceUnit");
+                }
+            });
+            sliderValue = slider.value * ((value.target.getAttribute("MaximumValue") - value.target.getAttribute("MinimumValue")) / (slider.maximum - slider.minimum));
+            domClass.add(value.target, "esriCTSelectedDistanceUnit");
+            this.unitValues[this.workflowCount] = this._getDistanceUnit(value.target.innerHTML.toString());
+            horizontalRule.domNode.firstChild.innerHTML = value.target.getAttribute("MinimumValue");
+            horizontalRule.domNode.lastChild.innerHTML = value.target.getAttribute("MaximumValue");
+            domStyle.set(horizontalRule.domNode.lastChild, "text-align", "right");
+            domStyle.set(horizontalRule.domNode.lastChild, "width", "334px");
+            domStyle.set(horizontalRule.domNode.lastChild, "left", "0");
+
+            slider.minimum = value.target.getAttribute("MinimumValue");
+            slider.maximum = value.target.getAttribute("MaximumValue");
+            domAttr.set(divSliderValue, "innerHTML", domAttr.get(divSliderValue, "innerHTML").toString().replace(domAttr.get(divSliderValue, "distanceUnit").toString(), value.target.innerHTML.toString()).replace(Math.round(slider.value).toString(), Math.round(sliderValue).toString()));
+            domAttr.set(divSliderValue, "distanceUnit", value.target.innerHTML.toString());
+            slider.value = sliderValue;
+            if (this.featureGeometry[this.workflowCount]) {
+                this._createBuffer(this.featureGeometry[this.workflowCount]);
+            }
+        },
+
+        /**
+        * Get distance unit based on unit selection 
+        * @param {string} Input distance unit
+        * @memberOf widgets/Sitelocator/Sitelocator
+        */
+        _getDistanceUnit: function (strUnit) {
+            var sliderUnitValue;
+            if (strUnit.toLowerCase() === "miles") {
                 sliderUnitValue = "UNIT_STATUTE_MILE";
-            } else if (resBuilding === " Feet") {
+            } else if (strUnit.toLowerCase() === "feet") {
                 sliderUnitValue = "UNIT_FOOT";
-            } else if (resBuilding === " Meters") {
+            } else if (strUnit.toLowerCase() === "meters") {
                 sliderUnitValue = "UNIT_METER";
-            } else if (resBuilding === " Kilometers") {
+            } else if (strUnit.toLowerCase() === "kilometers") {
                 sliderUnitValue = "UNIT_KILOMETER";
             } else {
                 sliderUnitValue = "UNIT_STATUTE_MILE";
             }
-            this.unitValues[this.workflowCount] = sliderUnitValue;
-            if (this.featureGeometry[this.workflowCount]) {
-                this._createBuffer(this.featureGeometry[this.workflowCount]);
-            }
+            return sliderUnitValue;
         },
 
         /**
@@ -550,6 +571,8 @@ define([
         _createBuffer: function (geometry) {
             var sliderDistance, slider, selectedPanel, geometryService, params;
             topic.publish("showProgressIndicator");
+            this.featureGeometry[this.workflowCount] = geometry;
+
             selectedPanel = query('.esriCTsearchContainerSitesSelected')[0];
             if (domClass.contains(selectedPanel, "esriCTsearchContainerBuilding")) {
                 slider = dijit.byId("sliderhorizontalSliderContainerBuliding");
@@ -561,13 +584,13 @@ define([
                 slider = dijit.byId("sliderhorizontalSliderContainerBusiness");
                 sliderDistance = slider.value;
             } else {
-                sliderDistance = dojo.configData.BufferDistanceSliderSettings.InitialValue;
+                sliderDistance = dojo.configData.BufferSliderSettings.defaultValue;
             }
             geometryService = new GeometryService(dojo.configData.GeometryService);
+
             if (sliderDistance !== 0) {
                 if (geometry && geometry.type === "point") {
                     //setup the buffer parameters
-                    this.featureGeometry[this.workflowCount] = geometry;
                     params = new BufferParameters();
                     params.distances = [Math.round(sliderDistance)];
                     params.bufferSpatialReference = this.map.spatialReference;
@@ -576,10 +599,11 @@ define([
                     params.unit = GeometryService[this.unitValues[this.workflowCount]];
                     geometryService.buffer(params, lang.hitch(this, function (geometries) {
                         this.map.setExtent(geometries[0].getExtent(), true);
+                        this.lastGeometry[this.workflowCount] = geometries;
                         if (this.workflowCount === 2) {
                             this._enrichData(geometries, this.workflowCount, null);
                         } else {
-                            this.lastGeometry = geometries;
+
                             if (this.workflowCount === 0) {
                                 this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
                             } else {
@@ -592,7 +616,24 @@ define([
                 }
             } else {
                 topic.publish("hideProgressIndicator");
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+                if (this.workflowCount === 0) {
+                    domStyle.set(this.outerDivForPegination, "display", "none");
+                    domConstruct.empty(this.outerResultContainerBuilding);
+                    domConstruct.empty(this.attachmentOuterDiv);
+                    delete this.buildingTabData;
+                } else {
+                    domStyle.set(this.outerDivForPeginationSites, "display", "none");
+                    domConstruct.empty(this.outerResultContainerSites);
+                    domConstruct.empty(this.attachmentOuterDivSites);
+                    delete this.sitesTabData;
+                }
+                this.lastGeometry[this.workflowCount] = null;
+                this.map.graphics.clear();
                 alert(sharedNls.errorMessages.bufferSliderValue);
+
             }
         },
 
@@ -605,6 +646,9 @@ define([
             var self, symbol;
             this.map.graphics.clear();
             self = this;
+            if (bufferedGeometries) {
+                this.map.setExtent(bufferedGeometries[0].getExtent(), true);
+            }
             symbol = new SimpleFillSymbol(
                 SimpleFillSymbol.STYLE_SOLID,
                 new SimpleLineSymbol(
@@ -644,7 +688,6 @@ define([
         */
         _showHideInfoRouteContainer: function () {
             if (html.coords(this.applicationHeaderRouteContainer).h > 0) {
-
                 /**
                 * when user clicks on share icon in header panel, close the sharing panel if it is open
                 */

@@ -65,10 +65,12 @@ html, body
 
 .esriCTApplicationHeaderTextTD
 {
-    float: left;
     font-size: 22px;
     padding: 10px 0 10px 15px;
     text-shadow: 0 0 1px #AAAAAA;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .esriCTRightTab
@@ -157,6 +159,7 @@ html, body
     vertical-align: middle !important;
     height: 18px;
     margin-left: 18px;
+    
 }
 
 input
@@ -172,6 +175,7 @@ input[type="text"]
     border: 1px solid #DFDFDF;
     padding: 5px;
     -webkit-appearance: none;
+    border-radius:0px !important;
 }
 
 .esriCTselectbox
@@ -189,16 +193,14 @@ input[type="text"]
     margin-top: 5px;
     z-index: 101;
     border: none;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
+    
     margin-left: -15px;
 }
 
 .esriCTSearchListPanel
 {
     display: table;
-    min-height: 38px;
+    height: 38px;
     width: 100%;
 }
 
@@ -394,49 +396,17 @@ input[type="text"]
     text-align: center;
 }
 
-.esriCTFacebook
+.esriCTTwitter, .esriCTFacebook, .esriCTEmail, .esriCTEmbedding
 {
     background-repeat: no-repeat;
     background-position: center;
-    height: 26px !important;
-    width: 26px;
+    height: 24px !important;
+    width: 24px;
     margin: 0 auto;
     cursor: pointer;
-    background-size: 26px;
+    background-size: 24px;
 }
 
-.esriCTTwitter
-{
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 26px !important;
-    width: 26px;
-    margin: 0 auto;
-    cursor: pointer;
-    background-size: 26px;
-}
-
-.esriCTEmail
-{
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 26px !important;
-    width: 26px;
-    margin: 0 auto;
-    cursor: pointer;
-    background-size: 26px;
-}
-
-.esriCTEmbedding
-{
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 26px !important;
-    width: 26px;
-    margin: 0 auto;
-    cursor: pointer;
-    background-size: 26px;
-}
 /* End of Share Container Styles */
 
 /* Slider */
@@ -496,8 +466,9 @@ input[type="text"]
 
 .horizontalSlider
 {
-    width: 330px !important;
+    width: 345px !important;
     margin-top: 15px !important;
+    margin-left: -5px;
 }
 
 .dijitSliderButtonContainerH, .dijitSliderDecrementButtonHover
@@ -510,6 +481,20 @@ input[type="text"]
     border: none;
 }
 
+.esriCTRadioButtonDiv
+{
+    padding-right: 15px;
+}
+
+.esriCTRadioBtn
+{
+    display:table-cell;
+    
+}
+.esriCTCursorPointer
+{
+    cursor: pointer;
+}
 /* End of Slider */
 
 /* Basemap */
@@ -637,6 +622,13 @@ input[type="text"]
 
 /* Splash Screen*/
 
+.splashScreenScrollBarContainer
+{
+    width: 100% !important;
+    position: relative !important;
+    margin-top: 10px;
+}
+
 .esriGovtLoadSpashScreen
 {
     top: 0px;
@@ -646,11 +638,50 @@ input[type="text"]
     height: 100%;
 }
 
-.splashScreenScrollBarContainer
+.applicationHeaderSplashscreenContainer
 {
-    width: 100% !important;
-    position: relative !important;
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    z-index: 10009;
+    width: 100%;
+    height: 100%;
 }
+
+.divSplashScreenContent
+{
+    z-index: 10003;
+    text-align: left;
+    height: 290px;
+    width: 350px;
+    position: absolute;
+    top: 25%;
+    right: 40%;
+}
+
+.divSplashScreenDialogContent
+{
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.divSplashContainer
+{
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
+.divSplashContent
+{
+    padding-left: 10px;
+    overflow: hidden;
+    width: 90%;
+    margin-top: 10px;
+    height: 224px;
+}
+
 .customButtonContainer
 {
     width: 100%;
@@ -669,12 +700,7 @@ input[type="text"]
     z-index: 10002;
 }
 
-.divSplashContainer
-{
-    overflow: hidden;
-    position: relative;
-    height: 100%;
-}
+
 .esriGovtSplashContent
 {
     overflow: hidden;
@@ -717,15 +743,14 @@ input[type="text"]
     border: none;
     cursor: pointer;
     width: 75px;
-    height: 25px !important;
-    margin: 10PX AUTO;
+     margin: 10PX AUTO;
 }
 .customButtonInner
 {
     width: 100%;
     height: 100%;
     text-align: center;
-    padding-top: 5px;
+    padding: 5px 0;
 }
 
 .splashTbldspl
@@ -845,7 +870,7 @@ input[type="text"]
     position: absolute;
     top: 65px;
     left: 50px;
-    z-index: 1000;
+    z-index: 998;
 }
 
 .divLayerHolder
@@ -911,7 +936,6 @@ input[type="text"]
 
 .esriCTMapLogo
 {
-    /*position: relative !important;*/
     right: 375px;
     margin-bottom: 0px;
 }
@@ -1106,7 +1130,7 @@ input[type="text"]
 .esriCTSliderText
 {
     float: left;
-    margin-left: 18px;
+   
 }
 
 .esriCTSearchContainerComm
@@ -1145,7 +1169,7 @@ input[type="text"]
     cursor: pointer;
 }
 
-.esriCTDivBusinessRevenue
+.esriCTDivFromTo
 {
     clear: both;
     width: 100%;
@@ -1191,7 +1215,14 @@ input[type="text"]
     border-bottom: none !important;
 }
 
-.esriCTToTextBox
+.esriCTToTextBoxFrom
+{
+    width: 32px;
+    margin-left: 5px;
+    padding: 5px 2px !important;
+}
+
+.esriCTToTextBoxTo
 {
     width: 32px;
     margin-left: 5px;
@@ -1220,12 +1251,11 @@ input[type="text"]
 
 .esriCTAddressPlaceHolder
 {
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+  
     position: relative;
     cursor: default !important;
 }
+
 /*end of site locator*/
 
 /* Horizontal Slider Styles*/
@@ -1235,7 +1265,7 @@ input[type="text"]
     border-bottom-width: 0 !important;
     border-left-width: 0 !important;
     border-top-width: 0 !important;
-    margin-left: -16px;
+     text-align: right;
     margin-top: 7px;
     width: 0;
 }
@@ -1243,7 +1273,6 @@ input[type="text"]
 .horizontalRule
 {
     height: 5px;
-    margin-left: 23px;
     margin-bottom: 5px;
 }
 
@@ -1347,14 +1376,14 @@ input[type="text"]
 
 .esriCTSlider
 {
-    margin-left: 12px;
+  
     height: 30px;
     clear: both;
 }
 
 .esriCTHorizontalRuleContainer, .horizontalRule
 {
-    width: 303px;
+    width: 334px;
 }
 
 .esriCTHorizontalSliderContainer
@@ -1618,7 +1647,7 @@ input[type="text"]
 
 .dijitPopup
 {
-    height: 69px !important;
+    
     overflow: hidden;
     overflow-y: auto;
     background: #FFFFFF;
@@ -1807,7 +1836,7 @@ input[type="text"]
 
 .esriCTBackToResultImage
 {
-    padding: 10px 0 0 16px;
+    padding: 10px 0 0 12px;
 }
 
 .esriCTBackwardImage
@@ -1817,7 +1846,7 @@ input[type="text"]
     width: 15px;
     height: 18px;
     vertical-align: middle;
-    margin-left: 8px;
+    margin-left: 0px;
     cursor: pointer;
 }
 
@@ -1954,3 +1983,53 @@ div.esriCTPrev
     float: left;
     width: 100%;
 }
+
+.esriControlsBR {
+    z-index: 1000 !important;
+}
+
+.esriCTDistanceUnit{display:table; width:90%; margin-top:5px;}
+
+.esriCTSortPanelHead
+{
+    clear: both;
+    font-weight: bold;
+    margin-left: 18px;
+}
+.esriCTouterDownloadDiv
+{
+    float: left;
+    clear:both;
+    margin-top: 5px;
+    margin-left: 18px;
+    height: 20px;
+}
+
+.esriCTInnerDownloadDivBuilding
+{
+    float: left;
+    cursor: pointer;
+}
+
+.esriCTInnerDownloadDiv
+{
+    float: left;
+    padding:1px;
+}
+.esriCTSortingDiv
+{
+    float: right;
+    height: 20px;
+    margin-right: -21px;
+}
+.esriCTSortDiv
+{
+    margin-right: 15px;
+    float: right;
+}
+.esriCTSpan
+{
+    float: left;
+    padding:1px;
+}
+

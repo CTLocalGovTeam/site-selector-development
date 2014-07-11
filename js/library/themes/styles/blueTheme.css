@@ -231,7 +231,7 @@
     border-bottom: 1px solid #007ac2;
 }
 
-.esriCTApplicationHeaderText {
+.esriCTApplicationHeaderTextTD {
     color: #007AC2;
 }
 
@@ -278,6 +278,11 @@
 
 .HomeButton .home, .HomeButton .home:hover {
     background-color: #007ac2;
+}
+.esriCTSelectedDistanceUnit
+{
+    color:#007ac2;
+    cursor:default;
 }
 
 /* End of Slider */
@@ -432,7 +437,8 @@
     border-color: #007AC2 !important;
 }
 
-.esriCTDownload {
+.esriCTsliderDisplayText
+{
     color: #007AC2 !important;
 }
 /*End of Site locator*/

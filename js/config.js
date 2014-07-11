@@ -52,7 +52,7 @@ define([], function () {
         HelpURL: "help.htm",
 
         // Set custom logo url, displayed in lower left corner. Set to empty "" to disable.
-        LogoURL: "",
+        LogoURL: "http://nddotfargo.com/uploads/media/nddotlogo.png",
 
         // Set splash window content - Message that appears when the application starts
         SplashScreen: {
@@ -126,17 +126,32 @@ define([], function () {
         // Set proxy url
         ProxyUrl: "/proxy/proxy.ashx",
 
-        // Specify buffer distance slider settings
-        BufferDistanceSliderSettings: {
-            Units: "Miles, Meters, Kilometers, Feet",
-            UnitConversionFactors: "1, 1609.34, 1.60934, 5280",
-            Minimum: 0,
-            Maximum: 50,
-            InitialValue: 20,
-            ShowButtons: true,
-            IntermediateChanges: true
-
+        // Specify buffer slider settings
+        BufferSliderSettings: {
+            defaultValue: 20
         },
+
+        DistanceUnitSettings: [{
+            DistanceUnitName: "Miles",
+            MinimumValue: 0,
+            MaximumValue: 100,
+            Checked: true
+        }, {
+            DistanceUnitName: "Feet",
+            MinimumValue: 0,
+            MaximumValue: 1000,
+            Checked: false
+        }, {
+            DistanceUnitName: "Meters",
+            MinimumValue: 0,
+            MaximumValue: 1000,
+            Checked: false
+        }, {
+            DistanceUnitName: "Kilometers",
+            MinimumValue: 0,
+            MaximumValue: 100,
+            Checked: false
+        }],
 
         BufferSymbology: {
             FillSymbolColor: "255,0,0",
@@ -173,7 +188,7 @@ define([], function () {
         // GeoEnrichmentContents: Configure settings to display data collections or variables from geoenrichment.
         // DownloadSettings: Configure settings for downloading reports from geoprocessing service or geoenrichment.
 
-        WebMapId: "993a4940bdb3436f8d57b777a4dbec33",
+        WebMapId: "70a04b42349d46368e92d0492331fead",
         Workflows: [
             {
                 Name: "Buildings",
@@ -184,7 +199,7 @@ define([], function () {
                         Title: "SitesandBuilding - Buildings",
                         QueryLayerId: "2",
                         SearchDisplayTitle: "Buildings",
-                        SearchDisplayFields: "${BUILDINGNAME}, ${ARC_City}, Phone: ${STATE}",
+                        SearchDisplayFields: "${BUILDINGNAME}, ${ARC_City}, ${STATE}",
                         SearchExpression: "UPPER(BUILDINGNAME) LIKE UPPER('${0}%') OR UPPER(ARC_City) LIKE UPPER('${0}%') OR UPPER(STATE) LIKE UPPER('${0}%')",
 
                         FilterSettings: {
@@ -192,7 +207,7 @@ define([], function () {
                             LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
-                                    DisplayText: "Area(sqft)",
+                                    DisplayText: "Area (sqft)",
                                     FieldName: "TOTALSQFT"
                                 }
                             ],
@@ -251,7 +266,7 @@ define([], function () {
                                 FieldName: "ZIP",
                                 SortingEnabled: true
                             }, {
-                                DisplayText: "Area(sqft):",
+                                DisplayText: "Area (sqft):",
                                 FieldName: "TOTALSQFT",
                                 SortingEnabled: true
                             }, {
@@ -359,14 +374,14 @@ define([], function () {
                         Title: "SitesandBuilding - Sites",
                         QueryLayerId: "1",
                         SearchDisplayTitle: "Sites",
-                        SearchDisplayFields: "${SiteName}, ${ARC_City}, Phone: ${StreetAddress}",
+                        SearchDisplayFields: "${SiteName}, ${ARC_City}, ${StreetAddress}",
                         SearchExpression: "UPPER(SiteName) LIKE UPPER('${0}%') OR UPPER(ARC_City) LIKE UPPER('${0}%') OR UPPER(StreetAddress) LIKE UPPER('${0}%')",
                         FilterSettings: {
                             LocatorFilterFieldName: "Addr_Type",
                             LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
-                                    DisplayText: "Site area(acres)",
+                                    DisplayText: "Area (acres)",
                                     FieldName: "SiteSizeAcres"
                                 }
                             ],
@@ -545,7 +560,7 @@ define([], function () {
                             VariableNameSuffix: "_SALES"
                         }, {
                             DisplayText: "Number of employees",
-                            VariableNameSuffix: "_TOTEMP"
+                            VariableNameSuffix: "_EMP"
                         }
                     ]
                 },
@@ -559,13 +574,13 @@ define([], function () {
                             BusinessSummaryFields: [
                                 {
                                     DisplayText: "Businesses",
-                                    FieldName: "IndustryByNAICSCode.N01_BUS"
+                                    FieldName: "IndustryByNAICSCode.DN01_BUS"
                                 }, {
                                     DisplayText: "Revenue",
-                                    FieldName: "IndustryByNAICSCode.N01_SALES"
+                                    FieldName: "IndustryByNAICSCode.DN01_SALES"
                                 }, {
                                     DisplayText: "Employees",
-                                    FieldName: "IndustryByNAICSCode.N01_TOTEMP"
+                                    FieldName: "IndustryByNAICSCode.DN01_EMP"
                                 }, {
                                     DisplayText: "Unemployment",
                                     FieldName: "Industry.UNEMPRT_CY"
@@ -648,9 +663,9 @@ define([], function () {
                         FeatureLimit: 10
                     },
                     FilterLayer: {
-                        LayerURL: "http://arcgis-gov-1244222493.us-west-2.elb.amazonaws.com/arcgis/rest/services/Permits/MapServer/1/",
-                        FilterFieldName: "NAME",
-                        OutFields: ["NAME", "OBJECTID"]
+                        LayerURL: "http://54.193.222.183:6080/arcgis/rest/services/EconomicDevelopment/MapServer/54",
+                        FilterFieldName: "MUNICIPALI",
+                        OutFields: ["MUNICIPALI", "OBJECTID"]
                     },
                     InfoPanelSettings: {
                         GeoEnrichmentContents: {

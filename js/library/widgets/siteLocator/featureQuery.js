@@ -71,7 +71,7 @@ define([
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, geoEnrichment], {
 
-     /**
+        /**
         * Performs from to filter query
         * @param {object}From container node
         * @param {object}To container node 
@@ -79,10 +79,12 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _fromToQuery: function (fromNode, toNode, chkBox) {
+            var isfilterRemoved = false;
             if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0) {
                 if (this.workflowCount === 0) {
                     if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
                         this.queryArrayBuildingAND.splice(array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")), 1);
+                        isfilterRemoved = true;
                     }
                     if (chkBox.checked) {
                         if (fromNode.value !== "" && toNode.value !== 0 && Number(fromNode.value) <= Number(toNode.value)) {
@@ -98,11 +100,13 @@ define([
                         fromNode.setAttribute("FieldValue", null);
                         toNode.setAttribute("FieldValue", null);
                     }
-                    this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
-
+                    if ((fromNode.value !== "" && toNode.value !== "") || isfilterRemoved) {
+                        this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
+                    }
                 } else {
                     if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArraySitesAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
                         this.queryArraySitesAND.splice(array.indexOf(this.queryArraySitesAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")), 1);
+                        isfilterRemoved = true;
                     }
                     if (chkBox.checked) {
                         if (fromNode.value !== "" && toNode.value !== 0 && Number(fromNode.value) <= Number(toNode.value)) {
@@ -118,10 +122,13 @@ define([
                         fromNode.setAttribute("FieldValue", null);
                         toNode.setAttribute("FieldValue", null);
                     }
-                    this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
-
+                    if ((fromNode.value !== "" && toNode.value !== "") || isfilterRemoved) {
+                        this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
+                    }
                 }
             } else {
+                fromNode.value = "";
+                toNode.value = "";
                 alert(sharedNls.errorMessages.invalidInput);
             }
         },
@@ -133,6 +140,8 @@ define([
         */
         chkQueryHandler: function (chkBoxNode) {
             var arrAndQuery = [], arrOrQuery = [];
+            topic.publish("showProgressIndicator");
+
             if (this.workflowCount === 0) {
                 arrAndQuery = this.queryArrayBuildingAND;
                 arrOrQuery = this.queryArrayBuildingOR;
@@ -140,18 +149,22 @@ define([
                 arrAndQuery = this.queryArraySitesAND;
                 arrOrQuery = this.queryArraySitesOR;
             }
-            if (chkBoxNode.currentTarget.children[0].checked) {
-                if (chkBoxNode.currentTarget.getAttribute("isRegularFilterOptionFields") === "true") {
-                    arrAndQuery.push(chkBoxNode.currentTarget.children[0].name + "='" + chkBoxNode.currentTarget.children[0].value + "'");
+            if (chkBoxNode.target.checked) {
+                if (chkBoxNode.target.parentElement.getAttribute("isRegularFilterOptionFields") === "true") {
+                    if (array.indexOf(arrAndQuery, chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'") === -1) {
+                        arrAndQuery.push(chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'");
+                    }
                 } else {
-                    arrOrQuery.push("UPPER(" + chkBoxNode.currentTarget.children[0].name + ") LIKE UPPER('%" + chkBoxNode.currentTarget.children[0].value + "%')");
+                    if (array.indexOf(arrOrQuery, "UPPER(" + chkBoxNode.target.name + ") LIKE UPPER('%" + chkBoxNode.target.value + "%')") === -1) {
+                        arrOrQuery.push("UPPER(" + chkBoxNode.target.name + ") LIKE UPPER('%" + chkBoxNode.target.value + "%')");
+                    }
                 }
             } else {
 
-                if (chkBoxNode.currentTarget.getAttribute("isRegularFilterOptionFields") === "true") {
-                    arrAndQuery.splice(array.indexOf(arrAndQuery, chkBoxNode.currentTarget.children[0].name + "='" + chkBoxNode.currentTarget.children[0].value + "'"), 1);
+                if (chkBoxNode.target.parentElement.getAttribute("isRegularFilterOptionFields") === "true") {
+                    arrAndQuery.splice(array.indexOf(arrAndQuery, chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'"), 1);
                 } else {
-                    arrOrQuery.splice(array.indexOf(arrOrQuery, "UPPER(" + chkBoxNode.currentTarget.children[0].name + ") LIKE UPPER('%" + chkBoxNode.currentTarget.children[0].value + "%')"), 1);
+                    arrOrQuery.splice(array.indexOf(arrOrQuery, "UPPER(" + chkBoxNode.target.name + ") LIKE UPPER('%" + chkBoxNode.target.value + "%')"), 1);
                 }
             }
             if (this.workflowCount === 0) {
@@ -172,11 +185,7 @@ define([
         */
         _callAndOrQuery: function (arrAndQuery, arrOrQuery) {
             var geometry, andString, orString, queryString;
-            if (this.lastGeometry) {
-                geometry = this.lastGeometry;
-            } else {
-                geometry = null;
-            }
+            geometry = this.lastGeometry[this.workflowCount];
             if (arrAndQuery.length > 0) {
                 andString = arrAndQuery.join(" AND ");
             }
@@ -199,6 +208,7 @@ define([
             } else if (geometry !== null) {
                 this.doLayerQuery(this.workflowCount, geometry, null);
             } else {
+                topic.publish("hideProgressIndicator");
                 if (this.workflowCount === 0) {
                     domStyle.set(this.outerDivForPegination, "display", "none");
                     domConstruct.empty(this.outerResultContainerBuilding);
@@ -213,7 +223,7 @@ define([
             }
         },
 
-         /**
+        /**
         * perform search by addess if search type is address search
         * @param {number} tab count 
         * @param {object} Geometry to perform query
@@ -222,7 +232,7 @@ define([
         */
         doLayerQuery: function (tabCount, geometry, where) {
             var queryLayer, queryLayerTask;
-            this.lastGeometry = geometry;
+            this.lastGeometry[this.workflowCount] = geometry;
             this.showBuffer(geometry);
             queryLayerTask = new QueryTask(this.opeartionLayer.url);
             queryLayer = new esri.tasks.Query();
@@ -235,10 +245,11 @@ define([
             }
             queryLayerTask.executeForIds(queryLayer, lang.hitch(this, this._queryLayerhandler), lang.hitch(this, this._queryErrorHandler));
         },
+
         /**
         * Error call back for query performed on selected layer
         * @param {object} Error object
-       * @memberOf widgets/Sitelocator/FeatureQuery
+        * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _queryErrorHandler: function (error) {
             topic.publish("hideProgressIndicator");
@@ -375,6 +386,7 @@ define([
         * @param {array} array of attachments
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
+
         mergeItemData: function (layerFeatureSet, layerAttachmentInfos) {
             var arrTabData = [], i, j;
             topic.publish("hideProgressIndicator");
@@ -396,7 +408,7 @@ define([
             }
         },
 
-          /**
+        /**
         * create pagination for batch query
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
@@ -680,8 +692,8 @@ define([
             this.selectedValue = value;
             queryTask = new QueryTask(this.opeartionLayer.url);
             querySort = new esri.tasks.Query();
-            if (this.lastGeometry) {
-                querySort.geometry = this.lastGeometry[0];
+            if (this.lastGeometry[this.workflowCount]) {
+                querySort.geometry = this.lastGeometry[this.workflowCount][0];
             }
             if (this.queryArrayBuildingAND.length > 0) {
                 andString = this.queryArrayBuildingAND.join(" AND ");

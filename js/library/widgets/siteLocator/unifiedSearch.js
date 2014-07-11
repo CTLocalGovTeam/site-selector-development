@@ -71,7 +71,7 @@ define([
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, featureQuery], {
 
-     /**
+        /**
         * attach locator events
         * @param {object} Nodes and other variable for all workflows
         * @memberOf widgets/Sitelocator/UnifiedSearch
@@ -101,7 +101,9 @@ define([
                 this._replaceDefaultText(evt, obj);
             })));
             this.own(on(obj.txtAddress, "focus", lang.hitch(this, function () {
-                domStyle.set(obj.close, "display", "block");
+                if (domStyle.get(obj.imgSearchLoader, "display") !== "block") {
+                    domStyle.set(obj.close, "display", "block");
+                }
                 domClass.add(obj.txtAddress, "esriCTColorChange");
             })));
             this.own(on(obj.close, "click", lang.hitch(this, function () {
@@ -109,7 +111,7 @@ define([
             })));
         },
 
-         /**
+        /**
         * perform search by addess if search type is address search
         * @param {object} evt Click event
         * @param {object} Nodes and other variable for all workflows
@@ -255,7 +257,7 @@ define([
             }));
         },
 
-         /**
+        /**
         * query layer for searched result
         * @param {array} deferred array to push query result
         * @param {object} an instance of services
@@ -285,7 +287,7 @@ define([
             }
         },
 
-         /**
+        /**
         * Search error handler
         * @param {object} Nodes and other variable for all workflows
         * @memberOf widgets/Sitelocator/UnifiedSearch
@@ -380,7 +382,7 @@ define([
             });
         },
 
-         /**
+        /**
         * search address on every key press
         * @param {object} evt Keyup event
         * @param {string} locator text
@@ -511,7 +513,7 @@ define([
             };
         },
 
-         /**
+        /**
         * perform search by addess if search type is address search
         * @param {object} Map point
         * @param {object} Nodes and other variable for all workflows
@@ -535,7 +537,7 @@ define([
             this._createBuffer(mapPoint);
         },
 
-         /**
+        /**
         * display error message if locator service fails or does not return any results
         * @param {object} Nodes and other variable for all workflows
         * @memberOf widgets/siteLocator/UnifiedSearch
@@ -548,7 +550,6 @@ define([
             domStyle.set(obj.imgSearchLoader, "display", "none");
             domStyle.set(obj.close, "display", "block");
             errorAddressCounty = domConstruct.create("div", { "class": "esriCTBottomBorder esriCTCursorPointer esriCTAddressCounty" }, obj.divAddressResults);
-            this.featureGeometry[this.workflowCount] = null;
             domAttr.set(errorAddressCounty, "innerHTML", sharedNls.errorMessages.invalidSearch);
         },
 
@@ -684,10 +685,9 @@ define([
                     });
                 }
                 this._showLocatedAddress(arrResult, arrResult.Address.length, obj);
-            }),
-                function (error) {
-                    alert(error.message);
-                });
+            }), function (error) {
+                alert(error.message);
+            });
         }
     });
 });
