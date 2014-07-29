@@ -95,6 +95,8 @@ define([
         opeartionLayer: null,
         unitValues: [null, null, null, null],
         arrStudyAreas: [null, null, null],
+        featureGraphics: [null, null, null, null],
+        arrReportDataJson: [null, null, null, null],
 
         /**
         * create Site selector widget
@@ -144,7 +146,7 @@ define([
             this._createHorizontalSlider(this.horizontalSliderContainerBusiness, this.horizontalRuleContainerBusiness, this.businessSliderText, this.bufferDistanceUnitBusiness, 2);
             arrSort = this._setSelectionOption(dojo.configData.Workflows[2].FilterSettings.BusinesSortOptions.Option.split(","));
             arrSort.splice(0, 0, { "label": sharedNls.titles.select, "value": sharedNls.titles.select });
-            selectSortOption = new SelectList({ options: arrSort, id: "sortBy" }, this.SortBy);
+            selectSortOption = new SelectList({ options: arrSort, id: "sortBy", maxHeight: 50 }, this.SortBy);
             /**
             * minimize other open header panel widgets and show route
             */
@@ -262,7 +264,7 @@ define([
                     this.lastGeometry[this.workflowCount] = null;
                     this.featureGeometry[this.workflowCount] = null;
                     this.map.graphics.clear();
-                    this.map.getLayer("esriFeatureGraphicsLayer").clear();
+                    this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                     this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
                     domClass.add(this.divSearchBuilding, "esriCTDisabledAddressColorChange");
                     domClass.add(this.txtAddressBuilding, "esriCTDisabledAddressColorChange");
@@ -286,7 +288,7 @@ define([
                     this.lastGeometry[this.workflowCount] = null;
                     this.featureGeometry[this.workflowCount] = null;
                     this.map.graphics.clear();
-                    this.map.getLayer("esriFeatureGraphicsLayer").clear();
+                    this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                     this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
                     domClass.add(this.divSearchSites, "esriCTDisabledAddressColorChange");
                     domClass.add(this.txtAddressSites, "esriCTDisabledAddressColorChange");
@@ -326,17 +328,18 @@ define([
         _createFilter: function (arrFilter, node) {
 
             array.forEach(arrFilter, lang.hitch(this, function (value) {
-                var divBusinessRevenue, leftDivSites, checkBoxAreaSites, chkAreaSites, areaText, rightDivSites, spanTextFrom, spanTextFromDes, txtFrom, spanTextTo, spanTextToDes, txtTo;
+                var divBusinessRevenue, leftDivSites, leftDivSitesContainer, checkBoxAreaSites, chkAreaSites, areaText, rightDivSites, spanTextFrom, spanTextFromDes, txtFrom, spanTextTo, spanTextToDes, txtTo;
                 divBusinessRevenue = domConstruct.create("div", { "class": "esriCTDivFromTo" }, node);
-                leftDivSites = domConstruct.create("div", { "class": "esriCTLeft" }, divBusinessRevenue);
+                leftDivSitesContainer = domConstruct.create("div", { "class": "esriCTLeftFromTO" }, divBusinessRevenue);
+                leftDivSites = domConstruct.create("div", { "class": "esriCTOptionRow" }, leftDivSitesContainer);
                 checkBoxAreaSites = domConstruct.create("div", { "class": "esriCTCheckBox" }, leftDivSites);
                 if (value.FieldName) {
-                    chkAreaSites = domConstruct.create("input", { "class": "esriCTChkBox", "type": "checkbox", "value": value.FieldName }, checkBoxAreaSites);
+                    chkAreaSites = domConstruct.create("input", { "type": "checkbox", "class": "esriCTChkBox", "value": value.FieldName }, checkBoxAreaSites);
                 } else {
-                    chkAreaSites = domConstruct.create("input", { "class": "esriCTChkBox", "type": "checkbox", "value": value.VariableNameSuffix }, checkBoxAreaSites);
+                    chkAreaSites = domConstruct.create("input", { "type": "checkbox", "class": "esriCTChkBox", "value": value.VariableNameSuffix }, checkBoxAreaSites);
                 }
                 areaText = domConstruct.create("div", { "class": "esriCTChkLabel" }, leftDivSites);
-                rightDivSites = domConstruct.create("div", { "class": "esriCTRight" }, divBusinessRevenue);
+                rightDivSites = domConstruct.create("div", { "class": "esriCTRightFromTO" }, divBusinessRevenue);
                 spanTextFrom = domConstruct.create("span", { "class": "esriCTText" }, rightDivSites);
                 spanTextFromDes = domConstruct.create("span", {}, rightDivSites);
                 txtFrom = domConstruct.create("input", { "type": "text", "class": "esriCTToTextBoxFrom", "maxlength": "15" }, spanTextFromDes);
@@ -436,8 +439,17 @@ define([
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _geometryForSelectedArea: function (featureSet) {
-            topic.publish("showProgressIndicator");
-            this._enrichData(featureSet.features[0].geometry, 3, null);
+            var i, arrPolygon = [], geometryService;
+            geometryService = new GeometryService(dojo.configData.GeometryService.toString());
+
+            for (i = 0; i < featureSet.features.length; i++) {
+                arrPolygon.push(featureSet.features[i].geometry);
+            }
+            geometryService.union(arrPolygon, lang.hitch(this, function (geometry) {
+                this._enrichData(geometry, 3, null);
+            }), lang.hitch(this, function (Error) {
+                topic.publish("hideProgressIndicator");
+            }));
         },
 
         /**
@@ -445,13 +457,18 @@ define([
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _searchCommunitySelectNames: function () {
-            var queryCommunityNames, queryTaskCommunityNames;
-            queryTaskCommunityNames = new QueryTask(dojo.configData.Workflows[3].FilterSettings.FilterLayer.LayerURL);
-            queryCommunityNames = new esri.tasks.Query();
-            queryCommunityNames.where = '1 = 1';
-            queryCommunityNames.returnGeometry = false;
-            queryCommunityNames.outFields = dojo.configData.Workflows[3].FilterSettings.FilterLayer.OutFields;
-            queryTaskCommunityNames.execute(queryCommunityNames, lang.hitch(this, this._showResultsearchCommunitySelectNames));
+            var queryCommunityNames;
+            queryCommunityNames = esriRequest({
+                url: dojo.configData.Workflows[3].FilterSettings.FilterLayer.LayerURL + "/query",
+                content: {
+                    f: "pjson",
+                    where: '1 = 1',
+                    returnGeometry: false,
+                    returnDistinctValues: true,
+                    outFields: JSON.stringify(dojo.configData.Workflows[3].FilterSettings.FilterLayer.OutFields)
+                }
+            });
+            queryCommunityNames.then(lang.hitch(this, this._showResultsearchCommunitySelectNames));
         },
 
         /**
@@ -584,11 +601,10 @@ define([
                 slider = dijit.byId("sliderhorizontalSliderContainerBusiness");
                 sliderDistance = slider.value;
             } else {
-                sliderDistance = dojo.configData.BufferSliderSettings.defaultValue;
+                sliderDistance = slider.value;
             }
             geometryService = new GeometryService(dojo.configData.GeometryService);
-
-            if (sliderDistance !== 0) {
+            if (Math.round(sliderDistance) !== 0) {
                 if (geometry && geometry.type === "point") {
                     //setup the buffer parameters
                     params = new BufferParameters();
@@ -646,9 +662,6 @@ define([
             var self, symbol;
             this.map.graphics.clear();
             self = this;
-            if (bufferedGeometries) {
-                this.map.setExtent(bufferedGeometries[0].getExtent(), true);
-            }
             symbol = new SimpleFillSymbol(
                 SimpleFillSymbol.STYLE_SOLID,
                 new SimpleLineSymbol(

@@ -38,7 +38,7 @@ define({
         titles: {
 
             informationPanelTitle: "Information for current map view",
-            searchBuildingText: "Search building near an address",
+            searchBuildingText: "Search buildings near an address",
             hideText: "Hide more options",
             showText: "Show more options",
             sliderDisplayText: "Show results within ",
@@ -54,8 +54,6 @@ define({
             select: "Select",
             toText: "to",
             fromText: "from"
-
-
         },
         errorMessages: {
             invalidSearch: "No results found",
@@ -65,6 +63,8 @@ define({
             widgetNotLoaded: "Unable to load widgets.",
             shareLoadingFailed: "Unable to load share options.",
             shareFailed: "Unable to share.",
+            invalidBasemapQuery: "Invalid BasemapQuery",
+            noBasemap: "No Basemap Found",
             disableTab: "Enable at least one tab.",
             bufferSliderValue: "Buffer slider should not be set to zero distance",
             invalidInput: "Plese enter valid input"

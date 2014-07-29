@@ -52,7 +52,7 @@ define([], function () {
         HelpURL: "help.htm",
 
         // Set custom logo url, displayed in lower left corner. Set to empty "" to disable.
-        LogoURL: "http://nddotfargo.com/uploads/media/nddotlogo.png",
+        CustomLogoUrl: "",
 
         // Set splash window content - Message that appears when the application starts
         SplashScreen: {
@@ -90,17 +90,16 @@ define([], function () {
             }
         ],
 
-        // Specify URL to ArcGIS Portal REST API
+
         PortalAPIURL: "http://www.arcgis.com/sharing/rest/",
-        // Specify URL to Search
-        SearchURL: "http://www.arcgis.com/sharing/rest/search?q=group:",
         // Specify the title of group that contains basemaps
-        BasemapGroupTitle: "Basemaps", //CyberTech Systems and Software Limited
+        BasemapGroupTitle: "Basemaps",
         // Specify the user name of owner of the group that contains basemaps
-        BasemapGroupOwner: "GISITAdmin", //cybertechagol
+        BasemapGroupOwner: "GISITAdmin",
+        // Specify spatial reference for basemaps, since all basemaps need to use the same spatial reference
+        BasemapSpatialReferenceWKID: 102100,
         // Specify path to image used to display the thumbnail for a basemap when portal does not provide it
         NoThumbnail: "js/library/themes/images/not-available.png",
-
 
         // Set geometry service URL
         GeometryService: "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer",
@@ -109,7 +108,7 @@ define([], function () {
         GeoEnrichmentService: "http://geoenrich.arcgis.com/arcgis/rest/services/World/geoenrichmentserver",
 
         // Following zoom level will be set for the map upon searching an address
-        ZoomLevel: 13,
+        ZoomLevel: 16,
 
         //minimum height should be 310 for the info-popup in pixels
         InfoPopupHeight: 250,
@@ -125,12 +124,6 @@ define([], function () {
 
         // Set proxy url
         ProxyUrl: "/proxy/proxy.ashx",
-
-        // Specify buffer slider settings
-        BufferSliderSettings: {
-            defaultValue: 20
-        },
-
         DistanceUnitSettings: [{
             DistanceUnitName: "Miles",
             MinimumValue: 0,
@@ -207,7 +200,7 @@ define([], function () {
                             LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
-                                    DisplayText: "Area (sqft)",
+                                    DisplayText: "Area(sqft)",
                                     FieldName: "TOTALSQFT"
                                 }
                             ],
@@ -360,7 +353,7 @@ define([], function () {
                     DownloadSettings: [
                         {
                             DisplayOptionTitle: "Property Information",
-                            GeoProcessingServiceURL: "http://",
+                            GeoProcessingServiceURL: "http://203.199.47.114/arcgis/rest/services/SiteSelector/GenerateReport/GPServer/GenerateReport",
                             Filetype: "PDF" //allowed PDF or XLSX
                         }
                     ]
@@ -537,7 +530,7 @@ define([], function () {
                     DownloadSettings: [
                         {
                             DisplayOptionTitle: "Site Information",
-                            GeoProcessingServiceURL: "http://",
+                            GeoProcessingServiceURL: "http://203.199.47.114/arcgis/rest/services/SiteSelector/GenerateReport/GPServer/GenerateReport",
                             Filetype: "PDF" //allowed PDF or XLSX
                         }, {
                             DisplayOptionTitle: "Traffic Count Profile",
@@ -664,8 +657,8 @@ define([], function () {
                     },
                     FilterLayer: {
                         LayerURL: "http://54.193.222.183:6080/arcgis/rest/services/EconomicDevelopment/MapServer/54",
-                        FilterFieldName: "MUNICIPALI",
-                        OutFields: ["MUNICIPALI", "OBJECTID"]
+                        FilterFieldName: "COUNTY",
+                        OutFields: ["COUNTY"]
                     },
                     InfoPanelSettings: {
                         GeoEnrichmentContents: {

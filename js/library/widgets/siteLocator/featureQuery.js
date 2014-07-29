@@ -79,8 +79,9 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _fromToQuery: function (fromNode, toNode, chkBox) {
+
             var isfilterRemoved = false;
-            if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0) {
+            if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0 &&  fromNode.value !== "" && toNode.value !== "") {
                 if (this.workflowCount === 0) {
                     if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
                         this.queryArrayBuildingAND.splice(array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")), 1);
@@ -129,7 +130,9 @@ define([
             } else {
                 fromNode.value = "";
                 toNode.value = "";
-                alert(sharedNls.errorMessages.invalidInput);
+                if (chkBox.checked) {
+                    alert(sharedNls.errorMessages.invalidInput);
+                }
             }
         },
 
@@ -413,7 +416,7 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _paginationForResults: function () {
-            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForBuilding, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForBuilding, timeOut, currentIndex = 0;
+            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForBuilding, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForBuilding, timeOut, currentIndex = 0;
             domConstruct.empty(this.outerDivForPegination);
             rangeDiv = domConstruct.create("div", { "class": "esriCTRangeDiv" }, this.outerDivForPegination);
             currentIndexNode = domConstruct.create("div", { "class": "esriCTIndex" }, rangeDiv);
@@ -430,7 +433,8 @@ define([
             sortingDiv = domConstruct.create("div", { "class": "esriCTSortingDiv" }, this.outerDivForPegination);
             sortContentDiv = domConstruct.create("div", { "class": "esriCTSortDiv" }, sortingDiv);
             spanContent = domConstruct.create("div", { "class": "esriCTSpan" }, sortContentDiv);
-            selectForBuilding = domConstruct.create("div", { "class": "esriCTSelect" }, sortContentDiv);
+            selectSortBox = domConstruct.create("div", { "class": "esriCTSelectSortBox" }, sortContentDiv);
+            selectForBuilding = domConstruct.create("div", { "class": "esriCTSelect" }, selectSortBox);
             domAttr.set(currentIndexNode, "innerHTML", currentIndex + 1);
             domAttr.set(hyphen, "innerHTML", "-");
             if (this.buildingResultSet.length < currentIndex + 10) {
@@ -454,7 +458,6 @@ define([
                     clearTimeout(timeOut);
                     timeOut = setTimeout(lang.hitch(this, function () {
                         if (!isNaN(Number(firstIndex.innerHTML)) && Number(firstIndex.innerHTML) > 0 && Math.ceil(Number(firstIndex.innerHTML)) <= result) {
-
                             currentIndex = Math.ceil(Number(firstIndex.innerHTML)) * 10 - 10;
                             currentPage = Math.ceil((currentIndex / 10) + 1);
                             domAttr.set(firstIndex, "innerHTML", currentPage);
@@ -551,7 +554,7 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _paginationForResultsSites: function () {
-            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForSites, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForSites, timeOut, currentIndexSites = 0;
+            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForSites, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForSites, timeOut, currentIndexSites = 0;
             domConstruct.empty(this.outerDivForPeginationSites);
             rangeDiv = domConstruct.create("div", { "class": "esriCTRangeDiv" }, this.outerDivForPeginationSites);
             currentIndexNode = domConstruct.create("div", { "class": "esriCTIndex" }, rangeDiv);
@@ -568,7 +571,8 @@ define([
             sortingDiv = domConstruct.create("div", { "class": "esriCTSortingDiv" }, this.outerDivForPeginationSites);
             sortContentDiv = domConstruct.create("div", { "class": "esriCTSortDiv" }, sortingDiv);
             spanContent = domConstruct.create("div", { "class": "esriCTSpan" }, sortContentDiv);
-            selectForSites = domConstruct.create("div", { "class": "esriCTSelect" }, sortContentDiv);
+            selectSortBox = domConstruct.create("div", { "class": "esriCTSelectSortBox" }, sortContentDiv);
+            selectForSites = domConstruct.create("div", { "class": "esriCTSelect" }, selectSortBox);
             domAttr.set(currentIndexNode, "innerHTML", currentIndexSites + 1);
             domAttr.set(hyphen, "innerHTML", "-");
             if (this.sitesResultSet.length < currentIndexSites + 10) {

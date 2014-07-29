@@ -119,10 +119,13 @@ define([
         */
         _locateAddress: function (evt, obj) {
             domConstruct.empty(obj.divAddressResults);
-            domStyle.set(obj.divAddressScrollContainer, "display", "block");
-            domStyle.set(obj.divAddressScrollContent, "display", "block");
-
             if (obj.addressWorkflowCount === 2) {
+                this.businessData = [];
+                this.enrichData = [];
+                this.salesFinalData = [];
+                this.employeFinalData = [];
+                this.revenueData = [];
+                this.totalArray = [];
                 domStyle.set(this.resultDiv, "display", "none");
             }
             if (lang.trim(obj.txtAddress.value) === '') {
@@ -217,6 +220,8 @@ define([
             deferredListResult = new DeferredList(deferredArray);
             deferredListResult.then(lang.hitch(this, function (result) {
                 var num, i, key, order, resultAttributes;
+                domStyle.set(obj.divAddressScrollContainer, "display", "block");
+                domStyle.set(obj.divAddressScrollContent, "display", "block");
                 if (result) {
                     if (result.length > 0) {
                         for (num = 0; num < result.length; num++) {
@@ -305,7 +310,7 @@ define([
         * @memberOf widgets/Sitelocator/UnifiedSearch
         */
         _showLocatedAddress: function (candidates, resultLength, obj) {
-            var addrListCount = 0, addrList = [], candidateArray, divAddressCounty, candidate, listContainer, i;
+            var addrListCount = 0, addrList = [], divAddressSearchCell, candidateArray, divAddressCounty, candidate, listContainer, i, candidateName, isCandidate;
             domConstruct.empty(obj.divAddressResults);
             if (lang.trim(obj.txtAddress.value) === "") {
                 obj.txtAddress.focus();
@@ -327,20 +332,30 @@ define([
                 domClass.add(obj.locatorScrollbar._scrollBarContent, "esriCTZeroHeight");
                 obj.locatorScrollbar.removeScrollBar();
             }
+            domStyle.set(obj.divAddressScrollContainer, "display", "block");
+            domStyle.set(obj.divAddressScrollContent, "display", "block");
             obj.locatorScrollbar = new ScrollBar({ domNode: obj.divAddressScrollContent });
             obj.locatorScrollbar.setContent(obj.divAddressResults);
             obj.locatorScrollbar.createScrollBar();
             if (resultLength > 0) {
+                isCandidate = false;
                 for (candidateArray in candidates) {
                     if (candidates.hasOwnProperty(candidateArray)) {
+                        if (!isCandidate) {
+                            candidateName = dojo.configData.LocatorSettings.DisplayText;
+                        } else {
+                            candidateName = candidateArray;
+                        }
                         if (candidates[candidateArray].length > 0) {
-                            divAddressCounty = domConstruct.create("div", { "class": "esriCTBottomBorder esriCTResultColor esriCTCursorPointer esriCTAddressCounty" }, obj.divAddressResults);
-                            candidate = candidateArray + " (" + candidates[candidateArray].length + ")";
-                            domConstruct.create("span", { "innerHTML": "+", "class": "esriCTPlusMinus" }, divAddressCounty);
-                            domConstruct.create("span", { "innerHTML": candidate }, divAddressCounty);
+                            isCandidate = true;
+                            divAddressCounty = domConstruct.create("div", { "class": "esriCTSearchGroupRow esriCTBottomBorder esriCTResultColor esriCTCursorPointer esriCTAddressCounty" }, obj.divAddressResults);
+                            divAddressSearchCell = domConstruct.create("div", { "class": "esriCTSearchGroupCell" }, divAddressCounty);
+                            candidate = candidateName + " (" + candidates[candidateArray].length + ")";
+                            domConstruct.create("div", { "innerHTML": "+", "class": "esriCTPlusMinus" }, divAddressSearchCell);
+                            domConstruct.create("div", { "innerHTML": candidate, "class": "esriCTGroupList" }, divAddressSearchCell);
                             domStyle.set(obj.imgSearchLoader, "display", "none");
                             domStyle.set(obj.close, "display", "block");
-                            addrList.push(divAddressCounty);
+                            addrList.push(divAddressSearchCell);
                             this._toggleAddressList(addrList, addrListCount, obj);
                             addrListCount++;
                             listContainer = domConstruct.create("div", { "class": "listContainer esriCTHideAddressList" }, obj.divAddressResults);
@@ -365,8 +380,8 @@ define([
         _toggleAddressList: function (addressList, idx, obj) {
             on(addressList[idx], "click", function () {
                 var listStatusSymbol, outputContainer, plusMinusContainer;
-                outputContainer = query(".listContainer", this.parentElement)[idx];
-                plusMinusContainer = query(".esriCTPlusMinus", this.parentElement)[idx];
+                outputContainer = query(".listContainer", this.parentElement.parentElement)[idx];
+                plusMinusContainer = query(".esriCTPlusMinus", this.parentElement.parentElement)[idx];
                 if (outputContainer && plusMinusContainer) {
                     if (domClass.contains(outputContainer, "esriCTShowAddressList")) {
                         domClass.toggle(outputContainer, "esriCTShowAddressList");
@@ -392,6 +407,10 @@ define([
         _submitAddress: function (evt, locatorText, obj) {
             if (locatorText) {
                 setTimeout(lang.hitch(this, function () {
+                    if (obj.locatorScrollbar) {
+                        domClass.add(obj.locatorScrollbar._scrollBarContent, "esriCTZeroHeight");
+                        obj.locatorScrollbar.removeScrollBar();
+                    }
                     this._locateAddress(evt, obj);
                 }), 100);
                 return;
@@ -549,7 +568,7 @@ define([
             domConstruct.empty(obj.divAddressResults);
             domStyle.set(obj.imgSearchLoader, "display", "none");
             domStyle.set(obj.close, "display", "block");
-            errorAddressCounty = domConstruct.create("div", { "class": "esriCTBottomBorder esriCTCursorPointer esriCTAddressCounty" }, obj.divAddressResults);
+            errorAddressCounty = domConstruct.create("div", { "class": "esriCTBottomBorder esriCTAddressCounty" }, obj.divAddressResults);
             domAttr.set(errorAddressCounty, "innerHTML", sharedNls.errorMessages.invalidSearch);
         },
 
@@ -669,7 +688,7 @@ define([
                     f: "pjson",
                     inSR: this.map.spatialReference.wkid,
                     outSR: this.map.spatialReference.wkid,
-                    geographyQuery: obj.txtAddress.value + "*",
+                    geographyQuery: lang.trim(obj.txtAddress.value) + "*",
                     sourceCountry: dojo.configData.Workflows[obj.addressWorkflowCount].FilterSettings.StandardGeographyQuery.SourceCountry,
                     featureLimit: dojo.configData.Workflows[obj.addressWorkflowCount].FilterSettings.StandardGeographyQuery.FeatureLimit
                 },

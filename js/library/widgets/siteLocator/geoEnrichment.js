@@ -1,4 +1,4 @@
-﻿/*global define,dojo,dojoConfig,esri,esriConfig,alert,handle:true,dijit */
+﻿/*global define,dojo,dojoConfig,esri,esriConfig,alert,console,handle:true,dijit */
 /*jslint browser:true,sloppy:true,nomen:true,unparam:true,plusplus:true,indent:4 */
 /** @license
 | Version 10.2
@@ -62,9 +62,11 @@ define([
     "esri/SpatialReference",
     "dojo/number",
     "esri/geometry/Polygon",
-    "dijit/form/HorizontalRule"
+    "dijit/form/HorizontalRule",
+    "esri/tasks/Geoprocessor",
+    "esri/tasks/PrintTask"
 
-], function (declare, domConstruct, on, topic, lang, array, domStyle, domAttr, dom, query, Locator, domClass, FeatureSet, domGeom, GeometryService, string, html, template, urlUtils, Query, QueryTask, Deferred, DeferredList, ScrollBar, Color, SimpleLineSymbol, SimpleFillSymbol, SimpleMarkerSymbol, Graphic, Point, registry, BufferParameters, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, sharedNls, GraphicsLayer, HorizontalSlider, SelectList, DropDownSelect, esriRequest, SpatialReference, number, Polygon, HorizontalRule) {
+], function (declare, domConstruct, on, topic, lang, array, domStyle, domAttr, dom, query, Locator, domClass, FeatureSet, domGeom, GeometryService, string, html, template, urlUtils, Query, QueryTask, Deferred, DeferredList, ScrollBar, Color, SimpleLineSymbol, SimpleFillSymbol, SimpleMarkerSymbol, Graphic, Point, registry, BufferParameters, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, sharedNls, GraphicsLayer, HorizontalSlider, SelectList, DropDownSelect, esriRequest, SpatialReference, number, Polygon, HorizontalRule, Geoprocessor, PrintTask) {
 
     //========================================================================================================================//
 
@@ -79,7 +81,7 @@ define([
             var queryCommunities, queryTaskCommunities;
             queryTaskCommunities = new QueryTask(dojo.configData.Workflows[3].FilterSettings.FilterLayer.LayerURL);
             queryCommunities = new esri.tasks.Query();
-            queryCommunities.where = dojo.configData.Workflows[3].FilterSettings.FilterLayer.OutFields[1].toString() + "=" + value;
+            queryCommunities.where = dojo.configData.Workflows[3].FilterSettings.FilterLayer.OutFields[0].toString() + "='" + value + "'";
             queryCommunities.returnGeometry = true;
             queryCommunities.outFields = dojo.configData.Workflows[3].FilterSettings.FilterLayer.OutFields;
             queryTaskCommunities.execute(queryCommunities, lang.hitch(this, this._geometryForSelectedArea));
@@ -94,7 +96,7 @@ define([
             var i, resultFeatures = featureSet.features, areaListOptions = [];
             for (i = 0; i < resultFeatures.length; i++) {
                 if (resultFeatures[i].attributes[dojo.configData.Workflows[3].FilterSettings.FilterLayer.FilterFieldName] !== " ") {
-                    areaListOptions.push({ "label": resultFeatures[i].attributes[dojo.configData.Workflows[3].FilterSettings.FilterLayer.FilterFieldName], "value": resultFeatures[i].attributes[dojo.configData.Workflows[3].FilterSettings.FilterLayer.OutFields[1]] });
+                    areaListOptions.push({ "label": resultFeatures[i].attributes[dojo.configData.Workflows[3].FilterSettings.FilterLayer.FilterFieldName], "value": resultFeatures[i].attributes[dojo.configData.Workflows[3].FilterSettings.FilterLayer.FilterFieldName] });
                 }
             }
             areaListOptions.sort(function (a, b) {
@@ -114,7 +116,10 @@ define([
             }, this.searchContainerComm);
 
             this.own(on(this.comAreaList, "change", lang.hitch(this, function (value) {
-                this._selectionChangeForCommunities(value);
+                if (value.toLowerCase() !== sharedNls.titles.select.toLowerCase()) {
+                    this._selectionChangeForCommunities(value);
+                    topic.publish("showProgressIndicator");
+                }
             })));
             this.comAreaList.disabled = "disabled";
         },
@@ -176,7 +181,7 @@ define([
         _fromToDatachangeHandler: function (fromNode, toNode, checkBox) {
             this._showBusinessTab();
             if (checkBox.checked) {
-                if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0) {
+                if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0 && Number(toNode.value) >= Number(fromNode.value) && fromNode.value !== "" && toNode.value !== "") {
                     if (checkBox.value === "_SALES") {
                         this.revenueData.length = 0;
                         this.salesFinalData = this._checkForValue(checkBox.value, fromNode.value, toNode.value);
@@ -364,6 +369,7 @@ define([
                         isRetunrnGeometry = false;
                         this.lastGeometry[this.workflowCount] = [geometry];
                         this.showBuffer([geometry]);
+                        this.map.setExtent(geometry.getExtent(), true);
                         studyAreas = [{ "geometry": { "rings": geometry.rings, "spatialReference": { "wkid": this.map.spatialReference.wkid} }, "attributes": { "id": "Polygon 1", "name": "Optional Name 1"}}];
                         this.arrStudyAreas[this.workflowCount] = studyAreas;
                     } else {
@@ -420,7 +426,7 @@ define([
                 domAttr.set(headerInfo, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents.DisplayTitle);
                 geoenrichtOuterDiv = domConstruct.create("div", { "class": "esriCTDemoInfoMainDiv" }, attachMentNode);
                 geoenrichtOuterDivContent = domConstruct.create("div", { "class": "esriCTDemoInfoMainDivBuildingContent" }, geoenrichtOuterDiv);
-                this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents.DisplayFields, geoenrichtOuterDivContent);
+                this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents, geoenrichtOuterDivContent);
                 image = query('img', attachMentNode)[0];
                 if (!image) {
                     domStyle.set(geoenrichtOuterDiv, "height", "363px");
@@ -460,7 +466,7 @@ define([
             if (this.workflowCount === 2) {
                 this.ResultBusinessTabTitle.innerHTML = dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[0].DisplayTitle;
                 this.ResultDemographicTabTitle.innerHTML = dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[1].DisplayTitle;
-                this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[1].DisplayFields, this.DemoInfoMainDivContent);
+                this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[1], this.DemoInfoMainDivContent);
                 this.demographicContainerTitle.innerHTML = dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[1].DisplayTitle;
                 domStyle.set(this.resultDiv, "display", "block");
                 this._setResultData(data);
@@ -479,7 +485,7 @@ define([
                 this._downloadDropDown(dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.DownloadSettings, this.communityMainDiv);
                 geoenrichtOuterDiv = domConstruct.create("div", { "class": "esriCTDemoInfoMainDiv" }, this.communityMainDiv);
                 geoenrichtOuterDivContent = domConstruct.create("div", { "class": "esriCTDemoInfoMainDivBuildingContent" }, geoenrichtOuterDiv);
-                this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.GeoEnrichmentContents.DisplayFields, geoenrichtOuterDivContent);
+                this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.GeoEnrichmentContents, geoenrichtOuterDivContent);
                 if (this.comunitiesDemoInfoMainScrollbar) {
                     this.comunitiesDemoInfoMainScrollbar.removeScrollBar();
                 }
@@ -523,8 +529,8 @@ define([
         * @param {object} HTML node on used to display demography data
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
-        _getDemographyResult: function (geoEnrichData, field, demoNode) {
-            var arrDemographyDataCount = 0, fieldKey, i, displayFieldDiv, valueDiv, demographicInfoContent;
+        _getDemographyResult: function (geoEnrichData, Geoenerichfield, demoNode) {
+            var arrDemographyDataCount = 0, fieldKey, i, displayFieldDiv, valueDiv, demographicInfoContent, field = Geoenerichfield.DisplayFields, aarReportData = [];
             domConstruct.empty(demoNode);
             for (i = 0; i < field.length; i++) {
                 fieldKey = field[i].FieldName.split(".")[1];
@@ -536,10 +542,15 @@ define([
                     valueDiv = domConstruct.create("div", { "class": "esriCTDemographicCollectonValue" }, demographicInfoContent);
                     if (isNaN(geoEnrichData.results[0].value.FeatureSet[0].features[0].attributes[fieldKey])) {
                         valueDiv.innerHTML = geoEnrichData.results[0].value.FeatureSet[0].features[0].attributes[fieldKey];
+                        aarReportData.push(field[i].DisplayText + ":" + valueDiv.innerHTML);
                     } else {
                         valueDiv.innerHTML = this._getUnit(geoEnrichData, fieldKey) + number.format(geoEnrichData.results[0].value.FeatureSet[0].features[0].attributes[fieldKey], { places: 0 });
+                        aarReportData.push(field[i].DisplayText + ":" + valueDiv.innerHTML);
                     }
                 }
+            }
+            if (this.arrReportDataJson[this.workflowCount]) {
+                this.arrReportDataJson[this.workflowCount].reportData[Geoenerichfield.DisplayTitle.toString()] = aarReportData;
             }
             if (arrDemographyDataCount === 0) {
                 demoNode.innerHTML = sharedNls.errorMessages.invalidSearch;
@@ -655,7 +666,6 @@ define([
         */
         _setBusinessValues: function (arrData, node, enrichData) {
             var i, resultpanel, content, countRevenueEmpPanel, esriContainerHeight, esriContainerStyle, countRevenueEmp, count, countName, countValue, revenue, revenueName, revenuevalue, employee, empName, empValue;
-
             this.currentBussinessData = arrData;
             domConstruct.empty(node);
             resultpanel = domConstruct.create("div", { "class": "esriCTSortPanelHead" }, node);
@@ -724,9 +734,8 @@ define([
             outerDownloadDiv = domConstruct.create("div", { "class": "esriCTouterDownloadDiv" }, node);
             innerDownloadDiv = domConstruct.create("div", { "class": "esriCTInnerDownloadDiv" }, outerDownloadDiv);
             domAttr.set(innerDownloadDiv, "innerHTML", sharedNls.titles.textDownload);
-            sortingDivDwnload = domConstruct.create("div", { "class": "esriCTSortingDiv" }, outerDownloadDiv);
-            sortContentDivDownload = domConstruct.create("div", { "class": "esriCTSortDiv" }, sortingDivDwnload);
-            domConstruct.create("div", { "class": "esriCTSpan" }, sortContentDivDownload);
+            sortingDivDwnload = domConstruct.create("div", { "class": "esriCTInnerSelectBoxDiv" }, outerDownloadDiv);
+            sortContentDivDownload = domConstruct.create("div", {}, sortingDivDwnload);
             selectForDownload = domConstruct.create("div", { "class": "esriCTSelect" }, sortContentDivDownload);
             areaSortBuildingDownload.push({ "label": sharedNls.titles.select, "value": sharedNls.titles.select });
             for (i = 0; i < arrDwnloadDisplayFieldValue.length; i++) {
@@ -740,10 +749,9 @@ define([
             }, selectForDownload);
 
             this.own(on(selectDownloadList, "change", lang.hitch(this, function (value) {
-                var form, postData, fileTypeInput, reportInput, studyAreasInput;
-                if (arrDwnloadDisplayFieldValue[value].GeoEnrichmentReportName) {
-                    try {
-
+                var form, postData, fileTypeInput, reportInput, studyAreasInput, gp, params, webMapJsonData;
+                try {
+                    if (arrDwnloadDisplayFieldValue[value].GeoEnrichmentReportName) {
                         form = document.createElement("form");
                         postData = document.createElement("input");
                         fileTypeInput = document.createElement("input");
@@ -767,11 +775,73 @@ define([
                         form.appendChild(studyAreasInput);
                         document.body.appendChild(form);
                         form.submit();
-                    } catch (Error) {
-                        alert(Error.Message);
+
+                    } else {
+                        if (arrDwnloadDisplayFieldValue[value].GeoProcessingServiceURL) {
+                            webMapJsonData = this._createMapJsonData();
+                            params = {
+                                "Logo": dojoConfig.baseURL + dojo.configData.ApplicationIcon.toString(),
+                                "WebMap_Json": JSON.stringify(webMapJsonData),
+                                "Report_Title": arrDwnloadDisplayFieldValue[value].DisplayOptionTitle.toString(),
+                                "Report_Data_Json": JSON.stringify([this.arrReportDataJson[this.workflowCount].reportData])
+                            };
+                            if (this.arrReportDataJson[this.workflowCount].attachmentData.length > 0) {
+                                params.Attachment_List = JSON.stringify(this.arrReportDataJson[this.workflowCount].attachmentData);
+                            }
+                            gp = new Geoprocessor(arrDwnloadDisplayFieldValue[value].GeoProcessingServiceURL);
+                            gp.submitJob(params, lang.hitch(this, function (jobInfo) {
+                                if (jobInfo.jobStatus !== "esriJobFailed") {
+                                    if (arrDwnloadDisplayFieldValue[value].Filetype.toLowerCase() === "pdf") {
+                                        gp.getResultData(jobInfo.jobId, "Report_PDF", this._downloadPDFFile);
+                                    } else {
+                                        gp.getResultData(jobInfo.jobId, "Report_PDF", this._downloadDataFile);
+                                    }
+                                }
+                            }), null, function (err) {
+                                alert(err.message);
+                            });
+                        }
                     }
+                } catch (Error) {
+                    console.log(Error.Message);
                 }
             })));
+        },
+
+        /**
+        * Downloads pdf file
+        * @param {object} Out put file
+        * @memberOf widgets/Sitelocator/Geoenrichment
+        */
+        _downloadPDFFile: function (outputFile) {
+            window.open(outputFile.value.url);
+        },
+
+        /**
+        * Downloads data file
+        * @param {object} Out put file
+        * @memberOf widgets/Sitelocator/Geoenrichment
+        */
+        _downloadDataFile: function (outputFile) {
+            window.location = outputFile.value.url;
+        },
+
+        /**
+        * Creates web map json object
+        * @memberOf widgets/Sitelocator/Geoenrichment
+        */
+        _createMapJsonData: function () {
+            var printTaskObj = new PrintTask(), jsonObject;
+            printTaskObj.legendAll = true;
+            jsonObject = printTaskObj._getPrintDefinition(this.map);
+            if (printTaskObj.allLayerslegend && printTaskObj.allLayerslegend.length > 0) {
+                jsonObject.layoutOptions = {};
+                jsonObject.layoutOptions.legendOptions = {
+                    operationalLayers: printTaskObj.allLayerslegend
+                };
+            }
+            jsonObject.exportOptions = { "outputSize": [1366, 412] };
+            return jsonObject;
         },
 
         /**

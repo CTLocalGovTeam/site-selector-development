@@ -255,9 +255,10 @@
 
 /* Share Container Styles */
 
-.esriCTDivAppHolder {
-    border-right: 1px solid #007ac2;
-    border-left: 1px solid #007ac2;
+.esriCTDivAppHolder 
+{
+    
+    border-color: #007ac2;
 }
 
 .esriCTDivShareContainer {
@@ -441,4 +442,5 @@
 {
     color: #007AC2 !important;
 }
+
 /*End of Site locator*/
