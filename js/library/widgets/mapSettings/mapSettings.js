@@ -76,15 +76,11 @@ define([
             });
             mapDeferred.then(lang.hitch(this, function (response) {
                 this.map = response.map;
-                dojo.selectedBasemapIndex = 0;
-                if (response.itemInfo.itemData.baseMap.baseMapLayers && response.itemInfo.itemData.baseMap.baseMapLayers[0].id) {
-                    if (response.itemInfo.itemData.baseMap.baseMapLayers[0].id !== "defaultBasemap") {
-                        this.map.getLayer(response.itemInfo.itemData.baseMap.baseMapLayers[0].id).id = "defaultBasemap";
-                        this.map._layers.defaultBasemap = this.map.getLayer(response.itemInfo.itemData.baseMap.baseMapLayers[0].id);
-                        delete this.map._layers[response.itemInfo.itemData.baseMap.baseMapLayers[0].id];
-                        this.map.layerIds[0] = "defaultBasemap";
-                    }
+                dojo.selectedBasemapIndex = null;
+                if (response.itemInfo.itemData.baseMap.baseMapLayers) {
+                    this._setBasemapLayerId(response.itemInfo.itemData.baseMap.baseMapLayers);
                 }
+                topic.publish("filterRedundantBasemap", response.itemInfo);
                 this._generateLayerURL(response.itemInfo.itemData.operationalLayers);
                 topic.publish("setMap", this.map);
                 topic.publish("hideProgressIndicator");
@@ -92,7 +88,36 @@ define([
 
             }));
         },
+        /**
+        * set default id for basemaps
+        * @memberOf widgets/mapSettings/mapSettings
+        */
+        _setBasemapLayerId: function (baseMapLayers) {
+            var i = 0, defaultId = "defaultBasemap";
+            if (baseMapLayers.length === 1) {
+                this._setBasemapId(baseMapLayers[0], defaultId);
+            } else {
+                for (i = 0; i < baseMapLayers.length; i++) {
+                    this._setBasemapId(baseMapLayers[i], defaultId + i);
+                }
+            }
 
+        },
+
+        /**
+        * set default id for each basemap of webmap
+        * @memberOf widgets/mapSettings/mapSettings
+        */
+        _setBasemapId: function (basmap, defaultId) {
+            var layerIndex;
+            if (basmap.id !== defaultId) {
+                this.map.getLayer(basmap.id).id = defaultId;
+                this.map._layers[defaultId] = this.map.getLayer(basmap.id);
+                layerIndex = array.indexOf(this.map.layerIds, basmap.id);
+                delete this.map._layers[basmap.id];
+                this.map.layerIds[layerIndex] = defaultId;
+            }
+        },
         /**
         * Get operational layers
         * @param{url} operational layers
@@ -155,7 +180,7 @@ define([
         },
 
         _mapOnLoad: function () {
-            var home, mapDefaultExtent, graphicsLayer, extent, featureGrapgicLayer, CustomLogoUrl = dojo.configData.CustomLogoUrl, imgSource;
+            var home, mapDefaultExtent, graphicsLayer, imgCustomLogo, extent, featureGrapgicLayer, CustomLogoUrl = dojo.configData.CustomLogoUrl, imgSource;
 
             /**
             * set map extent to default extent specified in configuration file
@@ -174,6 +199,17 @@ define([
             home = this._addHomeButton();
             domConstruct.place(home.domNode, query(".esriSimpleSliderIncrementButton")[0], "after");
             home.startup();
+
+            if (dojo.configData.CustomLogoUrl && lang.trim(dojo.configData.CustomLogoUrl).length !== 0) {
+                if (dojo.configData.CustomLogoUrl.match("http:") || dojo.configData.CustomLogoUrl.match("https:")) {
+                    imgSource = dojo.configData.CustomLogoUrl;
+                } else {
+                    imgSource = dojoConfig.baseURL + dojo.configData.CustomLogoUrl;
+                }
+                imgCustomLogo = domConstruct.create("img", { "src": imgSource, "class": "esriCTCustomMapLogo" }, dom.byId("esriCTParentDivContainer"));
+                domClass.add(imgCustomLogo, "esriCTCustomMapLogoBottom");
+            }
+
             this._showBasMapGallery();
             if (CustomLogoUrl && lang.trim(CustomLogoUrl).length !== 0) {
                 if (CustomLogoUrl.match("http:") || CustomLogoUrl.match("https:")) {

@@ -89,7 +89,11 @@ define([
                 */
                 geometryService.project([mapPoint], self.map.spatialReference).then(function (newPoint) {
                     currentBaseMap = self.map.getLayer("defaultBasemap");
-                    if (currentBaseMap.visible) {
+                    if (!currentBaseMap) {
+                        currentBaseMap = self.map.getLayer("defaultBasemap0");
+                    }
+
+                    if (currentBaseMap && currentBaseMap.visible) {
                         if (!currentBaseMap.fullExtent.contains(newPoint[0])) {
                             alert(sharedNls.errorMessages.invalidLocation);
                             return;

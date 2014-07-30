@@ -27,7 +27,7 @@ require([
 
     try {
         dojo.configData = config;
-        if (dojo.configData.ProxyUrl.toString().indexOf("http") === -1) {
+        if (dojo.configData.ProxyUrl && (!dojo.configData.ProxyUrl.match("http://") && (!dojo.configData.ProxyUrl.match("https://")))) {
             dojo.configData.ProxyUrl = dojoConfig.baseURL + dojo.configData.ProxyUrl;
         }
         esriConfig.defaults.io.proxyUrl = dojo.configData.ProxyUrl;

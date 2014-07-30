@@ -89,12 +89,10 @@ define([
             horizontalRule.domNode.lastChild.style.border = "none";
             horizontalRule.domNode.lastChild.style.right = "0" + "px";
             horizontalSlider = new HorizontalSlider({
-                value: dojo.configData.BufferSliderSettings.defaultValue,
                 intermediateChanges: true,
                 "class": "horizontalSlider",
                 id: sliderId
             }, sliderContainer);
-
             array.forEach(dojo.configData.DistanceUnitSettings, lang.hitch(this, function (DistanceUnit) {
                 count++;
                 radioContent = domConstruct.create("div", { "class": "esriCTRadioBtn " }, unitContainer);
@@ -135,11 +133,12 @@ define([
                         horizontalRule.domNode.firstChild.innerHTML = 0;
                         horizontalSlider.minimum = 0;
                     }
+                    horizontalSlider.value = horizontalSlider.minimum;
                     domStyle.set(horizontalRule.domNode.lastChild, "text-align", "right");
                     domStyle.set(horizontalRule.domNode.lastChild, "width", "334px");
                     domStyle.set(horizontalRule.domNode.lastChild, "left", "0");
                     domAttr.set(divSliderValue, "distanceUnit", DistanceUnit.DistanceUnitName.toString());
-                    domAttr.set(divSliderValue, "innerHTML", dojo.configData.BufferSliderSettings.defaultValue.toString() + " " + DistanceUnit.DistanceUnitName);
+                    domAttr.set(divSliderValue, "innerHTML", horizontalSlider.value.toString() + " " + DistanceUnit.DistanceUnitName);
                 }
                 on(radioSpanContent, "click", lang.hitch(this, function (value) {
                     this._selectionChangeForUnit(value, horizontalSlider, horizontalRule, divSliderValue);
@@ -242,6 +241,15 @@ define([
                     if (this.lastGeometry[this.workflowCount]) {
                         this.showBuffer(this.lastGeometry[this.workflowCount]);
                     }
+                    if (this.featureGraphics[i]) {
+                        this.map.getLayer("esriFeatureGraphicsLayer").add(this.featureGraphics[i]);
+                        this.map.setLevel(dojo.configData.ZoomLevel);
+                        this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].show();
+                        this.map.centerAt(this.featureGraphics[i].geometry);
+                    } else if (this.lastGeometry[this.workflowCount]) {
+                        this.map.setExtent(this.lastGeometry[this.workflowCount][0].getExtent(), true);
+                    }
+
                     if (this.featureGeometry[this.workflowCount]) {
                         this.addPushPin(this.featureGeometry[this.workflowCount]);
                     }
@@ -303,7 +311,6 @@ define([
             geoLocationPushpin = dojoConfig.baseURL + dojo.configData.LocatorSettings.DefaultLocatorSymbol;
             locatorMarkupSymbol = new esri.symbol.PictureMarkerSymbol(geoLocationPushpin, dojo.configData.LocatorSettings.MarkupSymbolSize.width, dojo.configData.LocatorSettings.MarkupSymbolSize.height);
             graphic = new esri.Graphic(mapPoint, locatorMarkupSymbol, {}, null);
-            this.map.getLayer("esriFeatureGraphicsLayer").clear();
             this.map.getLayer("esriGraphicsLayerMapSettings").clear();
             this.map.getLayer("esriGraphicsLayerMapSettings").add(graphic);
         },
@@ -561,13 +568,13 @@ define([
                         this.own(on(contentOuter, "click", lang.hitch(this, this._getAttchmentImageAndInformation)));
 
                         for (j = 0; j < dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields.length; j++) {
-                            domConstruct.create("div", { "class": "esriCTfeatureField", "innerHTML": dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields[j].DisplayText + listData[i].featureData[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields[j].FieldName] }, featureInfo);
+                            domConstruct.create("div", { "class": "esriCTfeatureField", "innerHTML": dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields[j].DisplayText + " " + listData[i].featureData[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields[j].FieldName] }, featureInfo);
                         }
                     } else {
                         featureInfo = domConstruct.create("div", { "class": "esriCTFeatureInfo" }, contentOuter);
                         this.own(on(contentOuter, "click", lang.hitch(this, this._getAttchmentImageAndInformation)));
                         for (k = 0; k < dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields.length; k++) {
-                            domConstruct.create("div", { "class": "esriCTfeatureField", "innerHTML": dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields[k].DisplayText + listData[i].featureData[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields[k].FieldName] }, featureInfo);
+                            domConstruct.create("div", { "class": "esriCTfeatureField", "innerHTML": dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields[k].DisplayText + " " + listData[i].featureData[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.DisplayFields[k].FieldName] }, featureInfo);
                         }
                     }
                 }
@@ -631,7 +638,7 @@ define([
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _attachMentQuery: function (value, dataSelected, attachmentNode, mainDivNode, searchContentNode) {
-            var backwardImage, backToResultDiv, backToResult, attachmentDiv, attachmentImageClickDiv, imageCount = 0, prevNextdiv, prevdiv, nextdiv, outfields = [], resultSelectionQuerytask, resultSelectQuery, i, j, geometryService, params, propertyHeaderInfo, attributedata;
+            var backwardImage, backToResultDiv, arrAttachmentURL = [], backToResult, attachmentDiv, attachmentImageClickDiv, imageCount = 0, prevNextdiv, prevdiv, nextdiv, outfields = [], resultSelectionQuerytask, resultSelectQuery, i, j, k, geometryService, params, propertyHeaderInfo, attributedata;
             domConstruct.empty(attachmentNode);
             domStyle.set(attachmentNode, "display", "block");
             domStyle.set(mainDivNode, "display", "none");
@@ -644,6 +651,9 @@ define([
                 attachmentDiv = domConstruct.create("div", { "class": "esriCTAttachmentDiv" }, attachmentNode);
                 attachmentImageClickDiv = domConstruct.create("img", { "src": dataSelected.attachmentData[0].url }, attachmentDiv);
                 if (dataSelected.attachmentData.length > 1) {
+                    for (k = 0; k < dataSelected.attachmentData.length; k++) {
+                        arrAttachmentURL.push(dataSelected.attachmentData[k].url);
+                    }
                     prevNextdiv = domConstruct.create("div", { "class": "esriCTPrevNext" }, attachmentNode);
                     prevdiv = domConstruct.create("div", { "class": "esriCTPrev" }, prevNextdiv);
                     nextdiv = domConstruct.create("div", { "class": "esriCTNext" }, prevNextdiv);
@@ -675,7 +685,7 @@ define([
             }
             resultSelectQuery.outFields = outfields;
             resultSelectionQuerytask.execute(resultSelectQuery, lang.hitch(this, function (featureSet) {
-                var symbol, graphic;
+                var symbol, graphic, arraProperyDisplayData = [];
                 if (featureSet.features[0].geometry.getExtent()) {
                     symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0, 0.65]), 3), new Color([255, 0, 0, 0.35]));
                     graphic = new Graphic(featureSet.features[0].geometry, symbol, {}, null);
@@ -689,21 +699,29 @@ define([
                     this.map.centerAt(featureSet.features[0].geometry);
                 }
                 this.map.getLayer("esriFeatureGraphicsLayer").clear();
+                this.featureGraphics[this.workflowCount] = graphic;
                 this.map.getLayer("esriFeatureGraphicsLayer").add(graphic);
                 propertyHeaderInfo = domConstruct.create("div", { "class": "esriCTHeaderInfoDiv" }, attachmentNode);
                 domAttr.set(propertyHeaderInfo, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.DownloadSettings[0].DisplayOptionTitle);
                 for (j = 0; j < dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields.length; j++) {
                     attributedata = domConstruct.create("div", { "class": "esriCTSelectedfeatureField" }, attachmentNode);
                     if (isNaN(featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName])) {
-                        domAttr.set(attributedata, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]);
+                        arraProperyDisplayData.push(dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]);
+                        domAttr.set(attributedata, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + " " + featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]);
                     } else {
                         if (Number(featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]) % 1 === 0) {
-                            domAttr.set(attributedata, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]);
+                            arraProperyDisplayData.push(dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]);
+                            domAttr.set(attributedata, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + " " + featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]);
                         } else {
-                            domAttr.set(attributedata, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + Number(featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]).toFixed(2));
+                            arraProperyDisplayData.push(dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + Number(featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]).toFixed(2));
+                            domAttr.set(attributedata, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].DisplayText + " " + Number(featureSet.features[0].attributes[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[j].FieldName]).toFixed(2));
                         }
                     }
                 }
+                this.arrReportDataJson[this.workflowCount] = {};
+                this.arrReportDataJson[this.workflowCount].reportData = {};
+                this.arrReportDataJson[this.workflowCount].reportData[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.DownloadSettings[0].DisplayOptionTitle.toString()] = arraProperyDisplayData;
+                this.arrReportDataJson[this.workflowCount].attachmentData = arrAttachmentURL;
                 geometryService = new GeometryService(dojo.configData.GeometryService);
                 params = new BufferParameters();
                 params.distances = [dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoenrichmentDistance.BufferDistance];
@@ -733,6 +751,8 @@ define([
         _getBackToTab: function (attachmentNode, mainDivNode) {
             domConstruct.empty(attachmentNode);
             domStyle.set(mainDivNode, "display", "block");
+            this.map.getLayer("esriFeatureGraphicsLayer").clear();
+            this.featureGraphics[this.workflowCount] = null;
             if (this.workflowCount === 0) {
                 if (this.outerResultContainerBuilding) {
                     while (this.outerResultContainerBuilding.hasChildNodes()) {

@@ -45,9 +45,6 @@
     color: #028D6A;
 }
 
-/*.esriCTDownload {
-  color: #028D6A !important;
-}*/
 .esriCTBuildingDownloadDiv
 {
     color:#028D6A;
@@ -56,9 +53,9 @@
 
 /* Share Container Styles */
 
-.esriCTDivAppHolder {
-    border-right: 1px solid #028D6A;
-    border-left: 1px solid #028D6A;
+.esriCTDivAppHolder 
+{
+    border-color:#028D6A;
 }
 
 .esriCTDivShareContainer {
