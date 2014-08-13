@@ -124,28 +124,15 @@ define([], function () {
 
         // Set proxy url
         ProxyUrl: "/proxy/proxy.ashx",
-        DistanceUnitSettings: [{
-            DistanceUnitName: "Miles",
-            MinimumValue: 0,
-            MaximumValue: 100,
-            Checked: true
-        }, {
-            DistanceUnitName: "Feet",
-            MinimumValue: 0,
-            MaximumValue: 1000,
-            Checked: false
-        }, {
-            DistanceUnitName: "Meters",
-            MinimumValue: 0,
-            MaximumValue: 1000,
-            Checked: false
-        }, {
-            DistanceUnitName: "Kilometers",
-            MinimumValue: 0,
-            MaximumValue: 100,
-            Checked: false
-        }],
 
+        // Set buffer distance unit
+        DistanceUnitSettings: {
+            DistanceUnitName: "Miles", // Allowed values for DistanceUnitName are "Miles", "Kilometers", "Meters" and "Feet".
+            MinimumValue: 0,
+            MaximumValue: 100
+        },
+
+        // Set buffer symbology
         BufferSymbology: {
             FillSymbolColor: "255,0,0",
             FillSymbolTransparency: "0.20",
@@ -353,7 +340,7 @@ define([], function () {
                     DownloadSettings: [
                         {
                             DisplayOptionTitle: "Property Information",
-                            GeoProcessingServiceURL: "http://203.199.47.114/arcgis/rest/services/SiteSelector/GenerateReport/GPServer/GenerateReport",
+                            GeoProcessingServiceURL: "http://csslesxi3-vm4.cybertech.com/arcgis/rest/services/SiteSelector/GeneratePDFReport/GPServer/SiteSelectorPDFGen",
                             Filetype: "PDF" //allowed PDF or XLSX
                         }
                     ]
@@ -530,7 +517,7 @@ define([], function () {
                     DownloadSettings: [
                         {
                             DisplayOptionTitle: "Site Information",
-                            GeoProcessingServiceURL: "http://203.199.47.114/arcgis/rest/services/SiteSelector/GenerateReport/GPServer/GenerateReport",
+                            GeoProcessingServiceURL: "http://csslesxi3-vm4.cybertech.com/arcgis/rest/services/SiteSelector/GeneratePDFReport/GPServer/SiteSelectorPDFGen",
                             Filetype: "PDF" //allowed PDF or XLSX
                         }, {
                             DisplayOptionTitle: "Traffic Count Profile",
@@ -656,7 +643,8 @@ define([], function () {
                         FeatureLimit: 10
                     },
                     FilterLayer: {
-                        LayerURL: "http://54.193.222.183:6080/arcgis/rest/services/EconomicDevelopment/MapServer/54",
+                        Title: "Communities",
+                        QueryLayerId: "54",
                         FilterFieldName: "COUNTY",
                         OutFields: ["COUNTY"]
                     },

@@ -1,11 +1,12 @@
 ﻿<div class="esriCTHeaderRouteContainer" data-dojo-attach-point="applicationHeaderRouteContainer">
-  <div class="esriCTTabContainer" data-dojo-attach-point="divDirectionContainer">
+    <div class="esriCTTabContainer" data-dojo-attach-point="divDirectionContainer">
         <div class="esriCTsearchContainerBuilding esriCTTab" data-dojo-attach-point="esriCTsearchContainerBuilding">
             <div class="directionsDisplayTextBuilding" data-dojo-attach-point="buildingContent">
             </div>
         </div>
         <div class="esriCTsearchContainerSites esriCTTab" data-dojo-attach-point="esriCTsearchContainerSites">
-            <div class="directionsDisplayTextSites" data-dojo-attach-point="sitesContent"></div>
+            <div class="directionsDisplayTextSites" data-dojo-attach-point="sitesContent">
+            </div>
         </div>
         <div class="esriCTsearchContainerBusiness esriCTTab" data-dojo-attach-point="esriCTsearchContainerBusiness">
             <div class="directionsDisplayTextBusiness" data-dojo-attach-point="businessContent">
@@ -16,7 +17,7 @@
             </div>
         </div>
     </div>
-    <div class="esriCTTabContentContainer"   data-dojo-attach-point="TabContentContainer">
+    <div class="esriCTTabContentContainer" data-dojo-attach-point="TabContentContainer">
         <div class="esriCTsearchContentBuilding" data-dojo-attach-point="searchContentBuilding">
             <div class="esriCTMainDivBuilding" data-dojo-attach-point="mainDivBuilding">
                 <div class="esriOuterDiv">
@@ -57,12 +58,12 @@
                     </div>
                     <div class="esriCTsliderNSelect">
                         <div class="esriCTSliderContainer">
-                            <div class="esriCTSliderText" >
-                            <span>${sharedNls.titles.sliderDisplayText}</span>
-                            <span class="esriCTsliderDisplayText" data-dojo-attach-point="sliderDisplayText"></span>
+                            <div class="esriCTSliderText">
+                                <span>${sharedNls.titles.sliderDisplayText}</span> <span class="esriCTsliderDisplayText"
+                                    data-dojo-attach-point="sliderDisplayText"></span>
                             </div>
-                          <div class="esriCTSelectCommon">
-                              <div class="esriCTSelect" data-dojo-attach-point="unitForSelectBuilding">
+                            <div class="esriCTSelectCommon">
+                                <div class="esriCTSelect" data-dojo-attach-point="unitForSelectBuilding">
                                 </div>
                             </div>
                             <div class="esriCTSlider">
@@ -84,7 +85,7 @@
                 </div>
                 <div class="esriCTOuterDivForPagination" data-dojo-attach-point="outerDivForPegination">
                 </div>
-                 <div class="esriCTOuterResultDiv esriCTDemoInfoMainDiv" data-dojo-attach-point="outerResultContainerBuilding">
+                <div class="esriCTOuterResultDiv esriCTDemoInfoMainDiv" data-dojo-attach-point="outerResultContainerBuilding">
                 </div>
             </div>
             <div class="esriCTAttachmentOuterDiv" data-dojo-attach-point="attachmentOuterDiv">
@@ -92,75 +93,75 @@
         </div>
         <div class="esriCTsearchContentSites" data-dojo-attach-point="searchContentSites">
             <div class="esriCTMainDivSites" data-dojo-attach-point="mainDivSites">
-            <div class="esriOuterDiv">
-                <div class="esriCTClear">
-                    <div class="esriCTCheckBox">
-                        <input type="checkbox" checked="checked" data-dojo-attach-point="chksearchContentSites" />
-                    </div>
-                    <div class="esriCTChkLabel" data-dojo-attach-point="serachSiteText">
-                    </div>
-                </div>
-                <div class="esriCTAddressClear">
-                    <div data-dojo-attach-point="divAddressSearchSites" class="esriCTCursorDefault" align="left">
-                        <div data-dojo-attach-point="divAddressPlaceHolderSites" class="esriCTAddressPlaceHolder">
-                            <div  class="esriCTAddressSize">
-                                <input type="text" data-dojo-attach-point="txtAddressSites" class="esriCTTxtAddress"
-                                    onfocus="if(this.setSelectionRange)this.setSelectionRange(this.value.length, this.value.length);" />
-                            </div>
-                            <div class="esriCTSearchClose" data-dojo-attach-point="clearhideSites">
-                                <span class="esriCTClearInput" data-dojo-attach-point="closeSites"></span><span>
-                                    <img data-dojo-attach-point="imgSearchLoaderSites" class="esriCTSearchLoader" /></span>
-                            </div>
+                <div class="esriOuterDiv">
+                    <div class="esriCTClear">
+                        <div class="esriCTCheckBox">
+                            <input type="checkbox" checked="checked" data-dojo-attach-point="chksearchContentSites" />
                         </div>
-                        <div class="esriCTSearch" data-dojo-attach-point="divSearchSites">
-                            <span class="esriCTSearchIcon" data-dojo-attach-point="esriCTimgLocateSites"></span>
+                        <div class="esriCTChkLabel" data-dojo-attach-point="serachSiteText">
                         </div>
-                        <div data-dojo-attach-point="divAddressListSites" class="esriCTAddressList">
-                            <div data-dojo-attach-point="divAddressScrollContainerSites" class="esriCTAddressScrollContainer"
-                                align="left">
-                                <div data-dojo-attach-point="divAddressScrollContentSites" class="esriCTAddressScrollContent">
-                                    <div data-dojo-attach-point="divAddressResultsSites" class="esriCTFullWidth">
+                    </div>
+                    <div class="esriCTAddressClear">
+                        <div data-dojo-attach-point="divAddressSearchSites" class="esriCTCursorDefault" align="left">
+                            <div data-dojo-attach-point="divAddressPlaceHolderSites" class="esriCTAddressPlaceHolder">
+                                <div class="esriCTAddressSize">
+                                    <input type="text" data-dojo-attach-point="txtAddressSites" class="esriCTTxtAddress"
+                                        onfocus="if(this.setSelectionRange)this.setSelectionRange(this.value.length, this.value.length);" />
+                                </div>
+                                <div class="esriCTSearchClose" data-dojo-attach-point="clearhideSites">
+                                    <span class="esriCTClearInput" data-dojo-attach-point="closeSites"></span><span>
+                                        <img data-dojo-attach-point="imgSearchLoaderSites" class="esriCTSearchLoader" /></span>
+                                </div>
+                            </div>
+                            <div class="esriCTSearch" data-dojo-attach-point="divSearchSites">
+                                <span class="esriCTSearchIcon" data-dojo-attach-point="esriCTimgLocateSites"></span>
+                            </div>
+                            <div data-dojo-attach-point="divAddressListSites" class="esriCTAddressList">
+                                <div data-dojo-attach-point="divAddressScrollContainerSites" class="esriCTAddressScrollContainer"
+                                    align="left">
+                                    <div data-dojo-attach-point="divAddressScrollContentSites" class="esriCTAddressScrollContent">
+                                        <div data-dojo-attach-point="divAddressResultsSites" class="esriCTFullWidth">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="esriCTsliderNSelect">
-                    <div class="esriCTSliderContainer">
-                        <div class="esriCTSliderText">
-                        <span>${sharedNls.titles.sliderDisplayText}</span>
-                        <span class="esriCTsliderDisplayText" data-dojo-attach-point="sitesSliderText"></span>
-                        </div>
-                         <div class="esriCTSelectCommon">
-                            <div class="esriCTSelect" data-dojo-attach-point="unitForSelectSite"> </div>
-                        </div>
-                        <div class="esriCTSlider">
-                            <div class="esriCTHorizontalRuleContainer" data-dojo-attach-point="horizontalRuleContainerSites">
+                    <div class="esriCTsliderNSelect">
+                        <div class="esriCTSliderContainer">
+                            <div class="esriCTSliderText">
+                                <span>${sharedNls.titles.sliderDisplayText}</span> <span class="esriCTsliderDisplayText"
+                                    data-dojo-attach-point="sitesSliderText"></span>
                             </div>
-                            <div class="esriCTHorizontalSliderContainer" data-dojo-attach-point="horizontalSliderContainerSites">
+                            <div class="esriCTSelectCommon">
+                                <div class="esriCTSelect" data-dojo-attach-point="unitForSelectSite">
+                                </div>
                             </div>
-                        </div>
-                        <div class="esriCTDistanceUnit" data-dojo-attach-point="bufferDistanceUnitSites">
+                            <div class="esriCTSlider">
+                                <div class="esriCTHorizontalRuleContainer" data-dojo-attach-point="horizontalRuleContainerSites">
+                                </div>
+                                <div class="esriCTHorizontalSliderContainer" data-dojo-attach-point="horizontalSliderContainerSites">
+                                </div>
+                            </div>
+                            <div class="esriCTDistanceUnit" data-dojo-attach-point="bufferDistanceUnitSites">
+                            </div>
                         </div>
                     </div>
+                    <div class="esriCTbuildingAreaToFromDiv" data-dojo-attach-point="sitesFromToMainDiv">
+                    </div>
+                    <div class="esriCTClear esriCTHorizantalrule" data-dojo-attach-point="horizantalruleSites">
+                    </div>
+                    <div class="esriCTdivHideOptionBuilding" data-dojo-attach-point="divHideOptionSites">
+                    </div>
                 </div>
-                <div class="esriCTbuildingAreaToFromDiv" data-dojo-attach-point="sitesFromToMainDiv">
+                <div class="esriCTOuterDivForPagination" data-dojo-attach-point="outerDivForPeginationSites">
                 </div>
-                <div class="esriCTClear esriCTHorizantalrule" data-dojo-attach-point="horizantalruleSites">
-                </div>
-                <div class="esriCTdivHideOptionBuilding" data-dojo-attach-point="divHideOptionSites">
+                <div class="esriCTOuterResultDiv esriCTDemoInfoMainDiv" data-dojo-attach-point="outerResultContainerSites">
                 </div>
             </div>
-             <div class="esriCTOuterDivForPagination" data-dojo-attach-point="outerDivForPeginationSites">
-                </div>
-                 <div class="esriCTOuterResultDiv esriCTDemoInfoMainDiv" data-dojo-attach-point="outerResultContainerSites">
-                </div>
-                </div>
-                <div class="esriCTAttachmentOuterDiv" data-dojo-attach-point="attachmentOuterDivSites">
-                </div>
+            <div class="esriCTAttachmentOuterDiv" data-dojo-attach-point="attachmentOuterDivSites">
+            </div>
         </div>
-        
         <div class="esriCTsearchContentBusiness" data-dojo-attach-point="searchContentBusiness">
             <div class="esriOuterDiv">
                 <div class="esriCTClear">
@@ -198,12 +199,12 @@
                 <div class="esriCTsliderNSelect">
                     <div class="esriCTSliderContainer">
                         <div class="esriCTSliderText">
-                        <span> ${sharedNls.titles.sliderDisplayText}</span>
-                        <span class="esriCTsliderDisplayText" data-dojo-attach-point="businessSliderText"></span>
+                            <span>${sharedNls.titles.sliderDisplayText}</span> <span class="esriCTsliderDisplayText"
+                                data-dojo-attach-point="businessSliderText"></span>
                         </div>
-                         <div class="esriCTSelectCommon">
-                        <div class="esriCTSelect" data-dojo-attach-point="unitForSelectBusiness">
-                        </div>
+                        <div class="esriCTSelectCommon">
+                            <div class="esriCTSelect" data-dojo-attach-point="unitForSelectBusiness">
+                            </div>
                         </div>
                         <div class="esriCTSlider">
                             <div class="esriCTHorizontalRuleContainer" data-dojo-attach-point="horizontalRuleContainerBusiness">
@@ -259,13 +260,13 @@
                         </div>
                     </div>
                     <div class="esriCTSortBussiness" data-dojo-attach-point="sortByDiv">
-                    <div class="esriCTSortDiv">
-                        <div class="esriCTSpan">
-                            Sort By</div>
-                         <div class="esriCTSelectCommon">
-                              <div class="esriCTSelect" data-dojo-attach-point="SortBy">
+                        <div class="esriCTSortDiv">
+                            <div class="esriCTSpan">
+                                Sort By</div>
+                            <div class="esriCTSelectCommon">
+                                <div class="esriCTSelect" data-dojo-attach-point="SortBy">
+                                </div>
                             </div>
-                        </div>
                         </div>
                     </div>
                     <div class="esriCTmainResultDiv">
@@ -329,8 +330,8 @@
                     <div class="esriCTradiolabel" data-dojo-attach-point="searchCommunityText">
                     </div>
                     <div class="esriCTSelectCommunities">
-                    <div class="esriCTSearchContainerComm" data-dojo-attach-point="searchContainerComm">
-                    </div>
+                        <div class="esriCTSearchContainerComm" data-dojo-attach-point="searchContainerComm">
+                        </div>
                     </div>
                 </div>
             </div>

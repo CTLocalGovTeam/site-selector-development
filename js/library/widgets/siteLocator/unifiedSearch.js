@@ -372,7 +372,7 @@ define([
 
         /**
         * perform search by addess if search type is address search
-        * @param {array} array of address 
+        * @param {array} array of address
         * @param {number} count of address in address list
         * @param {object} Nodes and other variable for all workflows
         * @memberOf widgets/Sitelocator/UnifiedSearch

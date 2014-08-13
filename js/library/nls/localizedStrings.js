@@ -33,7 +33,9 @@ define({
             locate: "Locate",
             share: "Share",
             help: "Help",
-            clearEntry: "Clear"
+            clearEntry: "Clear",
+            previous: "Previous",
+            next: "Next"
         },
         titles: {
 

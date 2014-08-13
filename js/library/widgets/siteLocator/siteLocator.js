@@ -322,7 +322,7 @@ define([
         /**
         * Create Filter UI
         * @param {array} check box node
-        * @param {containerNode} 
+        * @param {containerNode}
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _createFilter: function (arrFilter, node) {
@@ -394,9 +394,9 @@ define([
         /**
         * Create Create Filter Option Field UI
         * @param {array} Number of fields
-        * @param {object} Container node 
-        * @param {array} Additional fileds  
-        * @param {object} Additional fileds node 
+        * @param {object} Container node
+        * @param {array} Additional fileds
+        * @param {object} Additional fileds node
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _createFilterOptionField: function (arrFields, node, arrAdditionalFields, additionalFieldsNode) {
@@ -492,16 +492,15 @@ define([
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _selectionChangeForSort: function (value) {
-            this.strValueSort = value;
             this.currentBussinessData.sort(lang.hitch(this, function (a, b) {
-                if (a[this.strValueSort] > b[this.strValueSort]) {
+                if (a[value] > b[value]) {
                     return 1;
                 }
-                if (a[this.strValueSort] < b[this.strValueSort]) {
+                if (a[value] < b[value]) {
                     return -1;
                 }
                 // a must be equal to b
-                if (a[this.strValueSort] !== 0 && b[this.strValueSort] !== 0) {
+                if (a[value] !== 0 && b[value] !== 0) {
                     return 0;
                 }
             }));
@@ -527,40 +526,7 @@ define([
         },
 
         /**
-        * Set unit to be used to create buffer
-        * @param {string} Selected unit
-        * @param {object} slider object
-        * @memberOf widgets/Sitelocator/Sitelocator
-        */
-        _selectionChangeForUnit: function (value, slider, horizontalRule, divSliderValue) {
-            var sliderValue;
-
-            array.forEach(value.target.parentNode.parentNode.children, function (item) {
-                if (domClass.contains(item.children[0], "esriCTSelectedDistanceUnit")) {
-                    domClass.remove(item.children[0], "esriCTSelectedDistanceUnit");
-                }
-            });
-            sliderValue = slider.value * ((value.target.getAttribute("MaximumValue") - value.target.getAttribute("MinimumValue")) / (slider.maximum - slider.minimum));
-            domClass.add(value.target, "esriCTSelectedDistanceUnit");
-            this.unitValues[this.workflowCount] = this._getDistanceUnit(value.target.innerHTML.toString());
-            horizontalRule.domNode.firstChild.innerHTML = value.target.getAttribute("MinimumValue");
-            horizontalRule.domNode.lastChild.innerHTML = value.target.getAttribute("MaximumValue");
-            domStyle.set(horizontalRule.domNode.lastChild, "text-align", "right");
-            domStyle.set(horizontalRule.domNode.lastChild, "width", "334px");
-            domStyle.set(horizontalRule.domNode.lastChild, "left", "0");
-
-            slider.minimum = value.target.getAttribute("MinimumValue");
-            slider.maximum = value.target.getAttribute("MaximumValue");
-            domAttr.set(divSliderValue, "innerHTML", domAttr.get(divSliderValue, "innerHTML").toString().replace(domAttr.get(divSliderValue, "distanceUnit").toString(), value.target.innerHTML.toString()).replace(Math.round(slider.value).toString(), Math.round(sliderValue).toString()));
-            domAttr.set(divSliderValue, "distanceUnit", value.target.innerHTML.toString());
-            slider.value = sliderValue;
-            if (this.featureGeometry[this.workflowCount]) {
-                this._createBuffer(this.featureGeometry[this.workflowCount]);
-            }
-        },
-
-        /**
-        * Get distance unit based on unit selection 
+        * Get distance unit based on unit selection
         * @param {string} Input distance unit
         * @memberOf widgets/Sitelocator/Sitelocator
         */
@@ -588,6 +554,9 @@ define([
         _createBuffer: function (geometry) {
             var sliderDistance, slider, selectedPanel, geometryService, params;
             topic.publish("showProgressIndicator");
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
             this.featureGeometry[this.workflowCount] = geometry;
 
             selectedPanel = query('.esriCTsearchContainerSitesSelected')[0];
@@ -640,11 +609,19 @@ define([
                     domConstruct.empty(this.outerResultContainerBuilding);
                     domConstruct.empty(this.attachmentOuterDiv);
                     delete this.buildingTabData;
-                } else {
+                } else if (this.workflowCount === 1) {
                     domStyle.set(this.outerDivForPeginationSites, "display", "none");
                     domConstruct.empty(this.outerResultContainerSites);
                     domConstruct.empty(this.attachmentOuterDivSites);
                     delete this.sitesTabData;
+                } else if (this.workflowCount === 2) {
+                    this.businessData = [];
+                    this.enrichData = [];
+                    this.salesFinalData = [];
+                    this.employeFinalData = [];
+                    this.revenueData = [];
+                    this.totalArray = [];
+                    domStyle.set(this.resultDiv, "display", "none");
                 }
                 this.lastGeometry[this.workflowCount] = null;
                 this.map.graphics.clear();
