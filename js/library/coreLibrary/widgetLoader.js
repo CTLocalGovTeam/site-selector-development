@@ -62,7 +62,6 @@ define([
                     return;
                 }
                 dojo.configData.BaseMapLayers = baseMapLayers;
-             //   map = new Map();
                 if (dojo.configData.SplashScreen && dojo.configData.SplashScreen.IsVisible) {
                     splashScreen = new SplashScreen();
                     splashScreen.showSplashScreenDialog();
@@ -270,7 +269,7 @@ define([
             var i, bmLayerData, multiBasemap = [];
             bmLayerData = bmLayers.itemData.baseMap.baseMapLayers;
             if (this._isUniqueBasemap(baseMapArray, bmLayerData, isWorkFlowBasemap)) {
-                if (isWorkFlowBasemap) {
+                if (isWorkFlowBasemap || bmLayerData[0].visibility) {
                     dojo.selectedBasemapIndex = baseMapArray.length;
                 }
                 if (bmLayerData.length === 1) {
@@ -306,7 +305,7 @@ define([
             for (i = 0; i < baseMapArray.length; i++) {
                 if (!baseMapArray[i].length) {
                     if (bmLayerData[0].url === baseMapArray[i].MapURL) {
-                        if (bmLayerData[0].length > 1) {
+                        if (bmLayerData.length > 1) {
                             pushBasemap = true;
                         } else {
                             pushBasemap = false;
@@ -330,6 +329,9 @@ define([
                             break;
                         }
 
+                    }
+
+                    if (baseMapArray.length - 1 === i) {
                         if (count === baseMapArray[i].length) {
                             pushBasemap = false;
                         } else {

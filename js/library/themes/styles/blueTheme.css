@@ -1,6 +1,7 @@
 ﻿
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (-webkit-min-device-pixel-ratio: 2) {
-   
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (-webkit-min-device-pixel-ratio: 2)
+{
+
     .esriCTHeaderSearch
     {
         background-image: url("../images/img2X/search@2X.png") !important;
@@ -54,200 +55,236 @@
     {
         background-image: url("../images/img2X/img-email@2x.png") !important;
     }
+
+    .infoTitleArrow
+    {
+        background-image: url("../images/right-blue-arrow.png");
+    }
 }
+
 @media only screen and (min-device-width : 1024px) and (max-device-width : 1279px) /*if device wise @media only screen and (min-device-width : 1024px) and (max-device-width : 1280px)*/
 {
-.esriCTHeaderSearch
-{
-    background-image: url("../images/img44x44/search.png")!important;
-}
-
-.esriCTHeaderSearchSelected
-{
-    background-image: url("../images/img44x44/search-select.png")!important;
-}
-.esriCTHelpImg
-{
-    background-image: url("../images/img44x44/Help.png")!important;
-}
-
-.esriCTTdGeolocation
-{
-    background-image: url("../images/img44x44/imgGeolocation.png")!important;
-}
-
-.esriCTImgSocialMedia
-{
-    background-image: url("../images/img44x44/imgSocialMedia.png")!important;
-}
-.esriCTImgSocialMediaSelected
-{
-    background-image: url("../images/img44x44/imgSocialMedia-select.png")!important;
-}
-.esriCTRouteImg
-{
-    background-image: url("../images/img44x44/get-route.png")!important;
-}
-.esriCTRouteImg-select
-{
-    background-image: url("../images/img44x44/get-route-select.png")!important;
-}
-   .esriCTFacebook
-{
-    background-image: url("../images/img44x44/img_facebook.png") !important;
-}
-
-.esriCTTwitter
-{
-    background-image: url("../images/img44x44/img_twitter.png") !important;
-}
-
-.esriCTEmail
-{
-    background-image: url("../images/img44x44/img_email.png") !important;
-}
-.esriCTEmbedding
-{
-    background-image: url("../images/img44x44/embedding.png") !important;
-} 
-  .esriCTExitImg
-{
-     background-image: url("../images/img44x44/exit.png")!important;
+    .esriCTHeaderSearch
+    {
+        background-image: url("../images/img44x44/search.png") !important;
     }
 
+    .esriCTHeaderSearchSelected
+    {
+        background-image: url("../images/img44x44/search-select.png") !important;
+    }
+    .esriCTHelpImg
+    {
+        background-image: url("../images/img44x44/Help.png") !important;
+    }
+
+    .esriCTTdGeolocation
+    {
+        background-image: url("../images/img44x44/imgGeolocation.png") !important;
+    }
+
+    .esriCTImgSocialMedia
+    {
+        background-image: url("../images/img44x44/imgSocialMedia.png") !important;
+    }
+
+    .esriCTImgSocialMediaSelected
+    {
+        background-image: url("../images/img44x44/imgSocialMedia-select.png") !important;
+    }
+
+    .esriCTRouteImg
+    {
+        background-image: url("../images/img44x44/get-route.png") !important;
+    }
+
+    .esriCTRouteImg-select
+    {
+        background-image: url("../images/img44x44/get-route-select.png") !important;
+    }
+
+    .esriCTFacebook
+    {
+        background-image: url("../images/img44x44/img_facebook.png") !important;
+    }
+
+    .esriCTTwitter
+    {
+        background-image: url("../images/img44x44/img_twitter.png") !important;
+    }
+
+    .esriCTEmail
+    {
+        background-image: url("../images/img44x44/img_email.png") !important;
+    }
+
+    .esriCTEmbedding
+    {
+        background-image: url("../images/img44x44/embedding.png") !important;
+    }
+
+    .esriCTExitImg
+    {
+        background-image: url("../images/img44x44/exit.png") !important;
+    }
 }
+
 @media screen and (max-width: 1024px)
 {
-.esriCTHeaderSearch
-{
-    background-image: url("../images/img44x44/search.png")!important;
-}
+    .esriCTHeaderSearch
+    {
+        background-image: url("../images/img44x44/search.png") !important;
+    }
 
-.esriCTHeaderSearchSelected
-{
-    background-image: url("../images/img44x44/search-select.png")!important;
-}
-.esriCTHelpImg
-{
-    background-image: url("../images/img44x44/Help.png")!important;
-}
+    .esriCTHeaderSearchSelected
+    {
+        background-image: url("../images/img44x44/search-select.png") !important;
+    }
 
-.esriCTTdGeolocation
-{
-    background-image: url("../images/img44x44/imgGeolocation.png")!important;
-}
+    .esriCTHelpImg
+    {
+        background-image: url("../images/img44x44/Help.png") !important;
+    }
 
-.esriCTImgSocialMedia
-{
-    background-image: url("../images/img44x44/imgSocialMedia.png")!important;
-}
-.esriCTImgSocialMediaSelected
-{
-    background-image: url("../images/img44x44/imgSocialMedia-select.png")!important;
-}
-.esriCTRouteImg
-{
-    background-image: url("../images/img44x44/get-route.png")!important;
-}
-.esriCTRouteImg-select
-{
-    background-image: url("../images/img44x44/get-route-select.png")!important;
-}
-   .esriCTFacebook
-{
-    background-image: url("../images/img44x44/img_facebook.png") !important;
-}
+    .esriCTTdGeolocation
+    {
+        background-image: url("../images/img44x44/imgGeolocation.png") !important;
+    }
 
-.esriCTTwitter
-{
-    background-image: url("../images/img44x44/img_twitter.png") !important;
-}
+    .esriCTImgSocialMedia
+    {
+        background-image: url("../images/img44x44/imgSocialMedia.png") !important;
+    }
 
-.esriCTEmail
-{
-    background-image: url("../images/img44x44/img_email.png") !important;
-}
-.esriCTEmbedding
-{
-    background-image: url("../images/img44x44/embedding.png") !important;
-} 
-  .esriCTExitImg
-{
-     background-image: url("../images/img44x44/exit.png")!important;
+    .esriCTImgSocialMediaSelected
+    {
+        background-image: url("../images/img44x44/imgSocialMedia-select.png") !important;
+    }
+
+    .esriCTRouteImg
+    {
+        background-image: url("../images/img44x44/get-route.png") !important;
+    }
+
+    .esriCTRouteImg-select
+    {
+        background-image: url("../images/img44x44/get-route-select.png") !important;
+    }
+
+    .esriCTFacebook
+    {
+        background-image: url("../images/img44x44/img_facebook.png") !important;
+    }
+
+    .esriCTTwitter
+    {
+        background-image: url("../images/img44x44/img_twitter.png") !important;
+    }
+
+    .esriCTEmail
+    {
+        background-image: url("../images/img44x44/img_email.png") !important;
+    }
+
+    .esriCTEmbedding
+    {
+        background-image: url("../images/img44x44/embedding.png") !important;
+    }
+
+    .esriCTExitImg
+    {
+        background-image: url("../images/img44x44/exit.png") !important;
     }
 }
-    
-/*main browser theme*/   
 
-.esriCTHeaderSearch {
+/*main browser theme*/
+
+.esriCTHeaderSearch
+{
     background-image: url("../images/img24x24/search-24.png");
 }
 
-.esriCTHelpImg {
+.esriCTHelpImg
+{
     background-image: url("../images/img24x24/Help-24.png");
 }
 
-.esriCTTdGeolocation {
+.esriCTTdGeolocation
+{
     background-image: url("../images/img24x24/imgGeolocation-24.png");
 }
 
-.esriCTImgSocialMedia {
+.esriCTImgSocialMedia
+{
     background-image: url("../images/img24x24/imgSocialMedia-24.png");
 }
 
-.esriCTReportsImg {
+.esriCTReportsImg
+{
     background-image: url("../images/img24x24/reports-24.png");
 }
 
-.esriCTHeaderSearchSelected {
+.esriCTHeaderSearchSelected
+{
     background-image: url("../images/img24x24/search-select-24.png");
 }
 
-.esriCTImgSocialMediaSelected {
+.esriCTImgSocialMediaSelected
+{
     background-image: url("../images/img24x24/imgSocialMedia-select-24.png");
 }
 
-.esriCTReportsImgSelected {
+.esriCTReportsImgSelected
+{
     background-image: url("../images/img24x24/reportsSelected-24.png");
 }
-.esriCTFacebook {
+.esriCTFacebook
+{
     background-image: url("../images/img24x24/img_facebook-24.png");
 }
 
-.esriCTTwitter {
+.esriCTTwitter
+{
     background-image: url("../images/img24x24/img_twitter-24.png");
 }
 
-.esriCTEmail {
+.esriCTEmail
+{
     background-image: url("../images/img24x24/img_email-24.png");
 }
 
-.esriCTEmbedding {
+.esriCTEmbedding
+{
     background-image: url('../images/img24x24/embedding-24.png');
 }
 /* Application Header Styles */
 
-.esriCTApplicationHeader {
+.esriCTApplicationHeader
+{
     border-bottom: 1px solid #007ac2;
 }
 
-.esriCTApplicationHeaderTextTD {
+.esriCTApplicationHeaderTextTD
+{
     color: #007AC2;
 }
 
 /* Address container Styles */
 
-.esriCTAddressContent {
+.esriCTAddressContent
+{
     border-right: 1px solid #007ac2;
     border-left: 1px solid #007ac2;
     border-bottom: 1px solid #007ac2;
 }
 
-.esriCTSearchIcon {
+.esriCTSearchIcon
+{
     background-image: url("../images/searchBtn.png") !important;
 }
 
-.esriCTResultColor {
+.esriCTResultColor
+{
     color: #007ac2;
 }
 
@@ -255,87 +292,102 @@
 
 /* Share Container Styles */
 
-.esriCTDivAppHolder 
+.esriCTDivAppHolder
 {
-    
     border-color: #007ac2;
 }
 
-.esriCTDivShareContainer {
+.esriCTDivShareContainer
+{
     border-right: 1px solid #007ac2;
     border-left: 1px solid #007ac2;
     border-bottom: 1px solid #007ac2;
 }
 
-.esriCTTxtShare {
+.esriCTTxtShare
+{
     border: 1px solid #007AC2;
 }
 
 /* Slider */
 
-.esriSimpleSliderDecrementButton, .esriSimpleSliderIncrementButton {
+.esriSimpleSliderDecrementButton, .esriSimpleSliderIncrementButton
+{
     background-color: #007ac2 !important;
 }
 
-.HomeButton .home, .HomeButton .home:hover {
+.HomeButton .home, .HomeButton .home:hover
+{
     background-color: #007ac2;
 }
 .esriCTSelectedDistanceUnit
 {
-    color:#007ac2;
-    cursor:default;
+    color: #007ac2;
+    cursor: default;
 }
 
 /* End of Slider */
 
 /* Basemap */
 
-.BasemapToggle .toggleButton {
+.BasemapToggle .toggleButton
+{
     border: 2px solid #007ac2 !important;
 }
 
-.BasemapToggle .basemapTitle {
+.BasemapToggle .basemapTitle
+{
     color: #007ac2 !important;
 }
 
-.BasemapToggle .basemapImage {
+.BasemapToggle .basemapImage
+{
     border: 1px solid #007ac2;
 }
 
-.esriCTAreaOfInterestTabSelected {
+.esriCTAreaOfInterestTabSelected
+{
     color: #007AC2;
 }
 
-.esriCTAreaOfInterestTab {
+.esriCTAreaOfInterestTab
+{
     border-right: 1px solid #007ac2;
     border-bottom: 1px solid #007ac2;
     color: #007AC2;
 }
 
-.esriCTHeaderReportContainer {
+.esriCTHeaderReportContainer
+{
     border-left: 1px solid #007ac2;
     border-right: 1px solid #007ac2;
 }
 
-.esriCTReportTabSelected {
+.esriCTReportTabSelected
+{
     border-left: 1px solid #007ac2;
     border-bottom: 1px solid #007ac2;
     color: #007AC2;
 }
 
-.esriCTReportTab {
+.esriCTReportTab
+{
     color: #007AC2;
 }
 
 .esriCTBuildingDownloadDiv
 {
-    color:#007ac2;
- }
- .esriCTBackToResult{  color:#007ac2;}
+    color: #007ac2;
+}
+
+.esriCTBackToResult
+{
+    color: #007ac2;
+}
 
 /*Splash Screen*/
 
-.customButton 
+.customButton
 {
     color: #fff;
     background: #007ac2;
@@ -345,9 +397,11 @@
 
 /* CSS for shadow effect*/
 
-.esriCTBoxShadow {
+.esriCTBoxShadow
+{
     border: 2px solid #007AC2;
 }
+
 .esriCTRoundedCorner
 {
     behavior: url("esri_template/core_library/PIE.htc");
@@ -356,85 +410,115 @@
 /* End of CSS for shadow effect*/
 
 /*Site locator*/
-.esriCTHeaderRouteContainer {
+.esriCTHeaderRouteContainer
+{
     border-left: 1px solid #007AC2;
     border-right: 1px solid #007AC2;
 }
 
-.esriCTTab {
+.esriCTTab
+{
     border-color: #007AC2;
-     color: #007AC2;
-    background:#fafafa;
+    color: #007AC2;
+    background: #fafafa;
 }
 
-.esriCTsearchContainerSitesSelected {
+.esriCTsearchContainerSitesSelected
+{
     background: #fff;
-    color:#007AC2;
+    color: #007AC2;
 }
 
-.esriOuterDiv {
+.esriOuterDiv
+{
     border-bottom: 1px solid #007AC2;
 }
 
-.esriCTGoButton {
+.esriCTGoButton
+{
     background: none repeat scroll 0 0 #007AC2;
 }
 
+.esriCTinfoWindow
+{
+    border: #007AC2 solid 1px;
+}
 
-.dijitSliderImageHandleH {
+.esriCTInfoContainer
+{
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: 1001;
+    width: 100%;
+    height: 100%;
+}
+
+.dijitSliderImageHandleH
+{
     background-image: url('../images/blueThumb.png') !important;
 }
 
-.claro .dijitSliderProgressBarH .dijitSliderThumbHover {
+.claro .dijitSliderProgressBarH .dijitSliderThumbHover
+{
     background-image: url('../images/blueThumb.png') !important;
 }
 
-.dijitSliderBumperH, .dijitSliderBarH {
+.dijitSliderBumperH, .dijitSliderBarH
+{
     background-color: #007AC2;
 }
 
-.claro .dijitSlider .dijitSliderProgressBarH, .claro .dijitSlider .dijitSliderLeftBumper {
+.claro .dijitSlider .dijitSliderProgressBarH, .claro .dijitSlider .dijitSliderLeftBumper
+{
     background-color: #007AC2;
 }
 
-.esriCTTextRight {
+.esriCTTextRight
+{
     color: #007AC2;
 }
 
-.dijitReset {
+.dijitReset
+{
     color: #007AC2;
 }
 
-.claro .dijitSelect, .dijitArrowButtonInner, .claro .dijitComboBox, .dijitArrowButtonInner {
-    background-image: url("../images/blue-arrow.png")!important;
+.claro .dijitSelect, .dijitArrowButtonInner, .claro .dijitComboBox, .dijitArrowButtonInner
+{
+    background-image: url("../images/blue-arrow.png") !important;
     background-position: right center !important;
     background-repeat: no-repeat !important;
     margin: 0px !important;
     width: 16px !important;
-    padding: 0px!important;
+    padding: 0px !important;
 }
 
-.claro .dijitSelectFocused .dijitArrowButton {
+.claro .dijitSelectFocused .dijitArrowButton
+{
     background-color: #fff !important;
-    background-image: url("../images/blue-arrow.png" )!important;
+    background-image: url("../images/blue-arrow.png" ) !important;
     background-position: right center !important;
     background-repeat: no-repeat !important;
     margin: 0px !important;
     width: 16px !important;
-    padding: 0px!important;
+    padding: 0px !important;
 }
 
-.claro .dijitMenu .digitMenuItemSelected td, .claro .dijitComboBoxMenu .dijitMenuItemSelected {
+.claro .dijitMenu .digitMenuItemSelected td, .claro .dijitComboBoxMenu .dijitMenuItemSelected
+{
     background-color: #007AC2 !important;
 }
 
-.claro .dijitMenu .dijitMenuItemHover td, .claro .dijitMenu .dijitMenuItemSelected td, .claro .dijitMenuItemHover, .claro .dijitComboBoxMenu .dijitMenuItemHover, .claro .digitMenuItemSelected {
+.claro .dijitMenu .dijitMenuItemHover td, .claro .dijitMenu .dijitMenuItemSelected td, .claro .dijitMenuItemHover, .claro .dijitComboBoxMenu .dijitMenuItemHover, .claro .digitMenuItemSelected
+{
     background-image: none !important;
     background-color: #007AC2 !important;
     color: white !important;
 }
 
-.esriCTselectbox {
+.esriCTselectbox
+{
     border-color: #007AC2 !important;
 }
 
@@ -442,5 +526,29 @@
 {
     color: #007AC2 !important;
 }
+.infopanel
+{
+    border-top: 1px #007ac2 solid;
+}
+
+/* infowindow anchor*/
+.esriCTdivTriangle
+{
+    background-image: url("../images/bottomArrow-blue.png");
+}
+.infoBackTitleArrow
+{
+    background-image: url("../images/blue-arrow.png");
+}
+
+.esriCTdivInfoRightArrow
+{
+    background: url("../images/right-blue-arrow.png") !important;
+}
+.esriCTdivInfoLeftArrow
+{
+    background: url("../images/left-blue-arrow.png");
+}
 
 /*End of Site locator*/
+

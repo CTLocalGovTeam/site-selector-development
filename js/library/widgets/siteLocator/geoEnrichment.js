@@ -118,6 +118,9 @@ define([
             this.own(on(this.comAreaList, "change", lang.hitch(this, function (value) {
                 if (value.toLowerCase() !== sharedNls.titles.select.toLowerCase()) {
                     this._selectionChangeForCommunities(value);
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
                     topic.publish("showProgressIndicator");
                 }
             })));
@@ -175,11 +178,10 @@ define([
         * Validate the numeric text box control
         * @param {object} from node
         * @param {object} to node
-        * @param {object} check box 
+        * @param {object} check box
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _fromToDatachangeHandler: function (fromNode, toNode, checkBox) {
-            this._showBusinessTab();
             if (checkBox.checked) {
                 if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0 && Number(toNode.value) >= Number(fromNode.value) && fromNode.value !== "" && toNode.value !== "") {
                     if (checkBox.value === "_SALES") {
@@ -196,7 +198,7 @@ define([
                 } else {
                     alert(sharedNls.errorMessages.invalidInput);
                 }
-            } else {
+            } else if (fromNode.value !== "" && toNode.value !== "") {
                 if (checkBox.value === "_SALES") {
                     this.revenueData.length = 0;
                     this.salesFinalData.length = 0;
@@ -222,7 +224,7 @@ define([
         },
 
         /**
-        * Validate the check boxvalue 
+        * Validate the check boxvalue
         * @param {object} Checkbox value
         * @param {object} From text input node
         * @param {object} To text input node
@@ -294,7 +296,7 @@ define([
         * Perform data enrichment based on parameters
         * @param {object} Geometry used to perform enrichment analysis
         * @param {Number} Count of tab(workflow)
-        * @param {object} parameter for standerd serach 
+        * @param {object} parameter for standerd serach
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _enrichData: function (geometry, workflowCount, standardSearchCandidate) {
@@ -412,9 +414,12 @@ define([
         * @param {object} result data for geoenrichment request
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
-        _geoEnrichmentRequestHandler: function (data) {
+        _geoEnrichmentRequestHandler: function (data, id) {
             topic.publish("hideProgressIndicator");
             var headerInfo, enrichGeo, attachMentNode, image, esriCTBuildingSitesResultContainer, esriCTSitesResultContainer, esriCTBuildingSitesResultStyles, esriCTDemoGraphicContHeight, esriCTDemoGraphicContStyle, geoenrichtOuterDiv, geoenrichtOuterDivContent, esriCTSitesResultStyles;
+            if (!id && this.arrGeoenrichData[this.workflowCount]) {
+                this.arrGeoenrichData[this.workflowCount][this.arrGeoenrichData[this.workflowCount].length - 1].data = data;
+            }
             if (this.workflowCount === 0 || this.workflowCount === 1) {
                 if (this.workflowCount === 0) {
                     attachMentNode = this.attachmentOuterDiv;
@@ -524,7 +529,7 @@ define([
 
         /**
         * Gets demography data from geoenrichment result and add tem to specified html node
-        * @param {object} Geoenrichment result 
+        * @param {object} Geoenrichment result
         * @param {array} field used to denote demography
         * @param {object} HTML node on used to display demography data
         * @memberOf widgets/Sitelocator/Geoenrichment
@@ -558,8 +563,8 @@ define([
         },
 
         /**
-        * Gets units for demography data from geoenrichment result 
-        * @param {object} Geoenrichment result 
+        * Gets units for demography data from geoenrichment result
+        * @param {object} Geoenrichment result
         * @param {array} field used to denote demography
         * @return {string} unit for collection ids
         * @memberOf widgets/Sitelocator/Geoenrichment
@@ -579,7 +584,7 @@ define([
 
         /**
         * Set geoenrichment result
-        * @param {object} Geoenrichment result 
+        * @param {object} Geoenrichment result
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _setResultData: function (enrichData) {
@@ -661,11 +666,12 @@ define([
         * Set geoenrichment result and add it to specified html node
         * @param {array} Aggregated data fromGeoenrichment result
         * @param {object} HTML node to be used to display geoenrichment result
-        * @param {object} Geoenrichment result 
+        * @param {object} Geoenrichment result
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _setBusinessValues: function (arrData, node, enrichData) {
             var i, resultpanel, content, countRevenueEmpPanel, esriContainerHeight, esriContainerStyle, countRevenueEmp, count, countName, countValue, revenue, revenueName, revenuevalue, employee, empName, empValue;
+            this._showBusinessTab();
             this.currentBussinessData = arrData;
             domConstruct.empty(node);
             resultpanel = domConstruct.create("div", { "class": "esriCTSortPanelHead" }, node);
@@ -778,6 +784,7 @@ define([
 
                     } else {
                         if (arrDwnloadDisplayFieldValue[value].GeoProcessingServiceURL) {
+                            topic.publish("showProgressIndicator");
                             webMapJsonData = this._createMapJsonData();
                             params = {
                                 "Logo": dojoConfig.baseURL + dojo.configData.ApplicationIcon.toString(),
@@ -790,6 +797,7 @@ define([
                             }
                             gp = new Geoprocessor(arrDwnloadDisplayFieldValue[value].GeoProcessingServiceURL);
                             gp.submitJob(params, lang.hitch(this, function (jobInfo) {
+                                topic.publish("hideProgressIndicator");
                                 if (jobInfo.jobStatus !== "esriJobFailed") {
                                     if (arrDwnloadDisplayFieldValue[value].Filetype.toLowerCase() === "pdf") {
                                         gp.getResultData(jobInfo.jobId, "Report_PDF", this._downloadPDFFile);
@@ -798,11 +806,13 @@ define([
                                     }
                                 }
                             }), null, function (err) {
+                                topic.publish("hideProgressIndicator");
                                 alert(err.message);
                             });
                         }
                     }
                 } catch (Error) {
+                    topic.publish("hideProgressIndicator");
                     console.log(Error.Message);
                 }
             })));

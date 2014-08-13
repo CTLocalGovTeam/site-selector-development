@@ -74,14 +74,14 @@ define([
         /**
         * Performs from to filter query
         * @param {object}From container node
-        * @param {object}To container node 
-        * @param {object}Check box object   
+        * @param {object}To container node
+        * @param {object}Check box object
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _fromToQuery: function (fromNode, toNode, chkBox) {
 
             var isfilterRemoved = false;
-            if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0 &&  fromNode.value !== "" && toNode.value !== "") {
+            if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0 && Number(fromNode.value) < Number(toNode.value) && lang.trim(fromNode.value) !== "" && lang.trim(toNode.value) !== "") {
                 if (this.workflowCount === 0) {
                     if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
                         this.queryArrayBuildingAND.splice(array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")), 1);
@@ -228,9 +228,9 @@ define([
 
         /**
         * perform search by addess if search type is address search
-        * @param {number} tab count 
+        * @param {number} tab count
         * @param {object} Geometry to perform query
-        * @param {string} where clause for query 
+        * @param {string} where clause for query
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         doLayerQuery: function (tabCount, geometry, where) {
@@ -297,8 +297,8 @@ define([
         /**
         * perform query to get data (attachments) for batches of 10 based on curent index
         * @param {object} Layer on which query need to be performed
-        * @param {object} total features from query 
-        * @param {number} index of feature 
+        * @param {object} total features from query
+        * @param {number} index of feature
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         performQuery: function (layer, featureSet, curentIndex) {

@@ -75,6 +75,7 @@ define([
         areaSortBuilding: null,
         areaSortSites: null,
         lastGeometry: [null, null, null, null],
+        arrGeoenrichData: [null, null, null, null],
 
         /**
         * create horizontal slider for all required tab
@@ -82,9 +83,11 @@ define([
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _createHorizontalSlider: function (sliderContainer, horizontalRuleContainer, divSliderValue, unitContainer, tabCount) {
-            var _self, horizontalSlider, sliderId, horizontalRule, sliderTimeOut, count = 0, j, radioContent, radioSpanContent;
+            var _self, horizontalSlider, sliderId, horizontalRule, sliderTimeOut;
             sliderId = "slider" + domAttr.get(sliderContainer, "data-dojo-attach-point");
-            horizontalRule = new HorizontalRule({ "class": "horizontalRule" }, horizontalRuleContainer);
+            horizontalRule = new HorizontalRule({
+                "class": "horizontalRule"
+            }, horizontalRuleContainer);
             horizontalRule.domNode.firstChild.style.border = "none";
             horizontalRule.domNode.lastChild.style.border = "none";
             horizontalRule.domNode.lastChild.style.right = "0" + "px";
@@ -93,69 +96,44 @@ define([
                 "class": "horizontalSlider",
                 id: sliderId
             }, sliderContainer);
-            array.forEach(dojo.configData.DistanceUnitSettings, lang.hitch(this, function (DistanceUnit) {
-                count++;
-                radioContent = domConstruct.create("div", { "class": "esriCTRadioBtn " }, unitContainer);
-                domStyle.set(radioContent, "width", (100 / dojo.configData.DistanceUnitSettings.length).toString() + "%");
-                radioSpanContent = domConstruct.create("span", { "class": "esriCTRadioBtnContent esriCTCursorPointer" }, radioContent);
-                if (DistanceUnit.MaximumValue > 0) {
-                    domAttr.set(radioSpanContent, "MaximumValue", DistanceUnit.MaximumValue);
-                } else {
-                    domAttr.set(radioSpanContent, "MaximumValue", 1000);
-                }
-                if (DistanceUnit.MinimumValue >= 0) {
-                    domAttr.set(radioSpanContent, "MinimumValue", DistanceUnit.MinimumValue);
-                } else {
-                    domAttr.set(radioSpanContent, "MinimumValue", 0);
-                }
-                domAttr.set(radioSpanContent, "innerHTML", DistanceUnit.DistanceUnitName);
-                if (count === dojo.configData.DistanceUnitSettings.length) {
-                    domStyle.set(radioContent, "text-align", "right");
-                }
-
-                if (DistanceUnit.Checked) {
-                    for (j = 0; j < query(".esriCTSelectedDistanceUnit", unitContainer).length; j++) {
-                        domClass.remove(query(".esriCTSelectedDistanceUnit", unitContainer)[j], "esriCTSelectedDistanceUnit");
-                    }
-                    domClass.add(radioSpanContent, "esriCTSelectedDistanceUnit");
-                    this.unitValues[tabCount] = this._getDistanceUnit(DistanceUnit.DistanceUnitName);
-                    if (DistanceUnit.MaximumValue > 0) {
-                        horizontalRule.domNode.lastChild.innerHTML = DistanceUnit.MaximumValue;
-                        horizontalSlider.maximum = DistanceUnit.MaximumValue;
-                    } else {
-                        horizontalRule.domNode.lastChild.innerHTML = 1000;
-                        horizontalSlider.maximum = 1000;
-                    }
-                    if (DistanceUnit.MinimumValue >= 0) {
-                        horizontalRule.domNode.firstChild.innerHTML = DistanceUnit.MinimumValue;
-                        horizontalSlider.minimum = DistanceUnit.MinimumValue;
-                    } else {
-                        horizontalRule.domNode.firstChild.innerHTML = 0;
-                        horizontalSlider.minimum = 0;
-                    }
-                    horizontalSlider.value = horizontalSlider.minimum;
-                    domStyle.set(horizontalRule.domNode.lastChild, "text-align", "right");
-                    domStyle.set(horizontalRule.domNode.lastChild, "width", "334px");
-                    domStyle.set(horizontalRule.domNode.lastChild, "left", "0");
-                    domAttr.set(divSliderValue, "distanceUnit", DistanceUnit.DistanceUnitName.toString());
-                    domAttr.set(divSliderValue, "innerHTML", horizontalSlider.value.toString() + " " + DistanceUnit.DistanceUnitName);
-                }
-                on(radioSpanContent, "click", lang.hitch(this, function (value) {
-                    this._selectionChangeForUnit(value, horizontalSlider, horizontalRule, divSliderValue);
-                }));
-
-            }));
+            horizontalSlider.tabCount = tabCount;
+            this.unitValues[tabCount] = this._getDistanceUnit(dojo.configData.DistanceUnitSettings.DistanceUnitName);
+            if (dojo.configData.DistanceUnitSettings.MaximumValue > 0) {
+                horizontalRule.domNode.lastChild.innerHTML = dojo.configData.DistanceUnitSettings.MaximumValue;
+                horizontalSlider.maximum = dojo.configData.DistanceUnitSettings.MaximumValue;
+            } else {
+                horizontalRule.domNode.lastChild.innerHTML = 1000;
+                horizontalSlider.maximum = 1000;
+            }
+            if (dojo.configData.DistanceUnitSettings.MinimumValue >= 0) {
+                horizontalRule.domNode.firstChild.innerHTML = dojo.configData.DistanceUnitSettings.MinimumValue;
+                horizontalSlider.minimum = dojo.configData.DistanceUnitSettings.MinimumValue;
+            } else {
+                horizontalRule.domNode.firstChild.innerHTML = 0;
+                horizontalSlider.minimum = 0;
+            }
+            horizontalSlider.value = horizontalSlider.minimum;
+            domStyle.set(horizontalRule.domNode.lastChild, "text-align", "right");
+            domStyle.set(horizontalRule.domNode.lastChild, "width", "334px");
+            domStyle.set(horizontalRule.domNode.lastChild, "left", "0");
+            domAttr.set(divSliderValue, "distanceUnit", dojo.configData.DistanceUnitSettings.DistanceUnitName.toString());
+            domAttr.set(divSliderValue, "innerHTML", horizontalSlider.value.toString() + " " + dojo.configData.DistanceUnitSettings.DistanceUnitName);
             _self = this;
+
             /**
             * Call back for slider change event
             * @param {object} Slider value
             * @memberOf widgets/Sitelocator/SitelocatorHelper
             */
             on(horizontalSlider, "change", function (value) {
+                if (Number(value) > Number(horizontalSlider.maximum)) {
+                    horizontalSlider.setValue(horizontalSlider.maximum);
+                }
                 domAttr.set(divSliderValue, "innerHTML", Math.round(value) + " " + domAttr.get(divSliderValue, "distanceUnit"));
                 clearTimeout(sliderTimeOut);
                 sliderTimeOut = setTimeout(function () {
                     if (_self.featureGeometry && _self.featureGeometry[_self.workflowCount]) {
+
                         _self._createBuffer(_self.featureGeometry[_self.workflowCount]);
                     }
                 }, 500);
@@ -294,7 +272,7 @@ define([
 
             if (this.workflowCount === 3 && this.comunitiesDemoInfoMainScrollbar) {
                 srcContainer = query('.esriCTDemoInfoMainDiv', this.communityMainDiv)[0];
-                srcContent = query('.esriCTDemoInfoMainDivBuildingContent')[0];
+                srcContent = query('.esriCTDemoInfoMainDivBuildingContent')[query('.esriCTDemoInfoMainDivBuildingContent').length - 1];
                 esriCTDemoResultStylesd = { height: document.documentElement.clientHeight - srcContainer.offsetTop + "px" };
                 domAttr.set(srcContainer, "style", esriCTDemoResultStylesd);
                 this.resizeScrollbar(this.comunitiesDemoInfoMainScrollbar, srcContainer, srcContent);
@@ -349,8 +327,8 @@ define([
 
         /**
         * Resize Building Panel
-        * @param {object} Containernode for Building tab 
-        * @param {object} Contentnode for Building tab 
+        * @param {object} Containernode for Building tab
+        * @param {object} Contentnode for Building tab
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _resizeBuildingContainer: function (containerNode, contentNode) {
@@ -370,8 +348,8 @@ define([
 
         /**
         * Resize Sites Panel
-        * @param {object} Containernode for Sites tab 
-        * @param {object} Contentnode for Sites tab 
+        * @param {object} Containernode for Sites tab
+        * @param {object} Contentnode for Sites tab
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _resizeSitesContainer: function (containerNode, contentNode) {
@@ -390,7 +368,7 @@ define([
 
         /**
         * Show hide more option
-        * @param {object} show node 
+        * @param {object} show node
         * @param {object} text node
         * @param {object} rule node
         * @memberOf widgets/Sitelocator/Sitelocator
@@ -582,10 +560,10 @@ define([
         },
 
         /**
-        * perform query to get geometry and other data based on object selection from display list 
-        * @param {object} Scrollbar name 
-        * @param {object} Scrollbar container node 
-        * @param {object} scrollbar Content node 
+        * perform query to get geometry and other data based on object selection from display list
+        * @param {object} Scrollbar name
+        * @param {object} Scrollbar container node
+        * @param {object} scrollbar Content node
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         resizeScrollbar: function (scrollbarName, containerNode, scrollbarContent) {
@@ -611,7 +589,7 @@ define([
         },
 
         /**
-        * perform query to get geometry and other data based on object selection from display list 
+        * perform query to get geometry and other data based on object selection from display list
         * @param {object} Selected value
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
@@ -619,7 +597,9 @@ define([
             var index, dataSelected;
             index = domAttr.get(value.currentTarget, "index");
             topic.publish("showProgressIndicator");
+
             if (this.workflowCount === 0) {
+
                 dataSelected = this.buildingTabData[index];
                 this._attachMentQuery(value, dataSelected, this.attachmentOuterDiv, this.mainDivBuilding, this.searchContentBuilding);
             } else {
@@ -629,7 +609,7 @@ define([
         },
 
         /**
-        * perform query to get geometry and other data based on object selection from display list 
+        * perform query to get geometry and other data based on object selection from display list
         * @param {object} Selected value
         * @param {object} Data for selected value
         * @param {object} html node for attachment
@@ -685,7 +665,7 @@ define([
             }
             resultSelectQuery.outFields = outfields;
             resultSelectionQuerytask.execute(resultSelectQuery, lang.hitch(this, function (featureSet) {
-                var symbol, graphic, arraProperyDisplayData = [];
+                var symbol, graphic, arraProperyDisplayData = [], isGeoenriched = false, enrichIndex;
                 if (featureSet.features[0].geometry.getExtent()) {
                     symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0, 0.65]), 3), new Color([255, 0, 0, 0.35]));
                     graphic = new Graphic(featureSet.features[0].geometry, symbol, {}, null);
@@ -722,19 +702,38 @@ define([
                 this.arrReportDataJson[this.workflowCount].reportData = {};
                 this.arrReportDataJson[this.workflowCount].reportData[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.DownloadSettings[0].DisplayOptionTitle.toString()] = arraProperyDisplayData;
                 this.arrReportDataJson[this.workflowCount].attachmentData = arrAttachmentURL;
-                geometryService = new GeometryService(dojo.configData.GeometryService);
-                params = new BufferParameters();
-                params.distances = [dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoenrichmentDistance.BufferDistance];
-                params.bufferSpatialReference = this.map.spatialReference;
-                params.outSpatialReference = this.map.spatialReference;
-                params.geometries = [featureSet.features[0].geometry];
-                params.unit = GeometryService[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoenrichmentDistance.Unit];
-                geometryService.buffer(params, lang.hitch(this, function (geometries) {
-                    topic.publish("showProgressIndicator");
-                    this._enrichData(geometries, this.workflowCount, null);
-                }), function (error) {
-                    topic.publish("hideProgressIndicator");
-                });
+                if (this.arrGeoenrichData[this.workflowCount] !== null) {
+                    for (enrichIndex = 0; enrichIndex < this.arrGeoenrichData[this.workflowCount].length; enrichIndex++) {
+                        if (this.arrGeoenrichData[this.workflowCount][enrichIndex].ID === dataSelected.featureData.ObjectID) {
+                            this._geoEnrichmentRequestHandler(this.arrGeoenrichData[this.workflowCount][enrichIndex].data, this.arrGeoenrichData[this.workflowCount][enrichIndex].ID);
+                            isGeoenriched = true;
+                            break;
+                        }
+                    }
+                    if (!isGeoenriched) {
+                        this.arrGeoenrichData[this.workflowCount].push({ ID: dataSelected.featureData.ObjectID });
+                    }
+
+                } else {
+                    this.arrGeoenrichData[this.workflowCount] = [];
+                    this.arrGeoenrichData[this.workflowCount].push({ ID: dataSelected.featureData.ObjectID });
+                }
+
+                if (!isGeoenriched) {
+                    geometryService = new GeometryService(dojo.configData.GeometryService);
+                    params = new BufferParameters();
+                    params.distances = [dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoenrichmentDistance.BufferDistance];
+                    params.bufferSpatialReference = this.map.spatialReference;
+                    params.outSpatialReference = this.map.spatialReference;
+                    params.geometries = [featureSet.features[0].geometry];
+                    params.unit = GeometryService[dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoenrichmentDistance.Unit];
+                    geometryService.buffer(params, lang.hitch(this, function (geometries) {
+                        topic.publish("showProgressIndicator");
+                        this._enrichData(geometries, this.workflowCount, null);
+                    }), function (error) {
+                        topic.publish("hideProgressIndicator");
+                    });
+                }
             }));
             this.own(on(backToResult, "click", lang.hitch(this, function () {
                 this._getBackToTab(attachmentNode, mainDivNode);
