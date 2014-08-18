@@ -1,9 +1,9 @@
 Copy of repository https://github.com/Esri/resource-proxy
-commit e071986ddb8050ed7aaee330a7bd0b55733bf1f0
-Merge: 8a94e76 9c5a3be
-Author: Kelly Hutchins <khutchins@esri.com>
-Date:   Wed Jan 29 14:37:38 2014 -0800
+commit d49f85e22a5e11383f465ea162cbda2ba159357f
+Merge: bb0af5e ce42ec9
+Author: Bjorn Svensson <bsvensson@esri.com>
+Date:   Fri Mar 28 16:43:19 2014 -0700
 
-    Merge pull request #74 from afili/master
+    Merge pull request #62 from afili/DotNet-improve-server-errors
     
-    Enhanced support for allowedReferers
+    DotNet : Improve return status codes and message from server when error is encountered
