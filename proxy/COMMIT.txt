@@ -1,9 +1,0 @@
-Copy of repository https://github.com/Esri/resource-proxy
-commit d49f85e22a5e11383f465ea162cbda2ba159357f
-Merge: bb0af5e ce42ec9
-Author: Bjorn Svensson <bsvensson@esri.com>
-Date:   Fri Mar 28 16:43:19 2014 -0700
-
-    Merge pull request #62 from afili/DotNet-improve-server-errors
-    
-    DotNet : Improve return status codes and message from server when error is encountered
