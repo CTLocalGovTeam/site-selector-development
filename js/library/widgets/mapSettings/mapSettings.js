@@ -45,8 +45,9 @@ define([
     "esri/layers/ArcGISDynamicMapServiceLayer",
     "widgets/infoWindow/infoWindow",
     "dojo/string",
+    "esri/geometry/Point",
     "dojo/domReady!"
-], function (declare, domConstruct, domStyle, lang, on, array, esriUtils, dom, domAttr, query, Query, QueryTask, domClass, _WidgetBase, sharedNls, esriMap, ImageParameters, FeatureLayer, GraphicsLayer, BaseMapGallery, GeometryExtent, HomeButton, Deferred, DeferredList, topic, ArcGISDynamicMapServiceLayer, InfoWindow, string) {
+], function (declare, domConstruct, domStyle, lang, on, array, esriUtils, dom, domAttr, query, Query, QueryTask, domClass, _WidgetBase, sharedNls, esriMap, ImageParameters, FeatureLayer, GraphicsLayer, BaseMapGallery, GeometryExtent, HomeButton, Deferred, DeferredList, topic, ArcGISDynamicMapServiceLayer, InfoWindow, string, Point) {
 
     //========================================================================================================================//
 
@@ -56,6 +57,7 @@ define([
         tempGraphicsLayerId: "esriGraphicsLayerMapSettings",
         featureGraphicsLayerId: "esriFeatureGraphicsLayer",
         sharedNls: sharedNls,
+        isInfoPopupShown: false,
 
         /**
         * initialize map object
@@ -100,8 +102,12 @@ define([
 
                 topic.publish("hideProgressIndicator");
                 this._mapOnLoad();
+                dojo.isInfoPopupShared = false;
                 this._activateMapEvents(response);
-            }));
+            }), function (Error) {
+                domStyle.set(dom.byId("esriCTParentDivContainer"), "display", "none");
+                alert(Error.message);
+            });
         },
 
         /**
@@ -167,7 +173,6 @@ define([
                             this.operationalLayers[i] = webMapDetails.operationalLayers[j];
                             webmapSearchSettings[i].QueryURL = this.operationalLayers[i].url;
                             if (this.operationalLayers[i].popupInfo) {
-                                //infowindowCurrentSettings[i] = this._getConfigInfoData(webmapSearchSettings[i].QueryLayerId);
                                 if (!infowindowCurrentSettings[i]) {
                                     infowindowCurrentSettings[i] = {};
                                     infowindowCurrentSettings[i].QueryLayerId = webmapSearchSettings[i].QueryLayerId;
@@ -230,17 +235,31 @@ define([
         */
         _activateMapEvents: function (webMapRresponse) {
             this.map.on("click", lang.hitch(this, function (evt) {
-                var i;
                 dojo.mapClickedPoint = evt.mapPoint;
                 if (evt.graphic) {
-                    for (i = 0; i < dojo.configData.Workflows.length; i++) {
-                        topic.publish("loadingIndicatorHandler");
-                        this._showInfoWindowOnMap(evt.mapPoint, webMapRresponse);
-                    }
+                    topic.publish("loadingIndicatorHandler");
+                    this._showInfoWindowOnMap(evt.mapPoint, webMapRresponse);
+                    dojo.mapPointForInfowindow = evt.mapPoint.x + "," + evt.mapPoint.y;
                 }
             }));
             this.map.on("extent-change", lang.hitch(this, function (evt) {
-                this._onSetMapTipPosition();
+                var layer, mapPoint;
+                if (window.location.toString().split("$mapPointForInfowindow=").length > 1 && !this.isInfoPopupShown) {
+                    this.isInfoPopupShown = true;
+                    dojo.isInfoPopupShared = true;
+                    mapPoint = new Point(window.location.toString().split("$mapPointForInfowindow=")[1].split("$")[0].split(",")[0], window.location.toString().split("$mapPointForInfowindow=")[1].split("$")[0].split(",")[1], this.map.spatialReference);
+                    this._showInfoWindowOnMap(mapPoint, webMapRresponse);
+                    dojo.mapPointForInfowindow = mapPoint.x + "," + mapPoint.y;
+                } else {
+                    this._onSetMapTipPosition();
+                    for (layer in this.map._layers) {
+                        if (this.map._layers.hasOwnProperty(layer)) {
+                            if (!this.map.getLayer(layer).visibleAtMapScale) {
+                                this.infoWindowPanel.hide();
+                            }
+                        }
+                    }
+                }
             }));
         },
 
@@ -250,16 +269,12 @@ define([
         * @memberOf widgets/mapSettings/mapSettings
         */
         _showInfoWindowOnMap: function (mapPoint, webMapRresponse) {
-            var onMapFeaturArray, index, deferredListResult, featureArray, j, i, k;
+            var onMapFeaturArray, deferredListResult, featureArray, j, i, k;
             onMapFeaturArray = [];
-            for (index = 0; index < dojo.configData.Workflows.length; index++) {
-                if (dojo.configData.Workflows[index].SearchSettings && dojo.configData.Workflows[index].SearchSettings[0].QueryURL) {
-                    for (k = 0; k < webMapRresponse.itemInfo.itemData.operationalLayers.length; k++) {
-                        if (dojo.configData.Workflows[index].SearchSettings[0].QueryURL === webMapRresponse.itemInfo.itemData.operationalLayers[k].url && webMapRresponse.itemInfo.itemData.operationalLayers[k].layerObject.visibleAtMapScale) {
-                            this._executeQueryTask(index, mapPoint, dojo.configData.Workflows[index].SearchSettings[0].QueryURL, onMapFeaturArray, webMapRresponse);
-                            break;
-                        }
-                    }
+            for (k = 0; k < webMapRresponse.itemInfo.itemData.operationalLayers.length; k++) {
+                if ((webMapRresponse.itemInfo.itemData.operationalLayers[k].layerDefinition.maxScale === 0 && webMapRresponse.itemInfo.itemData.operationalLayers[k].layerDefinition.minScale === 0) || (this.map.getScale() >= webMapRresponse.itemInfo.itemData.operationalLayers[k].layerDefinition.maxScale && this.map.getScale() <= webMapRresponse.itemInfo.itemData.operationalLayers[k].layerDefinition.minScale)) {
+                    this._executeQueryTask(k, mapPoint, webMapRresponse.itemInfo.itemData.operationalLayers[k].url, onMapFeaturArray, webMapRresponse);
+
                 }
             }
             deferredListResult = new DeferredList(onMapFeaturArray);
@@ -394,7 +409,9 @@ define([
             this.map.getLayer(basmap.id).id = defaultId;
             this.map._layers[defaultId] = this.map.getLayer(basmap.id);
             layerIndex = array.indexOf(this.map.layerIds, basmap.id);
-            delete this.map._layers[basmap.id];
+            if (defaultId !== basmap.id) {
+                delete this.map._layers[basmap.id];
+            }
             this.map.layerIds[layerIndex] = defaultId;
         },
         /**
@@ -470,8 +487,8 @@ define([
             var home, mapDefaultExtent, graphicsLayer, imgCustomLogo, extent, featureGrapgicLayer, CustomLogoUrl = dojo.configData.CustomLogoUrl, imgSource;
 
             /**
-            * set map extent to default extent specified in configuration file
-            * @param {string} dojo.configData.DefaultExtent Default extent of map specified in configuration file
+            * set map extent to default extent
+            * @param {string} Default extent of map
             */
 
             extent = this._getQueryString('extent');
@@ -689,8 +706,17 @@ define([
             }
         },
         _centralizeInfowindowOnMap: function (infoTitle, divInfoDetailsTab, infoPopupWidth, infoPopupHeight) {
-            var extentChanged, screenPoint;
-            extentChanged = this.map.setExtent(this._calculateCustomMapExtent(dojo.selectedMapPoint));
+            var extentChanged, screenPoint, extent, mapDefaultExtent;
+            if (!dojo.isInfoPopupShared) {
+                extentChanged = this.map.setExtent(this._calculateCustomMapExtent(dojo.selectedMapPoint));
+            } else {
+                extent = this._getQueryString('extent');
+                if (extent !== "") {
+                    mapDefaultExtent = extent.split(',');
+                    mapDefaultExtent = new GeometryExtent({ "xmin": parseFloat(mapDefaultExtent[0]), "ymin": parseFloat(mapDefaultExtent[1]), "xmax": parseFloat(mapDefaultExtent[2]), "ymax": parseFloat(mapDefaultExtent[3]), "spatialReference": { "wkid": this.map.spatialReference.wkid} });
+                    extentChanged = this.map.setExtent(mapDefaultExtent);
+                }
+            }
             extentChanged.then(lang.hitch(this, function () {
                 topic.publish("hideProgressIndicator");
                 screenPoint = this.map.toScreen(dojo.selectedMapPoint);

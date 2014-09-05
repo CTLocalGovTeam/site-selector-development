@@ -63,6 +63,7 @@ define([
                     this.InfoShow = false;
                 }
                 dojo.mapClickedPoint = null;
+                dojo.mapPointForInfowindow = null;
                 domUtils.hide(this.domNode);
                 dojo.infoWindowIsShowing = false;
                 topic.publish("clearSelectedFeature");
@@ -108,6 +109,7 @@ define([
             while (this.infoContainerScrollbar.domNode.children.length > 1) {
                 this.infoContainerScrollbar.domNode.removeChild(this.infoContainerScrollbar.domNode.firstChild);
             }
+            dojo.isInfoPopupShared = false;
         },
 
         /**

@@ -2409,6 +2409,10 @@ div.esriCTPrev
     width: 15px;
     display: table-cell;
 }
+input[type="radio"]
+{
+    border-radius: 10px;
+}
 
 .esriCTChkLabel
 {
@@ -2454,11 +2458,6 @@ div.esriCTPrev
 .esriCTLeftFromTO div.esriCTCheckBox
 {
     padding-top: 7px;
-}
-
-#dijit_MenuItem_0_text
-{
-    display: none !important;
 }
 
 .esriCTRightFromTO

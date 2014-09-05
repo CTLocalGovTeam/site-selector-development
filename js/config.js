@@ -72,19 +72,15 @@ define([], function () {
 
         AppHeaderWidgets: [
             {
-                Title: "Search",
                 WidgetPath: "widgets/siteLocator/siteLocator",
                 MapInstanceRequired: true
             }, {
-                Title: "Locate",
                 WidgetPath: "widgets/geoLocation/geoLocation",
                 MapInstanceRequired: true
             }, {
-                Title: "Share",
                 WidgetPath: "widgets/share/share",
                 MapInstanceRequired: true
             }, {
-                Title: "Help",
                 WidgetPath: "widgets/help/help",
                 MapInstanceRequired: false
             }
@@ -140,12 +136,8 @@ define([], function () {
             LineSymbolTransparency: "0.30"
         },
 
-        RippleColor: "purple",
-        locatorRippleSize: 40,
-
-        // Initial map extent. Use comma (,) to separate values and don't delete the last comma
-        // The coordinates must be specified in the basemap's coordinate system, usually WKID:102100, unless a custom basemap is used
-        DefaultExtent: "-9412951.815477943,4480918.013545, -7742344.125277582,5077738.330395495",
+        RippleColor: "0,255,255",
+        LocatorRippleSize: 40,
 
         // WORKFLOW SETTINGS
         // ------------------------------------------------------------------------------------------------------------------------
@@ -172,7 +164,6 @@ define([], function () {
         Workflows: [
             {
                 Name: "Buildings",
-                Unit: "currency",
                 Enabled: true,
                 SearchSettings: [
                     {
@@ -341,13 +332,12 @@ define([], function () {
                         {
                             DisplayOptionTitle: "Property Information",
                             GeoProcessingServiceURL: "http://csslesxi3-vm4.cybertech.com/arcgis/rest/services/SiteSelector/GeneratePDFReport/GPServer/SiteSelectorPDFGen",
-                            Filetype: "PDF" //allowed PDF or XLSX
+                            Filetype: "PDF" //allowed PDF
                         }
                     ]
                 }
             }, {
                 Name: "Sites",
-                Unit: "currency",
                 Enabled: true,
                 SearchSettings: [
                     {
@@ -518,7 +508,7 @@ define([], function () {
                         {
                             DisplayOptionTitle: "Site Information",
                             GeoProcessingServiceURL: "http://csslesxi3-vm4.cybertech.com/arcgis/rest/services/SiteSelector/GeneratePDFReport/GPServer/SiteSelectorPDFGen",
-                            Filetype: "PDF" //allowed PDF or XLSX
+                            Filetype: "PDF" //allowed PDF
                         }, {
                             DisplayOptionTitle: "Traffic Count Profile",
                             GeoEnrichmentReportName: "traffic",
@@ -528,7 +518,6 @@ define([], function () {
                 }
             }, {
                 Name: "Business",
-                Unit: "currency",
                 Enabled: true,
                 FilterSettings: {
                     LocatorFilterFieldName: "Addr_Type",
@@ -631,7 +620,6 @@ define([], function () {
                 }
             }, {
                 Name: "Communities",
-                Unit: "currency",
                 Enabled: true,
                 EnableSearch: true,
                 EnableDropdown: true,
@@ -749,8 +737,8 @@ define([], function () {
         MapSharingOptions: {
             TinyURLServiceURL: "http://api.bit.ly/v3/shorten?login=esri&apiKey=R_65fd9891cd882e2a96b99d4bda1be00e&uri=${0}&format=json",
             TinyURLResponseAttribute: "data.url",
-            FacebookShareURL: "http://www.facebook.com/sharer.php?u=${0}&t=esri%Template",
-            TwitterShareURL: "http://mobile.twitter.com/compose/tweet?status=esri%Template ${0}",
+            FacebookShareURL: "http://www.facebook.com/sharer.php?u=${0}&t=Site%20Selector",
+            TwitterShareURL: "http://mobile.twitter.com/compose/tweet?status=Site%20Selector ${0}",
             ShareByMailLink: "mailto:%20?subject=Check%20out%20this%20map!&body=${0}"
         }
     };

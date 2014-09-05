@@ -59,17 +59,19 @@ define({
         },
         errorMessages: {
             invalidSearch: "No results found",
-            falseConfigParams: "Required configuration key values are either null or not exactly matching with layer attributes. This message may appear multiple times.",
-            invalidLocation: "Current location not found.",
-            invalidProjection: "Unable to plot current location on the map.",
+            falseConfigParams: "Required configuration key values are either null or not exactly matching with layer attributes. This message may appear multiple times",
+            invalidLocation: "Current location not found",
+            invalidProjection: "Unable to plot current location on the map",
             widgetNotLoaded: "Unable to load widgets.",
-            shareLoadingFailed: "Unable to load share options.",
-            shareFailed: "Unable to share.",
+            shareLoadingFailed: "Unable to load share options",
+            shareFailed: "Unable to share",
             invalidBasemapQuery: "Invalid BasemapQuery",
             noBasemap: "No Basemap Found",
-            disableTab: "Enable at least one tab.",
+            disableTab: "Enable at least one tab",
             bufferSliderValue: "Buffer slider should not be set to zero distance",
-            invalidInput: "Plese enter valid input"
+            invalidInput: "Plese enter valid input",
+            unableToSort: "Unable to sort",
+            portalUrlNotFound: "Portal URL cannot be empty"
         }
     },
     es: true,

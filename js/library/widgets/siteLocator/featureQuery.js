@@ -102,7 +102,12 @@ define([
                         toNode.setAttribute("FieldValue", null);
                     }
                     if ((fromNode.value !== "" && toNode.value !== "") || isfilterRemoved) {
-                        this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
+                        if (this.featureGeometry[this.workflowCount] && !this.lastGeometry[this.workflowCount]) {
+                            topic.publish("hideProgressIndicator");
+                            alert(sharedNls.errorMessages.bufferSliderValue);
+                        } else {
+                            this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
+                        }
                     }
                 } else {
                     if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArraySitesAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
@@ -124,7 +129,12 @@ define([
                         toNode.setAttribute("FieldValue", null);
                     }
                     if ((fromNode.value !== "" && toNode.value !== "") || isfilterRemoved) {
-                        this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
+                        if (this.featureGeometry[this.workflowCount] && !this.lastGeometry[this.workflowCount]) {
+                            topic.publish("hideProgressIndicator");
+                            alert(sharedNls.errorMessages.bufferSliderValue);
+                        } else {
+                            this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
+                        }
                     }
                 }
             } else {
@@ -177,7 +187,12 @@ define([
                 this.queryArraySitesAND = arrAndQuery;
                 this.queryArraySitesOR = arrOrQuery;
             }
-            this._callAndOrQuery(arrAndQuery, arrOrQuery);
+            if (this.featureGeometry[this.workflowCount] && !this.lastGeometry[this.workflowCount]) {
+                topic.publish("hideProgressIndicator");
+                alert(sharedNls.errorMessages.bufferSliderValue);
+            } else {
+                this._callAndOrQuery(arrAndQuery, arrOrQuery);
+            }
         },
 
         /**
@@ -206,12 +221,16 @@ define([
                     queryString = orString;
                 }
             }
+            if (window.location.toString().split("$whereClause=").length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === this.workflowCount) {
+                queryString = window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split("$whereClause=")[1].split("$")[0];
+            }
             if (queryString) {
                 this.doLayerQuery(this.workflowCount, geometry, queryString);
             } else if (geometry !== null) {
                 this.doLayerQuery(this.workflowCount, geometry, null);
             } else {
                 topic.publish("hideProgressIndicator");
+                dojo.arrWhereClause[this.workflowCount] = null;
                 if (this.workflowCount === 0) {
                     domStyle.set(this.outerDivForPegination, "display", "none");
                     domConstruct.empty(this.outerResultContainerBuilding);
@@ -242,6 +261,9 @@ define([
             queryLayer.returnGeometry = false;
             if (where !== null) {
                 queryLayer.where = where;
+                dojo.arrWhereClause[this.workflowCount] = where;
+            } else {
+                dojo.arrWhereClause[this.workflowCount] = "1=1";
             }
             if (geometry !== null) {
                 queryLayer.geometry = geometry[0];
@@ -268,13 +290,25 @@ define([
                 if (this.workflowCount === 0) {
                     domStyle.set(this.outerDivForPegination, "display", "block");
                     this.buildingResultSet = featureSet;
-                    this._paginationForResults();
+                    if (window.location.toString().split("$paginationIndex=").length > 1 && !dojo.paginationIndex) {
+                        this._paginationForResults(Number(window.location.toString().split("$paginationIndex=")[1].split("$")[0]));
+                    } else {
+                        this._paginationForResults(0);
+                    }
                 } else {
                     domStyle.set(this.outerDivForPeginationSites, "display", "block");
                     this.sitesResultSet = featureSet;
-                    this._paginationForResultsSites();
+                    if (window.location.toString().split("$paginationIndex=").length > 1 && !dojo.paginationIndex) {
+                        this._paginationForResultsSites(Number(window.location.toString().split("$paginationIndex=")[1].split("$")[0]));
+                    } else {
+                        this._paginationForResultsSites(0);
+                    }
                 }
-                this.performQuery(this.opeartionLayer, featureSet, 0);
+                if (window.location.toString().split("$paginationIndex=").length > 1 && !dojo.paginationIndex) {
+                    this.performQuery(this.opeartionLayer, featureSet, Number(window.location.toString().split("$paginationIndex=")[1].split("$")[0]));
+                } else {
+                    this.performQuery(this.opeartionLayer, featureSet, 0);
+                }
             } else {
 
                 if (this.workflowCount === 0) {
@@ -303,6 +337,12 @@ define([
         */
         performQuery: function (layer, featureSet, curentIndex) {
             try {
+                if (dojo.paginationIndex) {
+                    dojo.paginationIndex[this.workflowCount] = curentIndex;
+                } else {
+                    dojo.paginationIndex = [null, null, null, null];
+                    dojo.paginationIndex[this.workflowCount] = curentIndex;
+                }
                 if (featureSet.length !== 0) {
                     topic.publish("showProgressIndicator");
                     var i, arrIds = [], finalIndex;
@@ -415,8 +455,8 @@ define([
         * create pagination for batch query
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
-        _paginationForResults: function () {
-            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForBuilding, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForBuilding, timeOut, currentIndex = 0;
+        _paginationForResults: function (index) {
+            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForBuilding, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForBuilding, timeOut, currentIndex = index, strLastUpdate;
             domConstruct.empty(this.outerDivForPegination);
             rangeDiv = domConstruct.create("div", { "class": "esriCTRangeDiv" }, this.outerDivForPegination);
             currentIndexNode = domConstruct.create("div", { "class": "esriCTIndex" }, rangeDiv);
@@ -445,16 +485,31 @@ define([
             domAttr.set(ofTextDiv, "innerHTML", "of");
             domAttr.set(TotalCount, "innerHTML", this.buildingResultSet.length);
             domAttr.set(spanContent, "innerHTML", sharedNls.titles.sortBy);
-            domAttr.set(firstIndex, "innerHTML", currentIndex + 1);
+            domAttr.set(firstIndex, "innerHTML", Math.floor(currentIndex / 10) + 1);
+            currentPage = Math.floor(currentIndex / 10) + 1;
             domAttr.set(firstIndex, "contentEditable", true);
             total = this.buildingResultSet.length;
             result = Math.ceil(total / 10);
             domAttr.set(lastIndex, "innerHTML", result);
             if (Math.ceil((currentIndex / 10) + 1) === result) {
                 domClass.replace(rightArrow, "esriCTRightArrowBlue", "esriCTRightArrow");
+                domClass.replace(leftArrow, "esriCTLeftArrowBlue", "esriCTLeftArrow");
+            } else if (Math.ceil((currentIndex / 10) + 1) > 1) {
+                domClass.replace(rightArrow, "esriCTRightArrow", "esriCTRightArrowBlue");
+                domClass.replace(leftArrow, "esriCTLeftArrowBlue", "esriCTLeftArrow");
             }
-            this.own(on(firstIndex, "keydown", lang.hitch(this, function (value) {
+            if (total <= 10) {
+                domClass.replace(leftArrow, "esriCTLeftArrow", "esriCTLeftArrowBlue");
+            }
+            this.own(on(firstIndex, "keyup", lang.hitch(this, function (value) {
+                if (value.keyCode === 13) {
+                    domAttr.set(firstIndex, "innerHTML", strLastUpdate);
+                    topic.publish("showProgressIndicator");
+                } else {
+                    strLastUpdate = firstIndex.innerHTML;
+                }
                 if (Number(firstIndex.innerHTML).toString().length <= 10) {
+
                     clearTimeout(timeOut);
                     timeOut = setTimeout(lang.hitch(this, function () {
                         if (!isNaN(Number(firstIndex.innerHTML)) && Number(firstIndex.innerHTML) > 0 && Math.ceil(Number(firstIndex.innerHTML)) <= result) {
@@ -480,6 +535,7 @@ define([
                             }
                             this.performQuery(this.opeartionLayer, this.buildingResultSet, currentIndex);
                         } else {
+                            topic.publish("hideProgressIndicator");
                             domAttr.set(firstIndex, "innerHTML", currentPage);
                         }
                     }), 2000);
@@ -553,8 +609,8 @@ define([
         * create pagination for batch query
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
-        _paginationForResultsSites: function () {
-            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForSites, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForSites, timeOut, currentIndexSites = 0;
+        _paginationForResultsSites: function (index) {
+            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForSites, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForSites, timeOut, currentIndexSites = index, strLastUpdate;
             domConstruct.empty(this.outerDivForPeginationSites);
             rangeDiv = domConstruct.create("div", { "class": "esriCTRangeDiv" }, this.outerDivForPeginationSites);
             currentIndexNode = domConstruct.create("div", { "class": "esriCTIndex" }, rangeDiv);
@@ -583,15 +639,29 @@ define([
             domAttr.set(ofTextDiv, "innerHTML", "of");
             domAttr.set(TotalCount, "innerHTML", this.sitesResultSet.length);
             domAttr.set(spanContent, "innerHTML", sharedNls.titles.sortBy);
-            domAttr.set(firstIndex, "innerHTML", currentIndexSites + 1);
+            domAttr.set(firstIndex, "innerHTML", Math.floor(currentIndexSites / 10) + 1);
+            currentPage = Math.floor(currentIndexSites / 10) + 1;
             domAttr.set(firstIndex, "contentEditable", true);
             total = this.sitesResultSet.length;
             result = Math.ceil(total / 10);
             domAttr.set(lastIndex, "innerHTML", result);
             if (Math.ceil((currentIndexSites / 10) + 1) === result) {
                 domClass.replace(rightArrow, "esriCTRightArrowBlue", "esriCTRightArrow");
+                domClass.replace(leftArrow, "esriCTLeftArrowBlue", "esriCTLeftArrow");
+            } else if (Math.ceil((currentIndexSites / 10) + 1) > 1) {
+                domClass.replace(rightArrow, "esriCTRightArrow", "esriCTRightArrowBlue");
+                domClass.replace(leftArrow, "esriCTLeftArrowBlue", "esriCTLeftArrow");
             }
-            this.own(on(firstIndex, "keydown", lang.hitch(this, function (value) {
+            if (total <= 10) {
+                domClass.replace(leftArrow, "esriCTLeftArrow", "esriCTLeftArrowBlue");
+            }
+            this.own(on(firstIndex, "keyup", lang.hitch(this, function (value) {
+                if (value.keyCode === 13) {
+                    domAttr.set(firstIndex, "innerHTML", strLastUpdate);
+                    topic.publish("showProgressIndicator");
+                } else {
+                    strLastUpdate = firstIndex.innerHTML;
+                }
                 if (Number(firstIndex.innerHTML).toString().length <= 10) {
                     clearTimeout(timeOut);
                     timeOut = setTimeout(lang.hitch(this, function () {
@@ -618,6 +688,7 @@ define([
                             }
                             this.performQuery(this.opeartionLayer, this.sitesResultSet, currentIndexSites);
                         } else {
+                            topic.publish("hideProgressIndicator");
                             domAttr.set(firstIndex, "innerHTML", currentPage);
                         }
                     }), 2000);
@@ -723,7 +794,9 @@ define([
             querySort.where = queryString;
             querySort.returnGeometry = false;
             querySort.orderByFields = [this.selectedValue];
-            queryTask.executeForIds(querySort, lang.hitch(this, this._queryLayerhandler));
+            queryTask.executeForIds(querySort, lang.hitch(this, this._queryLayerhandler), function (error) {
+                alert(sharedNls.errorMessages.unableToSort);
+            });
         }
     });
 });

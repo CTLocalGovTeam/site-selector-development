@@ -54,7 +54,6 @@ define([
                     /**
                     * minimize other open header panel widgets and call geolocation service
                     */
-                    topic.publish("toggleWidget", "geolocation");
                     topic.publish("setMaxLegendLength");
                     this._showCurrentLocation();
                 })));

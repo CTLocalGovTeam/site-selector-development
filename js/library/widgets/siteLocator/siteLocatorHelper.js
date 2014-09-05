@@ -82,7 +82,7 @@ define([
         * @param container node,horizontal rule node and slider value
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
-        _createHorizontalSlider: function (sliderContainer, horizontalRuleContainer, divSliderValue, unitContainer, tabCount) {
+        _createHorizontalSlider: function (sliderContainer, horizontalRuleContainer, divSliderValue, unitContainer, tabCount, bufferDistance) {
             var _self, horizontalSlider, sliderId, horizontalRule, sliderTimeOut;
             sliderId = "slider" + domAttr.get(sliderContainer, "data-dojo-attach-point");
             horizontalRule = new HorizontalRule({
@@ -91,9 +91,17 @@ define([
             horizontalRule.domNode.firstChild.style.border = "none";
             horizontalRule.domNode.lastChild.style.border = "none";
             horizontalRule.domNode.lastChild.style.right = "0" + "px";
+            if (!bufferDistance) {
+                if (dojo.configData.DistanceUnitSettings.MinimumValue >= 0) {
+                    bufferDistance = dojo.configData.DistanceUnitSettings.MinimumValue;
+                } else {
+                    bufferDistance = 0;
+                }
+            }
             horizontalSlider = new HorizontalSlider({
                 intermediateChanges: true,
                 "class": "horizontalSlider",
+                value: bufferDistance,
                 id: sliderId
             }, sliderContainer);
             horizontalSlider.tabCount = tabCount;
@@ -112,7 +120,7 @@ define([
                 horizontalRule.domNode.firstChild.innerHTML = 0;
                 horizontalSlider.minimum = 0;
             }
-            horizontalSlider.value = horizontalSlider.minimum;
+
             domStyle.set(horizontalRule.domNode.lastChild, "text-align", "right");
             domStyle.set(horizontalRule.domNode.lastChild, "width", "334px");
             domStyle.set(horizontalRule.domNode.lastChild, "left", "0");
@@ -130,6 +138,7 @@ define([
                     horizontalSlider.setValue(horizontalSlider.maximum);
                 }
                 domAttr.set(divSliderValue, "innerHTML", Math.round(value) + " " + domAttr.get(divSliderValue, "distanceUnit"));
+                dojo.arrBufferDistance[_self.workflowCount] = Math.round(value);
                 clearTimeout(sliderTimeOut);
                 sliderTimeOut = setTimeout(function () {
                     if (_self.featureGeometry && _self.featureGeometry[_self.workflowCount]) {
@@ -193,11 +202,17 @@ define([
                         break;
                     }
                     countEnabledTab++;
-                    this._showTab(arrEnabledTab[0].Container, arrEnabledTab[0].Content);
+
                 }
             }
             if (countEnabledTab === 0) {
                 alert(sharedNls.errorMessages.disableTab);
+            } else {
+                if (window.location.toString().split("$workflowCount=").length > 1) {
+                    this._showTab(arrEnabledTab[window.location.toString().split("$workflowCount=")[1].split("$")[0]].Container, arrEnabledTab[window.location.toString().split("$workflowCount=")[1].split("$")[0]].Content);
+                } else {
+                    this._showTab(arrEnabledTab[0].Container, arrEnabledTab[0].Content);
+                }
             }
         },
 
@@ -213,17 +228,19 @@ define([
                 if (contentNode === this.TabContentContainer.children[i]) {
                     domStyle.set(this.TabContentContainer.children[i], "display", "block");
                     this.workflowCount = i;
+                    dojo.workflowCount = i;
                     this.map.graphics.clear();
                     this.map.getLayer("esriFeatureGraphicsLayer").clear();
                     this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                     if (this.lastGeometry[this.workflowCount]) {
+                        this.isSharedExtent = true;
                         this.showBuffer(this.lastGeometry[this.workflowCount]);
                     }
                     if (this.featureGraphics[i]) {
                         this.map.getLayer("esriFeatureGraphicsLayer").add(this.featureGraphics[i]);
                         this.map.setLevel(dojo.configData.ZoomLevel);
-                        this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].show();
                         this.map.centerAt(this.featureGraphics[i].geometry);
+                        this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].show();
                     } else if (this.lastGeometry[this.workflowCount]) {
                         this.map.setExtent(this.lastGeometry[this.workflowCount][0].getExtent(), true);
                     }
@@ -557,6 +574,11 @@ define([
                     }
                 }
             }
+            if (window.location.toString().split("$selectedObjectIndex=").length > 1 && dojo.selectedObjectIndex !== null && isNaN(dojo.selectedObjectIndex)) {
+                this.isSharedExtent = true;
+                this._getAttchmentImageAndInformation(Number(window.location.toString().split("$selectedObjectIndex=")[1].split("$")[0]));
+            }
+            dojo.selectedObjectIndex = null;
         },
 
         /**
@@ -595,7 +617,12 @@ define([
         */
         _getAttchmentImageAndInformation: function (value) {
             var index, dataSelected;
-            index = domAttr.get(value.currentTarget, "index");
+            if (isNaN(value)) {
+                index = domAttr.get(value.currentTarget, "index");
+            } else {
+                index = value;
+            }
+            dojo.selectedObjectIndex = index;
             topic.publish("showProgressIndicator");
 
             if (this.workflowCount === 0) {
@@ -670,13 +697,19 @@ define([
                     symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0, 0.65]), 3), new Color([255, 0, 0, 0.35]));
                     graphic = new Graphic(featureSet.features[0].geometry, symbol, {}, null);
                     graphic.attributes.layerURL = this.opeartionLayer.url;
-                    this.map.setExtent(featureSet.features[0].geometry.getExtent());
+                    if (!this.isSharedExtent) {
+                        this.map.setExtent(featureSet.features[0].geometry.getExtent());
+                    }
+                    this.isSharedExtent = false;
                 } else {
-                    symbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, dojo.configData.locatorRippleSize, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color(dojo.configData.RippleColor), 4), new dojo.Color([0, 0, 0, 0]));
+                    symbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, dojo.configData.LocatorRippleSize, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([parseInt(dojo.configData.RippleColor.split(",")[0], 10), parseInt(dojo.configData.RippleColor.split(",")[1], 10), parseInt(dojo.configData.RippleColor.split(",")[2], 10), 0.65]), 4), new dojo.Color([0, 0, 0, 0]));
                     graphic = new Graphic(featureSet.features[0].geometry, symbol, {}, null);
                     graphic.attributes.layerURL = this.opeartionLayer.url;
-                    this.map.setLevel(dojo.configData.ZoomLevel);
-                    this.map.centerAt(featureSet.features[0].geometry);
+                    if (!this.isSharedExtent) {
+                        this.map.setLevel(dojo.configData.ZoomLevel);
+                        this.map.centerAt(featureSet.features[0].geometry);
+                    }
+                    this.isSharedExtent = false;
                 }
                 this.map.getLayer("esriFeatureGraphicsLayer").clear();
                 this.featureGraphics[this.workflowCount] = graphic;
