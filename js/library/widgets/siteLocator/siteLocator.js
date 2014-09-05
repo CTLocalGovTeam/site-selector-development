@@ -97,6 +97,7 @@ define([
         arrStudyAreas: [null, null, null],
         featureGraphics: [null, null, null, null],
         arrReportDataJson: [null, null, null, null],
+        isSharedExtent: false,
 
         /**
         * create Site selector widget
@@ -105,7 +106,7 @@ define([
         * @name widgets/SiteSelector/SiteSelector
         */
         postCreate: function () {
-            var arrSort = [], selectSortOption;
+            var arrSort = [], selectSortOption, bufferDistance = null, timeOut, mapPoint, standerdGeoAttribute;
             this.logoContainer = query(".esriControlsBR")[0];
             topic.subscribe("toggleWidget", lang.hitch(this, function (widgetID) {
                 if (widgetID !== "siteLocator") {
@@ -126,11 +127,36 @@ define([
                 urlPrefix: dojo.configData.GeoEnrichmentService,
                 proxyUrl: dojo.configData.ProxyUrl
             });
+            dojo.arrStrAdderss = [null, null, null, null];
+            dojo.arrAddressMapPoint = [null, null, null, null];
+            dojo.arrBufferDistance = [null, null, null, null];
+            dojo.arrWhereClause = [null, null, null, null];
             this.domNode = domConstruct.create("div", { "title": sharedNls.tooltips.reports, "class": "esriCTHeaderSearch" }, null);
-            this._setDefaultTextboxValue(this.txtAddressBuilding);
-            this._setDefaultTextboxValue(this.txtAddressSites);
-            this._setDefaultTextboxValue(this.txtAddressBusiness);
-            domAttr.set(this.txtAddressCommunities, "defaultAddress", dojo.configData.Workflows[3].FilterSettings.StandardGeographyQuery.LocatorDefaultAddress);
+            if (window.location.toString().split("$workflowCount=").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === 0 && window.location.toString().split("$address=").length > 1) {
+                domAttr.set(this.txtAddressBuilding, "defaultAddress", window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" "));
+                dojo.arrStrAdderss[0] = window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" ");
+            } else {
+                this._setDefaultTextboxValue(this.txtAddressBuilding);
+            }
+            if (window.location.toString().split("$workflowCount=").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === 1 && window.location.toString().split("$address=").length > 1) {
+                domAttr.set(this.txtAddressSites, "defaultAddress", window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" "));
+                dojo.arrStrAdderss[1] = window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" ");
+            } else {
+                this._setDefaultTextboxValue(this.txtAddressSites);
+            }
+            if (window.location.toString().split("$workflowCount=").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === 2 && window.location.toString().split("$address=").length > 1) {
+                domAttr.set(this.txtAddressBusiness, "defaultAddress", window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" "));
+                dojo.arrStrAdderss[2] = window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" ");
+            } else {
+                this._setDefaultTextboxValue(this.txtAddressBusiness);
+            }
+            if (window.location.toString().split("$workflowCount=").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === 3 && window.location.toString().split("$address=").length > 1) {
+                domAttr.set(this.txtAddressCommunities, "defaultAddress", window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" "));
+                dojo.arrStrAdderss[3] = window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" ");
+            } else {
+                domAttr.set(this.txtAddressCommunities, "defaultAddress", dojo.configData.Workflows[3].FilterSettings.StandardGeographyQuery.LocatorDefaultAddress);
+            }
+
             domStyle.set(this.txtAddressBuilding, "verticalAlign", "middle");
             this.txtAddressBuilding.value = domAttr.get(this.txtAddressBuilding, "defaultAddress");
             this.lastSearchStringBuilding = lang.trim(this.txtAddressBuilding.value);
@@ -141,9 +167,27 @@ define([
             this.txtAddressCommunities.value = domAttr.get(this.txtAddressCommunities, "defaultAddress");
             this.lastSearchStringCommunities = lang.trim(this.txtAddressCommunities.value);
             this._showHideInfoRouteContainer();
-            this._createHorizontalSlider(this.horizontalSliderContainerBuliding, this.horizontalRuleContainer, this.sliderDisplayText, this.bufferDistanceUnitBuilding, 0);
-            this._createHorizontalSlider(this.horizontalSliderContainerSites, this.horizontalRuleContainerSites, this.sitesSliderText, this.bufferDistanceUnitSites, 1);
-            this._createHorizontalSlider(this.horizontalSliderContainerBusiness, this.horizontalRuleContainerBusiness, this.businessSliderText, this.bufferDistanceUnitBusiness, 2);
+            if (window.location.toString().split("$bufferDistance=").length > 1) {
+                bufferDistance = Number(window.location.toString().split("$bufferDistance=")[1].toString().split("$")[0]);
+            }
+            if (window.location.toString().split("$workflowCount=").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === 0) {
+                this._createHorizontalSlider(this.horizontalSliderContainerBuliding, this.horizontalRuleContainer, this.sliderDisplayText, this.bufferDistanceUnitBuilding, 0, bufferDistance);
+                dojo.arrBufferDistance[0] = bufferDistance;
+            } else {
+                this._createHorizontalSlider(this.horizontalSliderContainerBuliding, this.horizontalRuleContainer, this.sliderDisplayText, this.bufferDistanceUnitBuilding, 0, null);
+            }
+            if (window.location.toString().split("$workflowCount=").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === 1) {
+                this._createHorizontalSlider(this.horizontalSliderContainerSites, this.horizontalRuleContainerSites, this.sitesSliderText, this.bufferDistanceUnitSites, 1, bufferDistance);
+                dojo.arrBufferDistance[1] = bufferDistance;
+            } else {
+                this._createHorizontalSlider(this.horizontalSliderContainerSites, this.horizontalRuleContainerSites, this.sitesSliderText, this.bufferDistanceUnitSites, 1, null);
+            }
+            if (window.location.toString().split("$workflowCount=").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === 2) {
+                this._createHorizontalSlider(this.horizontalSliderContainerBusiness, this.horizontalRuleContainerBusiness, this.businessSliderText, this.bufferDistanceUnitBusiness, 2, bufferDistance);
+                dojo.arrBufferDistance[2] = bufferDistance;
+            } else {
+                this._createHorizontalSlider(this.horizontalSliderContainerBusiness, this.horizontalRuleContainerBusiness, this.businessSliderText, this.bufferDistanceUnitBusiness, 2, null);
+            }
             arrSort = this._setSelectionOption(dojo.configData.Workflows[2].FilterSettings.BusinesSortOptions.Option.split(","));
             arrSort.splice(0, 0, { "label": sharedNls.titles.select, "value": sharedNls.titles.select });
             selectSortOption = new SelectList({ options: arrSort, id: "sortBy", maxHeight: 50 }, this.SortBy);
@@ -239,6 +283,7 @@ define([
                 domStyle.set(this.divAddressScrollContainerCommunities, "display", "none");
                 domStyle.set(this.divAddressScrollContentCommunities, "display", "none");
                 this.comAreaList.disabled = !this.rdoCommunityPlaceName.checked;
+                dojo.standerdGeoQueryAttribute = null;
             })));
 
             this.own(on(this.rdoCommunitiesAddressSearch, "click", lang.hitch(this, function (value) {
@@ -252,6 +297,8 @@ define([
                 this.esriCTimgLocateCommunities.disabled = !this.rdoCommunitiesAddressSearch.checked;
                 this.divSearchCommunities.disabled = !this.rdoCommunitiesAddressSearch.checked;
                 this.comAreaList.disabled = this.rdoCommunitiesAddressSearch.checked;
+                dojo.communitySelectionFeature = null;
+                this.comAreaList.reset();
             })));
 
             this.own(on(this.chkSerachContentBuilding, "click", lang.hitch(this, function (value) {
@@ -265,6 +312,7 @@ define([
                     this.featureGeometry[this.workflowCount] = null;
                     this.map.graphics.clear();
                     this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                    dojo.arrAddressMapPoint[this.workflowCount] = null;
                     this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
                     domClass.add(this.divSearchBuilding, "esriCTDisabledAddressColorChange");
                     domClass.add(this.txtAddressBuilding, "esriCTDisabledAddressColorChange");
@@ -289,6 +337,7 @@ define([
                     this.featureGeometry[this.workflowCount] = null;
                     this.map.graphics.clear();
                     this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                    dojo.arrAddressMapPoint[this.workflowCount] = null;
                     this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
                     domClass.add(this.divSearchSites, "esriCTDisabledAddressColorChange");
                     domClass.add(this.txtAddressSites, "esriCTDisabledAddressColorChange");
@@ -303,11 +352,11 @@ define([
 
             })));
             // Dynamic UI for  tab//
-            this._createFilter(dojo.configData.Workflows[1].SearchSettings[0].FilterSettings.FilterRangeFields, this.sitesFromToMainDiv);
-            this._createFilterOptionField(dojo.configData.Workflows[1].SearchSettings[0].FilterSettings.RegularFilterOptionFields, this.horizantalruleSites, dojo.configData.Workflows[1].SearchSettings[0].FilterSettings.AdditionalFilterOptions, this.divHideOptionSites);
-            this._createFilter(dojo.configData.Workflows[0].SearchSettings[0].FilterSettings.FilterRangeFields, this.buildingAreaToFromDiv);
-            this._createFilterOptionField(dojo.configData.Workflows[0].SearchSettings[0].FilterSettings.RegularFilterOptionFields, this.horizantalruleBuliding, dojo.configData.Workflows[0].SearchSettings[0].FilterSettings.AdditionalFilterOptions, this.divHideOptionBuilding);
-            this._createFilter(dojo.configData.Workflows[2].FilterSettings.FilterRangeFields, this.revenueEmpFromToDiv);
+            this._createFilter(dojo.configData.Workflows[1].SearchSettings[0].FilterSettings.FilterRangeFields, this.sitesFromToMainDiv, 1);
+            this._createFilterOptionField(dojo.configData.Workflows[1].SearchSettings[0].FilterSettings.RegularFilterOptionFields, this.horizantalruleSites, dojo.configData.Workflows[1].SearchSettings[0].FilterSettings.AdditionalFilterOptions, this.divHideOptionSites, 1);
+            this._createFilter(dojo.configData.Workflows[0].SearchSettings[0].FilterSettings.FilterRangeFields, this.buildingAreaToFromDiv, 0);
+            this._createFilterOptionField(dojo.configData.Workflows[0].SearchSettings[0].FilterSettings.RegularFilterOptionFields, this.horizantalruleBuliding, dojo.configData.Workflows[0].SearchSettings[0].FilterSettings.AdditionalFilterOptions, this.divHideOptionBuilding, 0);
+            this._createFilter(dojo.configData.Workflows[2].FilterSettings.FilterRangeFields, this.revenueEmpFromToDiv, 2);
             this.map.on("extent-change", lang.hitch(this, function (evt) {
                 if (this.map.getLayer("esriFeatureGraphicsLayer").graphics[0]) {
                     if (this.opeartionLayer && this.opeartionLayer.visibleAtMapScale && this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].attributes.layerURL === this.opeartionLayer.url) {
@@ -317,6 +366,56 @@ define([
                     }
                 }
             }));
+            if (window.location.toString().split("$addressMapPoint=").length > 1) {
+                mapPoint = new Point(window.location.toString().split("$addressMapPoint=")[1].split("$")[0].split(",")[0], window.location.toString().split("$addressMapPoint=")[1].split("$")[0].split(",")[1], this.map.spatialReference);
+                clearTimeout(timeOut);
+                timeOut = setTimeout(lang.hitch(this, function () {
+                    this.isSharedExtent = true;
+                    this._locateAddressOnMap(mapPoint);
+                }, 500));
+            }
+            if (window.location.toString().split("$standerdGeoQueryAttribute=").length > 1) {
+                standerdGeoAttribute = {};
+                standerdGeoAttribute.attributes = {
+                    CountryAbbr: window.location.toString().split("$standerdGeoQueryAttribute=")[1].split("$")[0].split(",")[0],
+                    DataLayerID: window.location.toString().split("$standerdGeoQueryAttribute=")[1].split("$")[0].split(",")[1],
+                    AreaID: window.location.toString().split("$standerdGeoQueryAttribute=")[1].split("$")[0].split(",")[2]
+                };
+                clearTimeout(timeOut);
+                timeOut = setTimeout(lang.hitch(this, function () {
+                    topic.publish("showProgressIndicator");
+                    this.isSharedExtent = true;
+                    this._enrichData(null, this.workflowCount, standerdGeoAttribute);
+                }, 500));
+            }
+            if (window.location.toString().split("$communitySelectionFeature=").length > 1) {
+                clearTimeout(timeOut);
+                timeOut = setTimeout(lang.hitch(this, function () {
+                    this.isSharedExtent = true;
+                    topic.publish("showProgressIndicator");
+                    this.rdoCommunityPlaceName.checked = true;
+                    domClass.add(this.divSearchCommunities, "esriCTDisabledAddressColorChange");
+                    domClass.add(this.txtAddressCommunities, "esriCTDisabledAddressColorChange");
+                    domClass.add(this.closeCommunities, "esriCTDisabledAddressColorChange");
+                    domClass.add(this.clearhideCommunities, "esriCTDisabledAddressColorChange");
+                    this.txtAddressCommunities.disabled = true;
+                    this.closeCommunities.disabled = true;
+                    this.divSearchCommunities.disabled = true;
+                    this.divSearchCommunities.disabled = true;
+                    domConstruct.empty(this.divAddressResultsCommunities);
+                    domStyle.set(this.divAddressScrollContainerCommunities, "display", "none");
+                    domStyle.set(this.divAddressScrollContentCommunities, "display", "none");
+                }, 500));
+            }
+
+            if (window.location.toString().split("$whereClause=").length > 1 && window.location.toString().split("$addressMapPoint=").length === 1) {
+                clearTimeout(timeOut);
+                timeOut = setTimeout(lang.hitch(this, function () {
+                    topic.publish("showProgressIndicator");
+                    this.doLayerQuery(this.workflowCount, null, window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split("$whereClause=")[1].split("$")[0].toString());
+                }, 500));
+
+            }
         },
 
         /**
@@ -325,18 +424,20 @@ define([
         * @param {containerNode}
         * @memberOf widgets/Sitelocator/Sitelocator
         */
-        _createFilter: function (arrFilter, node) {
+        _createFilter: function (arrFilter, node, index) {
 
             array.forEach(arrFilter, lang.hitch(this, function (value) {
-                var divBusinessRevenue, leftDivSites, leftDivSitesContainer, checkBoxAreaSites, chkAreaSites, areaText, rightDivSites, spanTextFrom, spanTextFromDes, txtFrom, spanTextTo, spanTextToDes, txtTo;
+                var divBusinessRevenue, leftDivSites, leftDivSitesContainer, checkBoxAreaSites, chkAreaSites, areaText, rightDivSites, spanTextFrom, spanTextFromDes, txtFrom, spanTextTo, spanTextToDes, txtTo, i;
                 divBusinessRevenue = domConstruct.create("div", { "class": "esriCTDivFromTo" }, node);
                 leftDivSitesContainer = domConstruct.create("div", { "class": "esriCTLeftFromTO" }, divBusinessRevenue);
                 leftDivSites = domConstruct.create("div", { "class": "esriCTOptionRow" }, leftDivSitesContainer);
                 checkBoxAreaSites = domConstruct.create("div", { "class": "esriCTCheckBox" }, leftDivSites);
                 if (value.FieldName) {
                     chkAreaSites = domConstruct.create("input", { "type": "checkbox", "class": "esriCTChkBox", "value": value.FieldName }, checkBoxAreaSites);
+
                 } else {
                     chkAreaSites = domConstruct.create("input", { "type": "checkbox", "class": "esriCTChkBox", "value": value.VariableNameSuffix }, checkBoxAreaSites);
+
                 }
                 areaText = domConstruct.create("div", { "class": "esriCTChkLabel" }, leftDivSites);
                 rightDivSites = domConstruct.create("div", { "class": "esriCTRightFromTO" }, divBusinessRevenue);
@@ -349,10 +450,28 @@ define([
                 domAttr.set(spanTextFrom, "innerHTML", sharedNls.titles.fromText);
                 domAttr.set(spanTextTo, "innerHTML", sharedNls.titles.toText);
                 domAttr.set(areaText, "innerHTML", value.DisplayText);
-                txtFrom.disabled = true;
-                txtTo.disabled = true;
-                domClass.add(txtFrom, "esriCTDisabledAddressColorChange");
-                domClass.add(txtTo, "esriCTDisabledAddressColorChange");
+                if ((window.location.toString().split(value.FieldName).length > 1 || window.location.toString().split(value.VariableNameSuffix).length > 1) && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
+                    chkAreaSites.checked = true;
+                    if (value.FieldName) {
+                        txtFrom.value = Number(window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split(value.FieldName + ">=")[1].split(" ")[0]);
+                        txtTo.value = Number(window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split(value.FieldName + "<=")[1].split(" ")[0]);
+                    } else if (value.VariableNameSuffix) {
+                        dojo.toFromBussinessFilter = window.location.href.toString().split("$toFromBussinessFilter=")[1];
+                        for (i = 0; i < window.location.href.toString().split("$toFromBussinessFilter=")[1].split("$").length; i++) {
+                            if (window.location.href.toString().split("$toFromBussinessFilter=")[1].split("$")[i].split(value.VariableNameSuffix).length > 1) {
+                                txtFrom.value = Number(window.location.href.toString().split("$toFromBussinessFilter=")[1].split("$")[i].split(",")[1]);
+                                txtTo.value = Number(window.location.href.toString().split("$toFromBussinessFilter=")[1].split("$")[i].split(",")[2]);
+                            }
+                        }
+                    }
+                    txtFrom.setAttribute("FieldValue", Number(txtFrom.value));
+                    txtTo.setAttribute("FieldValue", Number(txtTo.value));
+                } else {
+                    txtFrom.disabled = true;
+                    txtTo.disabled = true;
+                    domClass.add(txtFrom, "esriCTDisabledAddressColorChange");
+                    domClass.add(txtTo, "esriCTDisabledAddressColorChange");
+                }
                 this.own(on(chkAreaSites, "click", lang.hitch(this, function (value) {
                     txtFrom.disabled = !chkAreaSites.checked;
                     txtTo.disabled = !chkAreaSites.checked;
@@ -399,13 +518,16 @@ define([
         * @param {object} Additional fileds node
         * @memberOf widgets/Sitelocator/Sitelocator
         */
-        _createFilterOptionField: function (arrFields, node, arrAdditionalFields, additionalFieldsNode) {
-            var i, j, divBusinessRevenue, checkBoxWithText, divCheckBox, checkBox, fieldContent, showHideText, divHideOptionText, divAdditionalField, checkBoxAdditionalWithText, additionalFieldCheckBox, additionalCheckBox, additionalFieldDisplayText;
+        _createFilterOptionField: function (arrFields, node, arrAdditionalFields, additionalFieldsNode, index) {
+            var i, j, divBusinessRevenue, checkBoxWithText, divCheckBox, checkBox, fieldContent, showHideText, divHideOptionText, divAdditionalField, checkBoxAdditionalWithText, additionalFieldCheckBox, additionalCheckBox, additionalFieldDisplayText, isShowMoreOptionShared = false;
             for (i = 0; i < arrFields.length; i++) {
                 divBusinessRevenue = domConstruct.create("div", { "class": "esriCTDivFilterOption" }, node);
                 checkBoxWithText = domConstruct.create("div", { "class": "esriCTCheckBoxWithText" }, divBusinessRevenue);
                 divCheckBox = domConstruct.create("div", { "class": "esriCTCheckBox" }, checkBoxWithText);
                 checkBox = domConstruct.create("input", { "type": "checkbox", "name": arrFields[i].FieldName, "value": arrFields[i].FieldValue }, divCheckBox);
+                if (window.location.toString().split(arrFields[i].FieldName).length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
+                    checkBox.checked = true;
+                }
                 divCheckBox.setAttribute("isRegularFilterOptionFields", true);
                 fieldContent = domConstruct.create("div", { "class": "esriCTChkLabel" }, checkBoxWithText);
                 domConstruct.create("div", { "class": "esriCTCheckBoxWithText" }, divBusinessRevenue);
@@ -413,7 +535,7 @@ define([
                 this.own(on(checkBox, "click", lang.hitch(this, this.chkQueryHandler)));
             }
             if (arrAdditionalFields.Enabled && arrAdditionalFields.FilterOptions.length) {
-                showHideText = domConstruct.create("div", { "class": "esriCTshowhideText" }, divBusinessRevenue);
+                showHideText = domConstruct.create("div", { "class": "esriCTshowhideText" }, node);
                 divHideOptionText = domConstruct.create("div", { "class": "esriCTTextRight" }, showHideText);
                 domAttr.set(divHideOptionText, "innerHTML", sharedNls.titles.hideText);
                 this._showHideMoreOption(additionalFieldsNode, divHideOptionText, node);
@@ -425,10 +547,18 @@ define([
                     checkBoxAdditionalWithText = domConstruct.create("div", { "class": "esriCTCheckBoxWithText" }, divAdditionalField);
                     additionalFieldCheckBox = domConstruct.create("div", { "class": "esriCTCheckBox" }, checkBoxAdditionalWithText);
                     additionalCheckBox = domConstruct.create("input", { "type": "checkbox", "name": arrAdditionalFields.FilterFieldName, "value": arrAdditionalFields.FilterOptions[j].FieldValue }, additionalFieldCheckBox);
+                    if (window.location.toString().split(arrAdditionalFields.FilterOptions[j].FieldValue).length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
+                        additionalCheckBox.checked = true;
+                        isShowMoreOptionShared = true;
+                    }
                     additionalFieldCheckBox.setAttribute("isRegularFilterOptionFields", false);
                     additionalFieldDisplayText = domConstruct.create("div", { "class": "esriCTChkLabel" }, checkBoxAdditionalWithText);
                     domAttr.set(additionalFieldDisplayText, "innerHTML", arrAdditionalFields.FilterOptions[j].DisplayText);
                     this.own(on(additionalCheckBox, "click", lang.hitch(this, this.chkQueryHandler)));
+                }
+                if (isShowMoreOptionShared) {
+                    domAttr.set(divHideOptionText, "innerHTML", sharedNls.titles.showText);
+                    this._showHideMoreOption(additionalFieldsNode, divHideOptionText, node);
                 }
             }
         },
@@ -492,19 +622,25 @@ define([
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _selectionChangeForSort: function (value) {
+            var isSorted = false;
             this.currentBussinessData.sort(lang.hitch(this, function (a, b) {
                 if (a[value] > b[value]) {
+                    isSorted = true;
                     return 1;
                 }
                 if (a[value] < b[value]) {
+                    isSorted = true;
                     return -1;
                 }
                 // a must be equal to b
                 if (a[value] !== 0 && b[value] !== 0) {
+                    isSorted = true;
                     return 0;
                 }
             }));
-            this._setBusinessValues(this.currentBussinessData, this.mainResultDiv, this.enrichData);
+            if (isSorted) {
+                this._setBusinessValues(this.currentBussinessData, this.mainResultDiv, this.enrichData);
+            }
         },
 
         /**
@@ -554,6 +690,7 @@ define([
         _createBuffer: function (geometry) {
             var sliderDistance, slider, selectedPanel, geometryService, params;
             topic.publish("showProgressIndicator");
+            dojo.arrAddressMapPoint[this.workflowCount] = geometry.x + "," + geometry.y;
             if (document.activeElement) {
                 document.activeElement.blur();
             }
@@ -583,7 +720,7 @@ define([
                     params.geometries = [this.featureGeometry[this.workflowCount]];
                     params.unit = GeometryService[this.unitValues[this.workflowCount]];
                     geometryService.buffer(params, lang.hitch(this, function (geometries) {
-                        this.map.setExtent(geometries[0].getExtent(), true);
+
                         this.lastGeometry[this.workflowCount] = geometries;
                         if (this.workflowCount === 2) {
                             this._enrichData(geometries, this.workflowCount, null);
@@ -626,6 +763,7 @@ define([
                 this.lastGeometry[this.workflowCount] = null;
                 this.map.graphics.clear();
                 alert(sharedNls.errorMessages.bufferSliderValue);
+                this.isSharedExtent = false;
 
             }
         },
@@ -652,6 +790,10 @@ define([
                 var graphic = new Graphic(geometry, symbol);
                 self.map.graphics.add(graphic);
             });
+            if (!this.isSharedExtent && bufferedGeometries) {
+                this.map.setExtent(bufferedGeometries[0].getExtent(), true);
+            }
+            this.isSharedExtent = false;
         },
 
         /**

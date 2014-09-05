@@ -512,9 +512,11 @@ define([
                 if (obj.addressWorkflowCount === 3) {
                     domConstruct.empty(obj.divAddressResults);
                     _this.txtAddressCommunities.value = candidate.name;
+                    dojo.arrStrAdderss[obj.addressWorkflowCount] = lang.trim(_this.txtAddressCommunities.value);
                     domStyle.set(obj.divAddressScrollContainer, "display", "none");
                     domStyle.set(obj.divAddressScrollContent, "display", "none");
                     _this._enrichData(null, obj.addressWorkflowCount, candidate);
+                    dojo.standerdGeoQueryAttribute = candidate.attributes.CountryAbbr + "," + candidate.attributes.DataLayerID + "," + candidate.attributes.AreaID;
                 } else {
                     if (_this.map.infoWindow) {
                         _this.map.infoWindow.hide();
@@ -540,7 +542,9 @@ define([
         */
         _locateAddressOnMap: function (mapPoint, obj) {
             var geoLocationPushpin, locatorMarkupSymbol, graphic;
-            this.map.centerAt(mapPoint);
+            if (!this.isSharedExtent) {
+                this.map.centerAt(mapPoint);
+            }
             geoLocationPushpin = dojoConfig.baseURL + dojo.configData.LocatorSettings.DefaultLocatorSymbol;
             locatorMarkupSymbol = new esri.symbol.PictureMarkerSymbol(geoLocationPushpin, dojo.configData.LocatorSettings.MarkupSymbolSize.width, dojo.configData.LocatorSettings.MarkupSymbolSize.height);
             graphic = new esri.Graphic(mapPoint, locatorMarkupSymbol, {}, null);
@@ -548,11 +552,13 @@ define([
             this.map.getLayer("esriGraphicsLayerMapSettings").clear();
             this.map.getLayer("esriGraphicsLayerMapSettings").add(graphic);
             topic.publish("hideProgressIndicator");
-            obj.lastSearchString = lang.trim(obj.txtAddress.value);
-            domConstruct.empty(obj.divAddressResults, obj.divAddressScrollContent);
-            domStyle.set(obj.divAddressScrollContainer, "display", "none");
-            domStyle.set(obj.divAddressScrollContent, "display", "none");
-            this.workflowCount = obj.addressWorkflowCount;
+            if (obj) {
+                obj.lastSearchString = lang.trim(obj.txtAddress.value);
+                dojo.arrStrAdderss[this.workflowCount] = obj.lastSearchString;
+                domConstruct.empty(obj.divAddressResults, obj.divAddressScrollContent);
+                domStyle.set(obj.divAddressScrollContainer, "display", "none");
+                domStyle.set(obj.divAddressScrollContent, "display", "none");
+            }
             this._createBuffer(mapPoint);
         },
 

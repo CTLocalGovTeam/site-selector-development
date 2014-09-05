@@ -140,7 +140,37 @@ define([
             domAttr.set(this.divShareCodeContainer, "innerHTML", sharedNls.titles.webpageDisplayText);
             mapExtent = this._getMapExtent();
             url = esri.urlToObject(window.location.toString());
-            urlStr = encodeURI(url.path) + "?extent=" + mapExtent;
+            urlStr = encodeURI(url.path) + "?extent=" + mapExtent + "$workflowCount=" + dojo.workflowCount;
+            if (dojo.mapPointForInfowindow) {
+                urlStr += "$mapPointForInfowindow=" + dojo.mapPointForInfowindow.toString();
+            }
+            if (dojo.arrStrAdderss && dojo.arrStrAdderss[dojo.workflowCount]) {
+                urlStr += "$address=" + dojo.arrStrAdderss[dojo.workflowCount].toString();
+            }
+            if (dojo.arrAddressMapPoint && dojo.arrAddressMapPoint[dojo.workflowCount]) {
+                urlStr += "$addressMapPoint=" + dojo.arrAddressMapPoint[dojo.workflowCount].toString();
+            }
+            if (dojo.arrBufferDistance && dojo.arrBufferDistance[dojo.workflowCount]) {
+                urlStr += "$bufferDistance=" + dojo.arrBufferDistance[dojo.workflowCount].toString();
+            }
+            if (dojo.standerdGeoQueryAttribute && dojo.workflowCount === 3) {
+                urlStr += "$standerdGeoQueryAttribute=" + dojo.standerdGeoQueryAttribute;
+            }
+            if (dojo.selectedObjectIndex) {
+                urlStr += "$selectedObjectIndex=" + dojo.selectedObjectIndex;
+            }
+            if (dojo.paginationIndex && dojo.paginationIndex[dojo.workflowCount]) {
+                urlStr += "$paginationIndex=" + dojo.paginationIndex[dojo.workflowCount];
+            }
+            if (dojo.communitySelectionFeature && dojo.workflowCount === 3) {
+                urlStr += "$communitySelectionFeature=" + dojo.communitySelectionFeature;
+            }
+            if (dojo.arrWhereClause && dojo.arrWhereClause[dojo.workflowCount]) {
+                urlStr += "$whereClause=" + dojo.arrWhereClause[dojo.workflowCount].toString();
+            }
+            if (dojo.toFromBussinessFilter && dojo.toFromBussinessFilter.length > 0) {
+                urlStr += "$toFromBussinessFilter=" + dojo.toFromBussinessFilter;
+            }
             try {
 
                 /**

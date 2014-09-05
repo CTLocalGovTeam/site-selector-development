@@ -79,6 +79,7 @@ define([
         */
         _selectionChangeForCommunities: function (value) {
             var queryCommunities, queryTaskCommunities;
+            dojo.communitySelectionFeature = value;
             queryTaskCommunities = new QueryTask(dojo.configData.Workflows[3].FilterSettings.FilterLayer.LayerURL);
             queryCommunities = new esri.tasks.Query();
             queryCommunities.where = dojo.configData.Workflows[3].FilterSettings.FilterLayer.OutFields[0].toString() + "='" + value + "'";
@@ -115,6 +116,13 @@ define([
                 maxHeight: 100
             }, this.searchContainerComm);
 
+            if (window.location.toString().split("$communitySelectionFeature=").length > 1) {
+                this.comAreaList.disabled = false;
+                this.comAreaList.set("displayedValue", window.location.toString().split("$communitySelectionFeature=")[1].split("$")[0]);
+
+            } else {
+                this.comAreaList.disabled = "disabled";
+            }
             this.own(on(this.comAreaList, "change", lang.hitch(this, function (value) {
                 if (value.toLowerCase() !== sharedNls.titles.select.toLowerCase()) {
                     this._selectionChangeForCommunities(value);
@@ -124,7 +132,7 @@ define([
                     topic.publish("showProgressIndicator");
                 }
             })));
-            this.comAreaList.disabled = "disabled";
+
         },
 
         /**
@@ -182,8 +190,25 @@ define([
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _fromToDatachangeHandler: function (fromNode, toNode, checkBox) {
+            var arrFilter, i;
             if (checkBox.checked) {
                 if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0 && Number(toNode.value) >= Number(fromNode.value) && fromNode.value !== "" && toNode.value !== "") {
+                    if (!dojo.toFromBussinessFilter) {
+                        dojo.toFromBussinessFilter = checkBox.value + "," + fromNode.value + "," + toNode.value;
+                    } else {
+                        arrFilter = dojo.toFromBussinessFilter.split("$");
+                        for (i = 0; i < arrFilter.length; i++) {
+                            if (arrFilter[i].toString().split(checkBox.value).length > 1) {
+                                arrFilter.splice(i, 1);
+                            }
+                        }
+                        if (arrFilter.length > 0) {
+                            dojo.toFromBussinessFilter = arrFilter.join("$");
+                            dojo.toFromBussinessFilter += "$" + checkBox.value + "," + fromNode.value + "," + toNode.value;
+                        } else {
+                            dojo.toFromBussinessFilter = checkBox.value + "," + fromNode.value + "," + toNode.value;
+                        }
+                    }
                     if (checkBox.value === "_SALES") {
                         this.revenueData.length = 0;
                         this.salesFinalData = this._checkForValue(checkBox.value, fromNode.value, toNode.value);
@@ -196,9 +221,23 @@ define([
                         this._setBusinessValues(this.employeFinalData, this.mainResultDiv, this.enrichData);
                     }
                 } else {
+                    arrFilter = dojo.toFromBussinessFilter.split("$");
+                    for (i = 0; i < arrFilter.length; i++) {
+                        if (arrFilter[i].toString().split(checkBox.value).length > 1) {
+                            arrFilter.splice(i, 1);
+                        }
+                    }
+                    dojo.toFromBussinessFilter = arrFilter.join("$");
                     alert(sharedNls.errorMessages.invalidInput);
                 }
             } else if (fromNode.value !== "" && toNode.value !== "") {
+                arrFilter = dojo.toFromBussinessFilter.split("$");
+                for (i = 0; i < arrFilter.length; i++) {
+                    if (arrFilter[i].toString().split(checkBox.value).length > 1) {
+                        arrFilter.splice(i, 1);
+                    }
+                }
+                dojo.toFromBussinessFilter = arrFilter.join("$");
                 if (checkBox.value === "_SALES") {
                     this.revenueData.length = 0;
                     this.salesFinalData.length = 0;
@@ -302,7 +341,6 @@ define([
         _enrichData: function (geometry, workflowCount, standardSearchCandidate) {
             var studyAreas, enrichUrl, geoEnrichmentRequest, dataCollections, analysisVariables, i, isRetunrnGeometry = true;
             try {
-                this.workflowCount = workflowCount;
                 if (geometry !== null && workflowCount !== 3) {
                     if (workflowCount === 2) {
                         this.showBuffer(geometry);
@@ -371,7 +409,6 @@ define([
                         isRetunrnGeometry = false;
                         this.lastGeometry[this.workflowCount] = [geometry];
                         this.showBuffer([geometry]);
-                        this.map.setExtent(geometry.getExtent(), true);
                         studyAreas = [{ "geometry": { "rings": geometry.rings, "spatialReference": { "wkid": this.map.spatialReference.wkid} }, "attributes": { "id": "Polygon 1", "name": "Optional Name 1"}}];
                         this.arrStudyAreas[this.workflowCount] = studyAreas;
                     } else {
@@ -480,7 +517,6 @@ define([
                 if (data.results[0].value.FeatureSet[0].features[0].geometry) {
                     enrichGeo = new Polygon(data.results[0].value.FeatureSet[0].features[0].geometry);
                     enrichGeo.spatialReference = this.map.spatialReference;
-                    this.map.setExtent(enrichGeo.getExtent(), true);
                     this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                     this.lastGeometry[this.workflowCount] = [enrichGeo];
                     this.showBuffer([enrichGeo]);
@@ -573,9 +609,11 @@ define([
             var i, strUnit = "";
             for (i = 0; i < data.results[0].value.FeatureSet[0].fields.length; i++) {
                 if (data.results[0].value.FeatureSet[0].fields[i].units !== undefined) {
-                    if (data.results[0].value.FeatureSet[0].fields[i].name === field && data.results[0].value.FeatureSet[0].fields[i].units === dojo.configData.Workflows[this.workflowCount].Unit.toString()) {
-                        strUnit = data.results[0].value.FeatureSet[0].fields[i][data.results[0].value.FeatureSet[0].fields[i].units];
-                        break;
+                    if (data.results[0].value.FeatureSet[0].fields[i].name === field) {
+                        if (data.results[0].value.FeatureSet[0].fields[i][data.results[0].value.FeatureSet[0].fields[i].units]) {
+                            strUnit = data.results[0].value.FeatureSet[0].fields[i][data.results[0].value.FeatureSet[0].fields[i].units];
+                            break;
+                        }
                     }
                 }
             }
@@ -652,7 +690,7 @@ define([
             this.revenueData = [];
             this.employeFinalData = [];
             for (t = 0; t < query(".esriCTDivFromTo", this.revenueEmpFromToDiv).length; t++) {
-                if (query(".esriCTChkBox", this.revenueEmpFromToDiv)[t].checked && Number(query(".esriCTToTextBoxFrom", this.revenueEmpFromToDiv)[t].value) >= 0 && Number(query(".esriCTToTextBoxTo", this.revenueEmpFromToDiv)[t].value) >= 0) {
+                if (query(".esriCTChkBox", this.revenueEmpFromToDiv)[t].checked && Number(query(".esriCTToTextBoxFrom", this.revenueEmpFromToDiv)[t].value) >= 0 && Number(query(".esriCTToTextBoxTo", this.revenueEmpFromToDiv)[t].value) >= 0 && lang.trim(query(".esriCTToTextBoxFrom", this.revenueEmpFromToDiv)[t].value) !== "" && lang.trim(query(".esriCTToTextBoxTo", this.revenueEmpFromToDiv)[t].value) !== "") {
                     this._fromToDatachangeHandler(query(".esriCTToTextBoxFrom", this.revenueEmpFromToDiv)[t], query(".esriCTToTextBoxTo", this.revenueEmpFromToDiv)[t], query(".esriCTChkBox", this.revenueEmpFromToDiv)[t]);
                     isFromToChecked = true;
                 }
