@@ -1,4 +1,4 @@
-﻿/*global define */
+/*global define */
 /** @license
 | Version 10.2
 | Copyright 2013 Esri
@@ -182,6 +182,7 @@ input[type="text"]
     border: 1px solid #DFDFDF;
     padding: 5px;
     -webkit-appearance: none;
+    overflow: hidden;
     border-radius: 0px !important;
 }
 
@@ -993,7 +994,7 @@ input[type="text"]
 
 /*Site locator tab block*/
 
-.esriCTHeaderRouteContainer
+.esriCTHeaderSearchContainer
 {
     width: 370px;
     position: absolute;
@@ -1247,7 +1248,7 @@ input[type="text"]
 {
     display: table-cell;
     padding-left: 5px;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 .esriCTradiolabel
@@ -1926,9 +1927,9 @@ input
     width: 386px !important;
     margin-left: -17px;
 }
-#sortBy_dropdown
+#By_dropdown
 {
-    height: 55px !important;
+    height: 68px !important;
     width: 65px !important;
     overflow: hidden !important;
 }
@@ -2380,7 +2381,6 @@ div.esriCTPrev
     display: table-cell;
     vertical-align: middle;
     padding-right: 5px;
-    word-break: break-all;
     width: 305px;
 }
 
@@ -2418,9 +2418,8 @@ input[type="radio"]
 {
     display: table-cell;
     padding-left: 5px;
-    vertical-align: top;
+    vertical-align: middle;
     vertical-align: /*\**/ middle\9;
-    word-break: break-all;
 }
 
 .esriCTClearBoxCommunities
@@ -2465,4 +2464,45 @@ input[type="radio"]
     width: 48%;
     float: right;
     margin-bottom: 10px;
+}
+
+.esriCTChkBox
+{
+    position: absolute;
+    z-index: -1000;
+    top: -1000px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    width: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+}
+
+.esriCTChkBox + label.css-label
+{
+    padding-left: 20px;
+    height: 20px;
+    display: inline-block;
+    line-height: 20px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    font-size: 12px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.esriCTChkBox:checked + label.css-label
+{
+    background-position: 0 -20px;
+}
+label.css-label
+{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

@@ -1,4 +1,4 @@
-﻿<div class="esriCTHeaderRouteContainer" data-dojo-attach-point="applicationHeaderRouteContainer">
+﻿<div class="esriCTHeaderSearchContainer" data-dojo-attach-point="applicationHeaderSearchContainer">
     <div class="esriCTTabContainer" data-dojo-attach-point="divDirectionContainer">
         <div class="esriCTsearchContainerBuilding esriCTTab" data-dojo-attach-point="esriCTsearchContainerBuilding">
             <div class="directionsDisplayTextBuilding" data-dojo-attach-point="buildingContent">
@@ -23,7 +23,8 @@
                 <div class="esriOuterDiv">
                     <div class="esriCTClear">
                         <div class="esriCTCheckBox">
-                            <input type="checkbox" checked="checked" data-dojo-attach-point="chkSerachContentBuilding" />
+                            <input class="esriCTChkBox" type="checkbox" checked="checked" id="checkboxG1" name="checkboxG1" data-dojo-attach-point="chkSerachContentBuilding" />
+                            <label for="checkboxG1" class="css-label"></label>
                         </div>
                         <div class="esriCTChkLabel" data-dojo-attach-point="searchBuildingText">
                         </div>
@@ -96,7 +97,8 @@
                 <div class="esriOuterDiv">
                     <div class="esriCTClear">
                         <div class="esriCTCheckBox">
-                            <input type="checkbox" checked="checked" data-dojo-attach-point="chksearchContentSites" />
+                            <input  class="esriCTChkBox" id="checkboxG2" name="checkboxG2" type="checkbox" checked="checked" data-dojo-attach-point="chksearchContentSites" />
+                            <label for="checkboxG2" class="css-label"></label>
                         </div>
                         <div class="esriCTChkLabel" data-dojo-attach-point="serachSiteText">
                         </div>
@@ -289,7 +291,8 @@
             <div class="esriOuterDiv">
                 <div class="esriCTClear" data-dojo-attach-point="searchBox">
                     <div class="esriCTCheckBox">
-                        <input type="radio" name="rdoCommunities" checked="checked" data-dojo-attach-point="rdoCommunitiesAddressSearch" />
+                        <input  class="esriCTChkBox" type="radio" name="rdoCommunities" id="rdoCommunities" checked="checked" data-dojo-attach-point="rdoCommunitiesAddressSearch" />
+                        <label for="rdoCommunities" class="css-label"></label>
                     </div>
                     <div class="esriCTradiolabelTextInput" data-dojo-attach-point="communityText">
                     </div>
@@ -325,7 +328,8 @@
                 </div>
                 <div class="esriCTClearCommunities" data-dojo-attach-point="divDropDownSearch">
                     <div class="esriCTCheckBoxBissiness">
-                        <input id="RadioDropSelection" type="radio" name="rdoCommunities" data-dojo-attach-point="rdoCommunityPlaceName" />
+                        <input class="esriCTChkBox"  id="RadioDropSelection" type="radio" name="rdoCommunities" data-dojo-attach-point="rdoCommunityPlaceName" />
+                        <label for="RadioDropSelection" class="css-label"></label>
                     </div>
                     <div class="esriCTradiolabel" data-dojo-attach-point="searchCommunityText">
                     </div>

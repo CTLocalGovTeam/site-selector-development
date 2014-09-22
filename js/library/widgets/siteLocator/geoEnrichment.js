@@ -231,13 +231,15 @@ define([
                     alert(sharedNls.errorMessages.invalidInput);
                 }
             } else if (fromNode.value !== "" && toNode.value !== "") {
-                arrFilter = dojo.toFromBussinessFilter.split("$");
-                for (i = 0; i < arrFilter.length; i++) {
-                    if (arrFilter[i].toString().split(checkBox.value).length > 1) {
-                        arrFilter.splice(i, 1);
+                if (dojo.toFromBussinessFilter) {
+                    arrFilter = dojo.toFromBussinessFilter.split("$");
+                    for (i = 0; i < arrFilter.length; i++) {
+                        if (arrFilter[i].toString().split(checkBox.value).length > 1) {
+                            arrFilter.splice(i, 1);
+                        }
                     }
+                    dojo.toFromBussinessFilter = arrFilter.join("$");
                 }
-                dojo.toFromBussinessFilter = arrFilter.join("$");
                 if (checkBox.value === "_SALES") {
                     this.revenueData.length = 0;
                     this.salesFinalData.length = 0;
@@ -405,9 +407,13 @@ define([
                     if (geometry === null) {
                         studyAreas = [{ "sourceCountry": standardSearchCandidate.attributes.CountryAbbr, "layer": standardSearchCandidate.attributes.DataLayerID, "ids": [standardSearchCandidate.attributes.AreaID]}];
                         this.arrStudyAreas[this.workflowCount] = studyAreas;
+                        this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                        this.featureGeometry[this.workflowCount] = null;
                     } else if (geometry.type === "polygon") {
                         isRetunrnGeometry = false;
                         this.lastGeometry[this.workflowCount] = [geometry];
+                        this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                        this.featureGeometry[this.workflowCount] = null;
                         this.showBuffer([geometry]);
                         studyAreas = [{ "geometry": { "rings": geometry.rings, "spatialReference": { "wkid": this.map.spatialReference.wkid} }, "attributes": { "id": "Polygon 1", "name": "Optional Name 1"}}];
                         this.arrStudyAreas[this.workflowCount] = studyAreas;
@@ -517,7 +523,6 @@ define([
                 if (data.results[0].value.FeatureSet[0].features[0].geometry) {
                     enrichGeo = new Polygon(data.results[0].value.FeatureSet[0].features[0].geometry);
                     enrichGeo.spatialReference = this.map.spatialReference;
-                    this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                     this.lastGeometry[this.workflowCount] = [enrichGeo];
                     this.showBuffer([enrichGeo]);
                 }
@@ -594,7 +599,10 @@ define([
                 this.arrReportDataJson[this.workflowCount].reportData[Geoenerichfield.DisplayTitle.toString()] = aarReportData;
             }
             if (arrDemographyDataCount === 0) {
-                demoNode.innerHTML = sharedNls.errorMessages.invalidSearch;
+                if (this.workflowCount === 3) {
+                    domConstruct.empty(this.communityMainDiv);
+                }
+                alert(sharedNls.errorMessages.invalidSearch);
             }
         },
 
@@ -793,33 +801,36 @@ define([
             }, selectForDownload);
 
             this.own(on(selectDownloadList, "change", lang.hitch(this, function (value) {
-                var form, postData, fileTypeInput, reportInput, studyAreasInput, gp, params, webMapJsonData;
+                var form, postData, fileTypeInput, reportInput, studyAreasInput, gp, params, webMapJsonData, spatialRefernceData;
                 try {
                     if (arrDwnloadDisplayFieldValue[value].GeoEnrichmentReportName) {
                         form = document.createElement("form");
+                        spatialRefernceData = document.createElement("input");
                         postData = document.createElement("input");
                         fileTypeInput = document.createElement("input");
                         reportInput = document.createElement("input");
                         studyAreasInput = document.createElement("input");
                         form.method = "POST";
-                        form.id = "someForm";
                         form.action = dojo.configData.ProxyUrl + "?" + dojo.configData.GeoEnrichmentService + "/GeoEnrichment/CreateReport";
                         form.target = "_blank";
                         postData.value = "bin";
                         postData.name = "f";
+                        spatialRefernceData.value = this.map.spatialReference.wkid.toString();
+                        spatialRefernceData.name = "inSR";
                         fileTypeInput.value = arrDwnloadDisplayFieldValue[value].Filetype;
                         fileTypeInput.name = "format";
                         reportInput.value = arrDwnloadDisplayFieldValue[value].GeoEnrichmentReportName.toString();
                         reportInput.name = "report";
                         studyAreasInput.value = JSON.stringify(this.arrStudyAreas[this.workflowCount]);
                         studyAreasInput.name = "studyAreas";
+                        form.appendChild(spatialRefernceData);
                         form.appendChild(postData);
                         form.appendChild(fileTypeInput);
                         form.appendChild(reportInput);
                         form.appendChild(studyAreasInput);
                         document.body.appendChild(form);
                         form.submit();
-
+                        selectDownloadList.reset();
                     } else {
                         if (arrDwnloadDisplayFieldValue[value].GeoProcessingServiceURL) {
                             topic.publish("showProgressIndicator");
@@ -843,7 +854,9 @@ define([
                                         gp.getResultData(jobInfo.jobId, "Report_PDF", this._downloadDataFile);
                                     }
                                 }
+                                selectDownloadList.reset();
                             }), null, function (err) {
+                                selectDownloadList.reset();
                                 topic.publish("hideProgressIndicator");
                                 alert(err.message);
                             });
@@ -862,7 +875,17 @@ define([
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _downloadPDFFile: function (outputFile) {
-            window.open(outputFile.value.url);
+            var form, fileTypeInput;
+            form = document.createElement("form");
+            fileTypeInput = document.createElement("input");
+            fileTypeInput.value = "pdf";
+            form.appendChild(fileTypeInput);
+            fileTypeInput.name = "format";
+            form.method = "post";
+            form.action = dojo.configData.ProxyUrl + "?" + outputFile.value.url;
+            form.target = "_blank";
+            document.body.appendChild(form);
+            form.submit();
         },
 
         /**

@@ -168,8 +168,11 @@ define([
             if (dojo.arrWhereClause && dojo.arrWhereClause[dojo.workflowCount]) {
                 urlStr += "$whereClause=" + dojo.arrWhereClause[dojo.workflowCount].toString();
             }
-            if (dojo.toFromBussinessFilter && dojo.toFromBussinessFilter.length > 0) {
+            if (dojo.toFromBussinessFilter && dojo.toFromBussinessFilter.length > 0 && dojo.workflowCount === 2) {
                 urlStr += "$toFromBussinessFilter=" + dojo.toFromBussinessFilter;
+            }
+            if (dojo.strGeoLocationMapPoint) {
+                urlStr += "$strGeoLocationMapPoint=" + dojo.strGeoLocationMapPoint;
             }
             try {
 

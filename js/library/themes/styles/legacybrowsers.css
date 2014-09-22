@@ -35,3 +35,49 @@
 {
     filter: progid:DXImageTransform.Microsoft.Glow(color='#8EAE21', Strength='4');
 }
+
+.esriCTChkBox
+{
+    position: relative;
+    z-index: 0;
+    top: 0px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height: 15px;
+    width: 15px;
+    margin: 0px;
+    padding: 0;
+    border: 0;
+}
+
+.esriCTChkBox + label.css-label
+{
+    position: absolute;
+    z-index: -1000;
+    top: -1000px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    width: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+}
+
+.esriCTChkBox:checked + label.css-label
+{
+    background-position: 0 -20px;
+}
+label.css-label
+{
+    position: absolute;
+    z-index: -1000;
+    top: -1000px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    width: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+}

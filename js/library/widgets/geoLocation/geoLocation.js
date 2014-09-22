@@ -99,6 +99,7 @@ define([
                         }
                     }
                     mapPoint = newPoint[0];
+                    topic.publish("geoLocation-Complete", mapPoint);
                     self.map.centerAndZoom(mapPoint, dojo.configData.ZoomLevel);
                     self._addGraphic(mapPoint);
                 }, function () {

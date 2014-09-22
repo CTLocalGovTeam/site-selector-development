@@ -559,7 +559,9 @@ define([
             }, selectForBuilding);
 
             this.own(on(selectBusinessSortForBuilding, "change", lang.hitch(this, function (value) {
-                this._selectionChangeForBuildingSort(value);
+                if (value.toLowerCase() !== sharedNls.titles.select.toLowerCase()) {
+                    this._selectionChangeForBuildingSort(value);
+                }
             })));
 
             this.own(on(leftArrow, "click", lang.hitch(this, function () {
@@ -713,7 +715,9 @@ define([
                 maxHeight: 100
             }, selectForSites);
             this.own(on(selectBusinessSortForSites, "change", lang.hitch(this, function (value) {
-                this._selectionChangeForBuildingSort(value);
+                if (value.toLowerCase() !== sharedNls.titles.select.toLowerCase()) {
+                    this._selectionChangeForBuildingSort(value);
+                }
             })));
             this.own(on(leftArrow, "click", lang.hitch(this, function () {
                 if (currentIndexSites !== 0) {

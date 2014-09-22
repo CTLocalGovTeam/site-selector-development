@@ -410,7 +410,7 @@
 /* End of CSS for shadow effect*/
 
 /*Site locator*/
-.esriCTHeaderRouteContainer
+.esriCTHeaderSearchContainer
 {
     border-left: 1px solid #007AC2;
     border-right: 1px solid #007AC2;
@@ -549,6 +549,9 @@
 {
     background: url("../images/left-blue-arrow.png");
 }
-
+label.css-label
+{
+    background-image: url(../images/checkbox.png);
+}
 /*End of Site locator*/
 
