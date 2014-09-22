@@ -119,6 +119,9 @@ define([
         */
         _addBasemapLayerOnMap: function (basemapLayerId) {
             var layer, basemapLayers = dojo.configData.BaseMapLayers[dojo.selectedBasemapIndex];
+            this.map.onLayerAdd = lang.hitch(this, function (layer) {
+                this.enableToggling = true;
+            });
             if (basemapLayers.length) {
                 array.forEach(basemapLayers, lang.hitch(this, function (basemap, index) {
                     this.enableToggling = false;
@@ -134,10 +137,6 @@ define([
                 }
                 this.map.addLayer(layer, 0);
             }
-
-            this.map.onLayerAdd = lang.hitch(this, function (layer) {
-                this.enableToggling = true;
-            });
         },
 
         /**

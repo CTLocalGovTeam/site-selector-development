@@ -178,16 +178,11 @@ define([], function () {
                             LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
-                                    DisplayText: "Area(sqft)",
+                                    DisplayText: "Area (sqft)",
                                     FieldName: "TOTALSQFT"
                                 }
                             ],
                             RegularFilterOptionFields: [
-                                {
-                                    DisplayText: "Active to users",
-                                    FieldName: "ACTIVETOUSERS",
-                                    FieldValue: "Y"
-                                }
                             ],
 
                             AdditionalFilterOptions: {
@@ -360,10 +355,6 @@ define([], function () {
                                     DisplayText: "Within city",
                                     FieldName: "WithinCityLimits",
                                     FieldValue: "Y"
-                                }, {
-                                    DisplayText: "Active to users",
-                                    FieldName: "SiteActivetoUsers",
-                                    FieldValue: "Y"
                                 }
                             ],
                             AdditionalFilterOptions: {
@@ -525,7 +516,7 @@ define([], function () {
                     BusinesSortOptions: { Option: "Count,Revenue,Employees" },
                     FilterRangeFields: [
                         {
-                            DisplayText: "Annual Revenue($)",
+                            DisplayText: "Annual Revenue ($)",
                             VariableNameSuffix: "_SALES"
                         }, {
                             DisplayText: "Number of employees",

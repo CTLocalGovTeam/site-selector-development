@@ -17,36 +17,60 @@
 | limitations under the License.
 */
 define({
-    showNullValue: "@fr@ N/A",
-    buttons: {
-        okButtonText: "@fr@ OK",
-        link: "@fr@ Link",
-        email: "Email",  // Shown next to icon for sharing the current map extents via email; works with shareViaEmail tooltip
-        facebook: "Facebook",  // Shown next to icon for sharing the current map extents via a Facebook post; works with shareViaFacebook tooltip
-        twitter: "Twitter"  // Shown next to icon for sharing the current map extents via a Twitter tweet; works with shareViaTwitter tooltip
-    },
-    tooltips: {
-        search: "Rechercher",
-        reports: "@fr@ Reports",
-        locate: "Emplacement actuel",
-        share: "Partager",
-        help: "Aide",
-        clearEntry: "@fr@ Clear"
-    },
-    titles: {
-        areaOfInterestTabText: "@fr@ Area of Interest",
-        reportTabText: "Report",
-        webpageDisplayText: "@fr@ Copy/Paste HTML into your web page"
-    },
-    errorMessages: {
-        invalidSearch: "Aucun résultat",
-        falseConfigParams: "Valeurs clés de configuration requis sont null ou pas exactement correspondant à des attributs de la couche. Ce message peut apparaître plusieurs fois.",
-        invalidLocation: "@fr@ Current location not found.",
-        invalidProjection: "@fr@ Unable to plot current location on the map.",
-        widgetNotLoaded: "@fr@ Unable to load widgets.",
-        shareLoadingFailed: "@fr@ Unable to load share options.",
-        shareFailed: "@fr@ Unable to share.",
-        disableTab: "@fr@ Enable at least one tab.",
-        bufferSliderValue: "@fr@ Buffer slider should not be set to zero distance"
+    root: {
+        showNullValue: "@fr@ N/A",
+        buttons: {
+            okButtonText: "@fr@ OK",
+            link: "@fr@ Link",
+            email: "Email",  // Shown next to icon for sharing the current map extents via email; works with shareViaEmail tooltip
+            facebook: "Facebook",  // Shown next to icon for sharing the current map extents via a Facebook post; works with shareViaFacebook tooltip
+            twitter: "Twitter",  // Shown next to icon for sharing the current map extents via a Twitter tweet; works with shareViaTwitter tooltip
+            embedding: "@fr@ Embedded URL"
+        },
+        tooltips: {
+            search: "Rechercher",
+            reports: "@fr@ Site Selector",
+            locate: "Emplacement actuel",
+            share: "Partager",
+            help: "Aide",
+            clearEntry: "@fr@ Clear",
+            previous: "@fr@ Previous",
+            next: "@fr@ Next"
+        },
+        titles: {
+            informationPanelTitle: "@fr@ Information for current map view",
+            searchBuildingText: "@fr@ Search buildings near an address",
+            hideText: "@fr@ Hide more options",
+            showText: "@fr@ Show more options",
+            sliderDisplayText: "@fr@ Show results within ",
+            communityText: "@fr@ Search communities by city, county or region",
+            searchCommunityText: "@fr@ Search communities in",
+            searchBusinessText: "@fr@ Search business near an address",
+            serachSiteText: "@fr@ Search sites near an address",
+            CountStatus: "${s} - ${e} of ${t}",
+            webpageDisplayText: "@fr@ Copy/Paste HTML into your web page",
+            textDownload: "@fr@ Download",
+            result: "@fr@ Back To Result",
+            sortBy: "@fr@  Sort by",
+            select: "@fr@ Select",
+            toText: "@fr@ to",
+            fromText: "@fr@ from"
+        },
+        errorMessages: {
+            invalidSearch: "@fr@ No results found",
+            falseConfigParams: "@fr@ Required configuration key values are either null or not exactly matching with layer attributes. This message may appear multiple times",
+            invalidLocation: "@fr@ Current location not found",
+            invalidProjection: "@fr@ Unable to plot current location on the map",
+            widgetNotLoaded: "@fr@ Unable to load widgets.",
+            shareLoadingFailed: "@fr@ Unable to load share options",
+            shareFailed: "@fr@ Unable to share",
+            invalidBasemapQuery: "@fr@ Invalid BasemapQuery",
+            noBasemap: "@fr@ No Basemap Found",
+            disableTab: "@fr@ Enable at least one tab",
+            bufferSliderValue: "@fr@ Buffer slider should not be set to zero distance",
+            invalidInput: "@fr@ Plese enter valid input",
+            unableToSort: "@fr@ Unable to sort",
+            portalUrlNotFound: "@fr@ Portal URL cannot be empty"
+        }
     }
 });

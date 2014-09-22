@@ -109,6 +109,53 @@ define([
             this.own(on(obj.close, "click", lang.hitch(this, function () {
                 this._hideText(obj);
             })));
+
+            topic.subscribe("geoLocation-Complete", lang.hitch(this, function (mapPoint) {
+                if (this.workflowCount === obj.addressWorkflowCount) {
+                    if (this.workflowCount === 0) {
+                        this._getBackToTab(query(".esriCTAttachmentOuterDiv")[this.workflowCount], query(".esriCTMainDivBuilding")[0]);
+                    } else if (this.workflowCount === 1) {
+                        this._getBackToTab(query(".esriCTAttachmentOuterDiv")[this.workflowCount], query(".esriCTMainDivSites")[0]);
+                    }
+                    if (html.coords(this.applicationHeaderSearchContainer).h > 0) {
+                        dojo.arrAddressMapPoint[this.workflowCount] = mapPoint.x + "," + mapPoint.y;
+                        this._geoLocationQuery(obj, mapPoint);
+                        dojo.strGeoLocationMapPoint = null;
+
+                    } else {
+                        dojo.strGeoLocationMapPoint = mapPoint.x + "," + mapPoint.y;
+                    }
+                }
+            }));
+        },
+
+        /**
+        * perform query on GeoLocation
+        * @param {object} Nodes and other variable for all workflows
+        * @param {object} Geolocation MapPoint
+        * @memberOf widgets/Sitelocator/UnifiedSearch
+        */
+        _geoLocationQuery: function (obj, mapPoint) {
+            var locator;
+            locator = new Locator(dojo.configData.LocatorSettings.LocatorURL);
+            locator.locationToAddress(mapPoint, 100);
+            locator.on("location-to-address-complete", lang.hitch(this, function (evt) {
+                if (evt.address.address) {
+                    domAttr.set(obj.txtAddress, "defaultAddress", evt.address.address.Address);
+                    domAttr.set(obj.txtAddress, "value", evt.address.address.Address);
+                    this.featureGeometry[this.workflowCount] = mapPoint;
+                    this.addPushPin(this.featureGeometry[this.workflowCount]);
+                    if (this.workflowCount === 3) {
+                        topic.publish("showProgressIndicator");
+                        this._enrichData(mapPoint, this.workflowCount, null);
+                    } else {
+                        this._createBuffer(mapPoint);
+                    }
+                    dojo.arrStrAdderss[this.workflowCount] = evt.address.address.Address;
+
+                }
+            }));
+
         },
 
         /**
@@ -119,15 +166,6 @@ define([
         */
         _locateAddress: function (evt, obj) {
             domConstruct.empty(obj.divAddressResults);
-            if (obj.addressWorkflowCount === 2) {
-                this.businessData = [];
-                this.enrichData = [];
-                this.salesFinalData = [];
-                this.employeFinalData = [];
-                this.revenueData = [];
-                this.totalArray = [];
-                domStyle.set(this.resultDiv, "display", "none");
-            }
             if (lang.trim(obj.txtAddress.value) === '') {
                 domStyle.set(obj.imgSearchLoader, "display", "none");
                 domStyle.set(obj.close, "display", "block");

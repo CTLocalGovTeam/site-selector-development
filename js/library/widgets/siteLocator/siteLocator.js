@@ -114,9 +114,9 @@ define([
                     /**
                     * @memberOf widgets/SiteSelector/SiteSelector
                     */
-                    if (html.coords(this.applicationHeaderRouteContainer).h > 0) {
+                    if (html.coords(this.applicationHeaderSearchContainer).h > 0) {
                         domClass.replace(this.domNode, "esriCTHeaderSearch", "esriCTHeaderSearchSelected");
-                        domClass.replace(this.applicationHeaderRouteContainer, "esriCTHideContainerHeight", "esriCTShowRouteContainerHeight");
+                        domClass.replace(this.applicationHeaderSearchContainer, "esriCTHideContainerHeight", "esriCTShowRouteContainerHeight");
                         if (this.logoContainer) {
                             domClass.remove(this.logoContainer, "esriCTMapLogo");
                         }
@@ -190,11 +190,11 @@ define([
             }
             arrSort = this._setSelectionOption(dojo.configData.Workflows[2].FilterSettings.BusinesSortOptions.Option.split(","));
             arrSort.splice(0, 0, { "label": sharedNls.titles.select, "value": sharedNls.titles.select });
-            selectSortOption = new SelectList({ options: arrSort, id: "sortBy", maxHeight: 50 }, this.SortBy);
+            selectSortOption = new SelectList({ options: arrSort, id: "sortBy" }, this.SortBy);
             /**
-            * minimize other open header panel widgets and show route
+            * minimize other open header panel widgets and show search
             */
-            dom.byId("esriCTParentDivContainer").appendChild(this.applicationHeaderRouteContainer);
+            dom.byId("esriCTParentDivContainer").appendChild(this.applicationHeaderSearchContainer);
             this._setTabVisibility();
             this._attachLocatorEvents({ divSearch: this.divSearchBuilding, checkBox: this.chkSerachContentBuilding, imgSearchLoader: this.imgSearchLoaderBuilding, txtAddress: this.txtAddressBuilding, close: this.closeBuilding, divAddressResults: this.divAddressResultsBuilding, divAddressScrollContainer: this.divAddressScrollContainerBuilding, divAddressScrollContent: this.divAddressScrollContentBuilding, addressWorkflowCount: 0, searchContent: this.searchContentBuilding, lastSearchString: this.lastSearchStringBuilding, locatorScrollBar: this.locatorScrollbarBuilding });
             this._attachLocatorEvents({ divSearch: this.divSearchSites, checkBox: this.chksearchContentSites, imgSearchLoader: this.imgSearchLoaderSites, txtAddress: this.txtAddressSites, close: this.closeSites, divAddressResults: this.divAddressResultsSites, divAddressScrollContainer: this.divAddressScrollContainerSites, divAddressScrollContent: this.divAddressScrollContentSites, addressWorkflowCount: 1, searchContent: this.searchContentSites, lastSearchString: this.lastSearchStringSites, locatorScrollBar: this.locatorScrollbarSites });
@@ -235,7 +235,7 @@ define([
             domStyle.set(this.divAddressScrollContentCommunities, "display", "none");
             this.own(on(this.domNode, "click", lang.hitch(this, function () {
                 topic.publish("toggleWidget", "siteLocator");
-                domStyle.set(this.applicationHeaderRouteContainer, "display", "block");
+                domStyle.set(this.applicationHeaderSearchContainer, "display", "block");
                 this._showHideInfoRouteContainer();
             })));
             if (this.logoContainer) {
@@ -302,12 +302,18 @@ define([
             })));
 
             this.own(on(this.chkSerachContentBuilding, "click", lang.hitch(this, function (value) {
+                var slider;
                 this.txtAddressBuilding.disabled = !this.chkSerachContentBuilding.checked;
                 this.closeBuilding.disabled = !this.chkSerachContentBuilding.checked;
                 this.esriCTimgLocateBuilding.disabled = !this.chkSerachContentBuilding.checked;
                 this.divSearchBuilding.disabled = !this.chkSerachContentBuilding.checked;
                 this.esriCTimgLocateBuilding.disabled = !this.chkSerachContentBuilding.checked;
+                slider = dijit.byId("sliderhorizontalSliderContainerBuliding");
+                slider.disabled = !this.chkSerachContentBuilding.checked;
                 if (!this.chkSerachContentBuilding.checked) {
+                    domConstruct.empty(this.divAddressResultsBuilding);
+                    domStyle.set(this.divAddressScrollContainerBuilding, "display", "none");
+                    domStyle.set(this.divAddressScrollContentBuilding, "display", "none");
                     this.lastGeometry[this.workflowCount] = null;
                     this.featureGeometry[this.workflowCount] = null;
                     this.map.graphics.clear();
@@ -328,11 +334,17 @@ define([
             })));
 
             this.own(on(this.chksearchContentSites, "click", lang.hitch(this, function (value) {
+                var slider;
                 this.txtAddressSites.disabled = !this.chksearchContentSites.checked;
                 this.closeSites.disabled = !this.chksearchContentSites.checked;
                 this.esriCTimgLocateSites.disabled = !this.chksearchContentSites.checked;
                 this.divSearchSites.disabled = !this.chksearchContentSites.checked;
+                slider = dijit.byId("sliderhorizontalSliderContainerSites");
+                slider.disabled = !this.chksearchContentSites.checked;
                 if (!this.chksearchContentSites.checked) {
+                    domConstruct.empty(this.divAddressResultsSites);
+                    domStyle.set(this.divAddressScrollContainerSites, "display", "none");
+                    domStyle.set(this.divAddressScrollContentSites, "display", "none");
                     this.lastGeometry[this.workflowCount] = null;
                     this.featureGeometry[this.workflowCount] = null;
                     this.map.graphics.clear();
@@ -370,9 +382,17 @@ define([
                 mapPoint = new Point(window.location.toString().split("$addressMapPoint=")[1].split("$")[0].split(",")[0], window.location.toString().split("$addressMapPoint=")[1].split("$")[0].split(",")[1], this.map.spatialReference);
                 clearTimeout(timeOut);
                 timeOut = setTimeout(lang.hitch(this, function () {
-                    this.isSharedExtent = true;
-                    this._locateAddressOnMap(mapPoint);
+                    if (this.workflowCount === 3) {
+                        topic.publish("geoLocation-Complete", mapPoint);
+                    } else {
+                        this.isSharedExtent = true;
+                        this._locateAddressOnMap(mapPoint);
+                    }
                 }, 500));
+            }
+            if (window.location.toString().split("$strGeoLocationMapPoint=").length > 1) {
+                mapPoint = new Point(window.location.toString().split("$strGeoLocationMapPoint=")[1].split("$")[0].split(",")[0], window.location.toString().split("$strGeoLocationMapPoint=")[1].split("$")[0].split(",")[1], this.map.spatialReference);
+                this.addPushPin(mapPoint);
             }
             if (window.location.toString().split("$standerdGeoQueryAttribute=").length > 1) {
                 standerdGeoAttribute = {};
@@ -433,11 +453,11 @@ define([
                 leftDivSites = domConstruct.create("div", { "class": "esriCTOptionRow" }, leftDivSitesContainer);
                 checkBoxAreaSites = domConstruct.create("div", { "class": "esriCTCheckBox" }, leftDivSites);
                 if (value.FieldName) {
-                    chkAreaSites = domConstruct.create("input", { "type": "checkbox", "class": "esriCTChkBox", "value": value.FieldName }, checkBoxAreaSites);
-
+                    chkAreaSites = domConstruct.create("input", { "type": "checkbox", "class": "esriCTChkBox", id: value.FieldName.toString() + index.toString(), "value": value.FieldName }, checkBoxAreaSites);
+                    domConstruct.create("label", { "class": "css-label", "for": value.FieldName.toString() + index.toString() }, checkBoxAreaSites);
                 } else {
-                    chkAreaSites = domConstruct.create("input", { "type": "checkbox", "class": "esriCTChkBox", "value": value.VariableNameSuffix }, checkBoxAreaSites);
-
+                    chkAreaSites = domConstruct.create("input", { "type": "checkbox", "class": "esriCTChkBox", id: value.VariableNameSuffix.toString() + index.toString(), "value": value.VariableNameSuffix }, checkBoxAreaSites);
+                    domConstruct.create("label", { "class": "css-label", "for": value.VariableNameSuffix.toString() + index.toString() }, checkBoxAreaSites);
                 }
                 areaText = domConstruct.create("div", { "class": "esriCTChkLabel" }, leftDivSites);
                 rightDivSites = domConstruct.create("div", { "class": "esriCTRightFromTO" }, divBusinessRevenue);
@@ -454,7 +474,7 @@ define([
                     chkAreaSites.checked = true;
                     if (value.FieldName) {
                         txtFrom.value = Number(window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split(value.FieldName + ">=")[1].split(" ")[0]);
-                        txtTo.value = Number(window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split(value.FieldName + "<=")[1].split(" ")[0]);
+                        txtTo.value = Number(window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split(value.FieldName + "<=")[1].split(" ")[0].split("$")[0]);
                     } else if (value.VariableNameSuffix) {
                         dojo.toFromBussinessFilter = window.location.href.toString().split("$toFromBussinessFilter=")[1];
                         for (i = 0; i < window.location.href.toString().split("$toFromBussinessFilter=")[1].split("$").length; i++) {
@@ -524,7 +544,8 @@ define([
                 divBusinessRevenue = domConstruct.create("div", { "class": "esriCTDivFilterOption" }, node);
                 checkBoxWithText = domConstruct.create("div", { "class": "esriCTCheckBoxWithText" }, divBusinessRevenue);
                 divCheckBox = domConstruct.create("div", { "class": "esriCTCheckBox" }, checkBoxWithText);
-                checkBox = domConstruct.create("input", { "type": "checkbox", "name": arrFields[i].FieldName, "value": arrFields[i].FieldValue }, divCheckBox);
+                checkBox = domConstruct.create("input", { "class": "esriCTChkBox", "type": "checkbox", "name": arrFields[i].FieldName.toString(), "id": arrFields[i].FieldName.toString() + index.toString(), "value": arrFields[i].FieldValue }, divCheckBox);
+                domConstruct.create("label", { "class": "css-label", "for": arrFields[i].FieldName.toString() + index.toString() }, divCheckBox);
                 if (window.location.toString().split(arrFields[i].FieldName).length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
                     checkBox.checked = true;
                 }
@@ -546,7 +567,8 @@ define([
                     divAdditionalField = domConstruct.create("div", { "class": "esriCTDivAdditionalOpt" }, additionalFieldsNode);
                     checkBoxAdditionalWithText = domConstruct.create("div", { "class": "esriCTCheckBoxWithText" }, divAdditionalField);
                     additionalFieldCheckBox = domConstruct.create("div", { "class": "esriCTCheckBox" }, checkBoxAdditionalWithText);
-                    additionalCheckBox = domConstruct.create("input", { "type": "checkbox", "name": arrAdditionalFields.FilterFieldName, "value": arrAdditionalFields.FilterOptions[j].FieldValue }, additionalFieldCheckBox);
+                    additionalCheckBox = domConstruct.create("input", { "class": "esriCTChkBox", "type": "checkbox", "name": arrAdditionalFields.FilterFieldName, "id": arrAdditionalFields.FilterOptions[j].FieldValue.toString() + index.toString(), "value": arrAdditionalFields.FilterOptions[j].FieldValue }, additionalFieldCheckBox);
+                    domConstruct.create("label", { "class": "css-label", "for": arrAdditionalFields.FilterOptions[j].FieldValue.toString() + index.toString() }, additionalFieldCheckBox);
                     if (window.location.toString().split(arrAdditionalFields.FilterOptions[j].FieldValue).length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
                         additionalCheckBox.checked = true;
                         isShowMoreOptionShared = true;
@@ -819,27 +841,27 @@ define([
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _showHideInfoRouteContainer: function () {
-            if (html.coords(this.applicationHeaderRouteContainer).h > 0) {
+            if (html.coords(this.applicationHeaderSearchContainer).h > 0) {
                 /**
                 * when user clicks on share icon in header panel, close the sharing panel if it is open
                 */
-                domClass.add(this.applicationHeaderRouteContainer, "esriCTZeroHeight");
+                domClass.add(this.applicationHeaderSearchContainer, "esriCTZeroHeight");
                 if (this.logoContainer) {
                     domClass.remove(this.logoContainer, "esriCTMapLogo");
                 }
                 domClass.replace(this.domNode, "esriCTHeaderSearch", "esriCTHeaderSearchSelected");
-                domClass.replace(this.applicationHeaderRouteContainer, "esriCTHideContainerHeight", "esriCTShowContainerHeight");
+                domClass.replace(this.applicationHeaderSearchContainer, "esriCTHideContainerHeight", "esriCTShowContainerHeight");
                 topic.publish("setMaxLegendLength");
             } else {
                 /**
                 * when user clicks on share icon in header panel, open the sharing panel if it is closed
                 */
-                domClass.remove(this.applicationHeaderRouteContainer, "esriCTZeroHeight");
+                domClass.remove(this.applicationHeaderSearchContainer, "esriCTZeroHeight");
                 if (this.logoContainer) {
                     domClass.add(this.logoContainer, "esriCTMapLogo");
                 }
                 domClass.replace(this.domNode, "esriCTHeaderSearchSelected", "esriCTHeaderSearch");
-                domClass.replace(this.applicationHeaderRouteContainer, "esriCTShowContainerHeight", "esriCTHideContainerHeight");
+                domClass.replace(this.applicationHeaderSearchContainer, "esriCTShowContainerHeight", "esriCTHideContainerHeight");
             }
         },
 
