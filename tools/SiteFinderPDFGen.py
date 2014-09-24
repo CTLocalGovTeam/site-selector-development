@@ -1,30 +1,29 @@
 """-----------------------------------------------------------------------------
-# Name:             Economic_Development_SiteSelector_GPService
-
-# Purpose:          To generate a report containing map of the site, result
-#                   of the query and attachments
-
-# Author:           Shreya Chatterjee
-
-# Input Parameters:  1.	logo - gpstring (url to logo image)(optional),
-#                    2.	report_title  - gpstring (optional),
-#                    3.	webmap_json - gpstring (optional),
-#                    4.	reportdata_json - gpstring (required),
-#                    5. attachment_list - gpstring (optional)
-#
-# Created:          17/06/2014
+Copyright 2013 Esri
+ |
+ | Licensed under the Apache License, Version 2.0 (the "License");
+ | you may not use this file except in compliance with the License.
+ | You may obtain a copy of the License at
+ |
+ |    http://www.apache.org/licenses/LICENSE-2.0
+ |
+ | Unless required by applicable law or agreed to in writing, software
+ | distributed under the License is distributed on an "AS IS" BASIS,
+ | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ | See the License for the specific language governing permissions and
+ | limitations under the License.
 #----------------------------------------------------------------------------"""
 
 # Importing required modules
 
 # pylint disable: E1101
 import os
+import base64
 import json
 import arcpy
 import urllib
 import collections
 from cStringIO import StringIO
-from PIL import Image as PILImage, ImageFile
 import datetime, time
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -40,7 +39,14 @@ from reportlab.lib.utils import ImageReader
 import reportlab.rl_config
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-
+try:
+    from PIL import Image as PILImage, ImageFile
+except:
+    try:
+        import PIL.Image as PILImage, PIL.ImageFile as ImageFile
+    except:
+        arcpy.AddError( "Could not find PIL module. \
+                            Please install it by executing pip install pillow")
 
 class NumberedCanvas(canvas.Canvas):
     """Class created for printing page numbers in X of Y format in Footer"""
@@ -329,8 +335,68 @@ try:
     try:
         LOGOIMAGE = PILImage.open(StringIO(urllib.urlopen(LOGOURL).read()))
     except:
-        LOGOBASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAJAAAACQCAYAAADnRuK4AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MDI3MUYwQzlGMTJGMTFFM0E4RTZERjA3MTlFQTA3NEMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MDI3MUYwQ0FGMTJGMTFFM0E4RTZERjA3MTlFQTA3NEMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDowMjcxRjBDN0YxMkYxMUUzQThFNkRGMDcxOUVBMDc0QyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDowMjcxRjBDOEYxMkYxMUUzQThFNkRGMDcxOUVBMDc0QyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PpwkvO8AAAfzSURBVHja7J1pjBRF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'#pylint: disable=C
-        IMGFILE = StringIO(LOGOBASE64.decode('base64'))
+        # use the default application logo encoded as a base64 string
+        LOGOBASE64 = b"""
+        iVBORw0KGgoAAAANSUhEUgAAAJAAAACQCAYAAADnRuK4AAAAGXRFWHRTb2Z0d2FyZQBBZG
+        9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBh
+        Y2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4On
+        htcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBD
+        b3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj
+        4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJk
+        Zi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG
+        1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDov
+        L25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG
+        9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0i
+        QWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC
+        5paWQ6MDI3MUYwQzlGMTJGMTFFM0E4RTZERjA3MTlFQTA3NEMiIHhtcE1NOkRvY3VtZW50
+        SUQ9InhtcC5kaWQ6MDI3MUYwQ0FGMTJGMTFFM0E4RTZERjA3MTlFQTA3NEMiPiA8eG1wTU
+        06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDowMjcxRjBDN0YxMkYx
+        MUUzQThFNkRGMDcxOUVBMDc0QyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDowMjcxRj
+        BDOEYxMkYxMUUzQThFNkRGMDcxOUVBMDc0QyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9y
+        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
+        QmCC
+        """
+
+        IMGFILE = StringIO(base64.decodestring(LOGOBASE64))
         IMGFILE.seek(0)
         LOGOIMAGE = PILImage.open(IMGFILE)
 
@@ -436,4 +502,3 @@ try:
 except Exception as exception:
     arcpy.AddError(str(exception))
     print exception
-
