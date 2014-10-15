@@ -140,8 +140,28 @@ define([
             } else {
                 fromNode.value = "";
                 toNode.value = "";
+                if (this.workflowCount === 0) {
+                    if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
+
+                        this.queryArrayBuildingAND.splice(array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")), 1);
+                        //this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
+                    }
+                } else {
+                    if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArraySitesAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
+                        this.queryArraySitesAND.splice(array.indexOf(this.queryArraySitesAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")), 1);
+                        //this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
+                    }
+                }
                 if (chkBox.checked) {
                     alert(sharedNls.errorMessages.invalidInput);
+                } else {
+                    if (this.workflowCount === 0) {
+                        this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
+
+                    } else {
+                        this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
+
+                    }
                 }
             }
         },
@@ -253,7 +273,7 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         doLayerQuery: function (tabCount, geometry, where) {
-            var queryLayer, queryLayerTask;
+            var queryLayer, queryLayerTask, geometryService;
             this.lastGeometry[this.workflowCount] = geometry;
             this.showBuffer(geometry);
             queryLayerTask = new QueryTask(this.opeartionLayer.url);
@@ -266,9 +286,33 @@ define([
                 dojo.arrWhereClause[this.workflowCount] = "1=1";
             }
             if (geometry !== null) {
-                queryLayer.geometry = geometry[0];
+                geometryService = new GeometryService(dojo.configData.GeometryService.toString());
+                geometryService.intersect(geometry, dojo.webMapExtent, lang.hitch(this, function (interSectGeometry) {
+                    if (interSectGeometry[0].rings.length > 0) {
+                        queryLayer.geometry = geometry[0];
+                        queryLayerTask.executeForIds(queryLayer, lang.hitch(this, this._queryLayerhandler), lang.hitch(this, this._queryErrorHandler));
+                    } else {
+                        topic.publish("hideProgressIndicator");
+                        if (this.workflowCount === 0) {
+                            domStyle.set(this.outerDivForPegination, "display", "none");
+                            domConstruct.empty(this.outerResultContainerBuilding);
+                            domConstruct.empty(this.attachmentOuterDiv);
+                            delete this.buildingTabData;
+                        } else {
+                            domStyle.set(this.outerDivForPeginationSites, "display", "none");
+                            domConstruct.empty(this.outerResultContainerSites);
+                            domConstruct.empty(this.attachmentOuterDivSites);
+                            delete this.sitesTabData;
+                        }
+                        alert(sharedNls.errorMessages.invalidSearch);
+
+                    }
+                }), lang.hitch(this, function (Error) {
+                    topic.publish("hideProgressIndicator");
+                }));
+            } else {
+                queryLayerTask.executeForIds(queryLayer, lang.hitch(this, this._queryLayerhandler), lang.hitch(this, this._queryErrorHandler));
             }
-            queryLayerTask.executeForIds(queryLayer, lang.hitch(this, this._queryLayerhandler), lang.hitch(this, this._queryErrorHandler));
         },
 
         /**

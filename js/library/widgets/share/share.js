@@ -24,6 +24,7 @@ define([
     "dojo/dom-attr",
     "dojo/on",
     "dojo/dom",
+    "dojo/query",
     "dojo/dom-class",
     "dojo/dom-geometry",
     "dojo/dom-style",
@@ -36,7 +37,7 @@ define([
     "dojo/i18n!application/js/library/nls/localizedStrings",
     "dojo/topic",
     "esri/request"
-], function (declare, domConstruct, lang, domAttr, on, dom, domClass, domGeom, domStyle, string, html, template, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, sharedNls, topic, esriRequest) {
+], function (declare, domConstruct, lang, domAttr, on, dom, query, domClass, domGeom, domStyle, string, html, template, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, sharedNls, topic, esriRequest) {
 
     //========================================================================================================================//
 
@@ -140,7 +141,7 @@ define([
             domAttr.set(this.divShareCodeContainer, "innerHTML", sharedNls.titles.webpageDisplayText);
             mapExtent = this._getMapExtent();
             url = esri.urlToObject(window.location.toString());
-            urlStr = encodeURI(url.path) + "?extent=" + mapExtent + "$workflowCount=" + dojo.workflowCount;
+            urlStr = encodeURI(url.path) + "?extent=" + mapExtent + "$workflowCount=" + dojo.workflowCount + "$selectedBasemapIndex=" + dojo.selectedBasemapIndex;
             if (dojo.mapPointForInfowindow) {
                 urlStr += "$mapPointForInfowindow=" + dojo.mapPointForInfowindow.toString();
             }

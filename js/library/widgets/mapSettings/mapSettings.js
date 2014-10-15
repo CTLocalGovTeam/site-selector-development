@@ -83,6 +83,7 @@ define([
             });
             mapDeferred.then(lang.hitch(this, function (response) {
                 this.map = response.map;
+                dojo.webMapExtent = new GeometryExtent(response.map.extent.xmin, response.map.extent.ymin, response.map.extent.xmax, response.map.extent.ymax, this.map.spatialReference); //response.map.extent;
                 dojo.selectedBasemapIndex = null;
                 if (response.itemInfo.itemData.baseMap.baseMapLayers) {
                     this._setBasemapLayerId(response.itemInfo.itemData.baseMap.baseMapLayers);
@@ -96,10 +97,8 @@ define([
                     this._onSetInfoWindowPosition(infoTitle, divInfoDetailsTab, screenPoint, infoPopupWidth, infoPopupHeight);
                 }));
                 this.infoWindowPanel = new InfoWindow({ infoWindowWidth: dojo.configData.InfoPopupWidth, infoWindowHeight: dojo.configData.InfoPopupHeight });
-
                 this._fetchWebMapData(response);
                 topic.publish("setMap", this.map);
-
                 topic.publish("hideProgressIndicator");
                 this._mapOnLoad();
                 dojo.isInfoPopupShared = false;
@@ -141,72 +140,41 @@ define([
         * @memberOf widgets/mapSettings/mapSettings
         */
         _fetchWebMapData: function (response) {
-            var str, webMapDetails, serviceTitle, operationalLayerId, lastIndex, infowindowCurrentSettings = [], i, j, k, lastSlashIndex, idx, popupField, layerSearchSetting, webmapSearchSettings = [], flowIndex;
-            for (flowIndex = 0; flowIndex < dojo.configData.Workflows.length; flowIndex++) {
-                if (dojo.configData.Workflows[flowIndex].SearchSettings) {
-                    webMapDetails = response.itemInfo.itemData;
-                    serviceTitle = [];
-                    for (i = 0; i < webMapDetails.operationalLayers.length; i++) {
-                        operationalLayerId = lang.trim(webMapDetails.operationalLayers[i].title);
-                        str = webMapDetails.operationalLayers[i].url.split('/');
-                        lastIndex = str[str.length - 1];
-                        if (isNaN(lastIndex) || lastIndex === "") {
-                            if (lastIndex === "") {
-                                serviceTitle[operationalLayerId] = webMapDetails.operationalLayers[i].url;
-                            } else {
-                                serviceTitle[operationalLayerId] = webMapDetails.operationalLayers[i].url + "/";
-                            }
+            var webMapDetails, infowindowCurrentSettings = [], j, idx, popupField;
+            webMapDetails = response.itemInfo.itemData;
+            this.operationalLayers = [];
+            for (j = 0; j < webMapDetails.operationalLayers.length; j++) {
+                this.operationalLayers[j] = webMapDetails.operationalLayers[j];
+                if (this.operationalLayers[j].popupInfo) {
+                    if (!infowindowCurrentSettings[j]) {
+                        infowindowCurrentSettings[j] = {};
+                    }
+                    infowindowCurrentSettings[j].InfoQueryURL = this.operationalLayers[j].url;
+                    if (this.operationalLayers[j].popupInfo.title.split("{").length > 1) {
+                        infowindowCurrentSettings[j].InfoWindowHeaderField = dojo.string.trim(this.operationalLayers[j].popupInfo.title.split("{")[0]);
+                        for (idx = 1; idx < this.operationalLayers[j].popupInfo.title.split("{").length; idx++) {
+                            infowindowCurrentSettings[j].InfoWindowHeaderField += " ${" + dojo.string.trim(this.operationalLayers[j].popupInfo.title.split("{")[idx]);
+                        }
+                    } else {
+                        if (dojo.string.trim(this.operationalLayers[j].popupInfo.title) !== "") {
+                            infowindowCurrentSettings[j].InfoWindowHeaderField = dojo.string.trim(this.operationalLayers[j].popupInfo.title);
                         } else {
-                            lastSlashIndex = array.lastIndexOf(webMapDetails.operationalLayers[i].url, "/");
-                            serviceTitle[operationalLayerId] = webMapDetails.operationalLayers[i].url.substring(0, lastSlashIndex + 1);
+                            infowindowCurrentSettings[j].InfoWindowHeaderField = dojo.configData.ShowNullValueAs;
                         }
                     }
-                    k = 0;
-                    this.operationalLayers = [];
-                    for (j = 0; j < webMapDetails.operationalLayers.length; j++) {
-                        str = webMapDetails.operationalLayers[k].url.split('/');
-                        lastIndex = str[str.length - 1];
-                        i = webmapSearchSettings.length;
-                        layerSearchSetting = this._getConfigSearchSetting(lastIndex, flowIndex);
-                        if (layerSearchSetting) {
-                            webmapSearchSettings[i] = layerSearchSetting;
-                            this.operationalLayers[i] = webMapDetails.operationalLayers[j];
-                            webmapSearchSettings[i].QueryURL = this.operationalLayers[i].url;
-                            if (this.operationalLayers[i].popupInfo) {
-                                if (!infowindowCurrentSettings[i]) {
-                                    infowindowCurrentSettings[i] = {};
-                                    infowindowCurrentSettings[i].QueryLayerId = webmapSearchSettings[i].QueryLayerId;
-                                }
-                                infowindowCurrentSettings[i].InfoQueryURL = this.operationalLayers[i].url;
-                                if (this.operationalLayers[i].popupInfo.title.split("{").length > 1) {
-                                    infowindowCurrentSettings[i].InfoWindowHeaderField = dojo.string.trim(this.operationalLayers[i].popupInfo.title.split("{")[0]);
-                                    for (idx = 1; idx < this.operationalLayers[i].popupInfo.title.split("{").length; idx++) {
-                                        infowindowCurrentSettings[i].InfoWindowHeaderField += " ${" + dojo.string.trim(this.operationalLayers[i].popupInfo.title.split("{")[idx]);
-                                    }
-                                } else {
-                                    if (dojo.string.trim(this.operationalLayers[i].popupInfo.title) !== "") {
-                                        infowindowCurrentSettings[i].InfoWindowHeaderField = dojo.string.trim(this.operationalLayers[i].popupInfo.title);
-                                    } else {
-                                        infowindowCurrentSettings[i].InfoWindowHeaderField = dojo.configData.ShowNullValueAs;
-                                    }
-                                }
-                                infowindowCurrentSettings[i].InfoWindowData = [];
-                                for (popupField in this.operationalLayers[i].popupInfo.fieldInfos) {
-                                    if (this.operationalLayers[i].popupInfo.fieldInfos.hasOwnProperty(popupField)) {
-                                        if (this.operationalLayers[i].popupInfo.fieldInfos[popupField].visible) {
-                                            infowindowCurrentSettings[i].InfoWindowData.push({
-                                                "DisplayText": this.operationalLayers[i].popupInfo.fieldInfos[popupField].label + ":",
-                                                "FieldName": "${" + this.operationalLayers[i].popupInfo.fieldInfos[popupField].fieldName + "}"
-                                            });
-                                        }
-                                    }
-                                }
+                    infowindowCurrentSettings[j].InfoWindowData = [];
+                    for (popupField in this.operationalLayers[j].popupInfo.fieldInfos) {
+                        if (this.operationalLayers[j].popupInfo.fieldInfos.hasOwnProperty(popupField)) {
+                            if (this.operationalLayers[j].popupInfo.fieldInfos[popupField].visible) {
+                                infowindowCurrentSettings[j].InfoWindowData.push({
+                                    "DisplayText": this.operationalLayers[j].popupInfo.fieldInfos[popupField].label + ":",
+                                    "FieldName": "${" + this.operationalLayers[j].popupInfo.fieldInfos[popupField].fieldName + "}"
+                                });
                             }
-                            k++;
-                        } else { k++; }
+                        }
                     }
-                    dojo.configData.Workflows[flowIndex].InfowindowSettings = infowindowCurrentSettings;
                 }
+                this.operationalLayers[j].InfowindowSettings = infowindowCurrentSettings[j];
             }
 
         },
@@ -272,7 +240,7 @@ define([
             var onMapFeaturArray, deferredListResult, featureArray, j, i, k;
             onMapFeaturArray = [];
             for (k = 0; k < webMapRresponse.itemInfo.itemData.operationalLayers.length; k++) {
-                if ((webMapRresponse.itemInfo.itemData.operationalLayers[k].layerDefinition.maxScale === 0 && webMapRresponse.itemInfo.itemData.operationalLayers[k].layerDefinition.minScale === 0) || (this.map.getScale() >= webMapRresponse.itemInfo.itemData.operationalLayers[k].layerDefinition.maxScale && this.map.getScale() <= webMapRresponse.itemInfo.itemData.operationalLayers[k].layerDefinition.minScale)) {
+                if (webMapRresponse.itemInfo.itemData.operationalLayers[k].layerObject.visibleAtMapScale && webMapRresponse.itemInfo.itemData.operationalLayers[k].popupInfo) {
                     this._executeQueryTask(k, mapPoint, webMapRresponse.itemInfo.itemData.operationalLayers[k].url, onMapFeaturArray, webMapRresponse);
 
                 }
@@ -287,7 +255,7 @@ define([
                                 for (i = 0; i < result[j][1].features.length; i++) {
                                     featureArray.push({
                                         attr: result[j][1].features[i],
-                                        layerIndex: j,
+                                        layerIndex: result[j][1].layerIndex,
                                         fields: result[j][1].fields
                                     });
                                 }
@@ -344,13 +312,14 @@ define([
                 topic.publish("hideLoadingIndicatorHandler");
             }
         },
+
         /**
         * execute query task to find infowindow data
         * @param{string} index is layer index in operational layer array
         * @memberOf widgets/mapSettings/mapSettings
         */
         _executeQueryTask: function (index, mapPoint, QueryURL, onMapFeaturArray, webMapRresponse) {
-            var esriQuery, queryTask, queryOnRouteTask, currentTime;
+            var esriQuery, queryTask, queryOnRouteTask, currentTime, layerIndex = index;
             queryTask = new QueryTask(QueryURL);
             esriQuery = new Query();
             currentTime = new Date();
@@ -362,6 +331,7 @@ define([
             esriQuery.outFields = ["*"];
             queryOnRouteTask = queryTask.execute(esriQuery, lang.hitch(this, function (results) {
                 var deferred = new Deferred();
+                results.layerIndex = layerIndex;
                 deferred.resolve(results);
                 return deferred.promise;
             }), function (err) {
@@ -484,13 +454,12 @@ define([
         },
 
         _mapOnLoad: function () {
-            var home, mapDefaultExtent, graphicsLayer, imgCustomLogo, extent, featureGrapgicLayer, CustomLogoUrl = dojo.configData.CustomLogoUrl, imgSource;
+            var home, mapDefaultExtent, graphicsLayer, imgCustomLogo, extent, featureGrapgicLayer, imgSource;
 
             /**
             * set map extent to default extent
             * @param {string} Default extent of map
             */
-
             extent = this._getQueryString('extent');
             if (extent !== "") {
                 mapDefaultExtent = extent.split(',');
@@ -505,6 +474,7 @@ define([
             home.startup();
 
             if (dojo.configData.CustomLogoUrl && lang.trim(dojo.configData.CustomLogoUrl).length !== 0) {
+
                 if (dojo.configData.CustomLogoUrl.match("http:") || dojo.configData.CustomLogoUrl.match("https:")) {
                     imgSource = dojo.configData.CustomLogoUrl;
                 } else {
@@ -515,15 +485,6 @@ define([
             }
 
             this._showBasMapGallery();
-            if (CustomLogoUrl && lang.trim(CustomLogoUrl).length !== 0) {
-                if (CustomLogoUrl.match("http:") || CustomLogoUrl.match("https:")) {
-                    imgSource = CustomLogoUrl;
-                } else {
-                    imgSource = dojoConfig.baseURL + CustomLogoUrl;
-                }
-                domConstruct.create("img", { "src": imgSource, "class": "esriCTMapLogo" }, dom.byId("esriCTParentDivContainer"));
-            }
-
             graphicsLayer = new GraphicsLayer();
             graphicsLayer.id = this.tempGraphicsLayerId;
             this.map.addLayer(graphicsLayer);
@@ -611,7 +572,7 @@ define([
         * @memberOf widgets/locator/locator
         */
         _createInfoWindowContent: function (mapPoint, featureArray, count, isInfoArrowClicked, isFeatureListClicked) {
-            var layerSettings, infoPopupFieldsCollection, infoPopupHeight, infoPopupWidth, divInfoDetailsTab, key, screenPoint,
+            var infoPopupFieldsCollection, infoPopupHeight, infoPopupWidth, divInfoDetailsTab, key, screenPoint,
                 divInfoRow, i, j, fieldNames, link, divLink, infoTitle, attributes, infoIndex;
             if (featureArray[count].attr && featureArray[count].attr.attributes) {
                 attributes = featureArray[count].attr.attributes;
@@ -644,11 +605,7 @@ define([
                 domAttr.set(query(".esriCTdivInfoTotalFeatureCount")[0], "innerHTML", "");
             }
             topic.publish("hideLoadingIndicatorHandler");
-            dojo.featureID = attributes.ObjectID;
-
-            layerSettings = dojo.configData.Workflows[infoIndex];
-            dojo.layerID = layerSettings.SearchSettings[0].QueryLayerId;
-            infoPopupFieldsCollection = layerSettings.InfowindowSettings[infoIndex].InfoWindowData;
+            infoPopupFieldsCollection = this.operationalLayers[infoIndex].InfowindowSettings.InfoWindowData;
             infoPopupHeight = dojo.configData.InfoPopupHeight;
             infoPopupWidth = dojo.configData.InfoPopupWidth;
             divInfoDetailsTab = domConstruct.create("div", { "class": "esriCTInfoDetailsTab" }, null);
@@ -687,7 +644,7 @@ define([
                 }
             }
             try {
-                infoTitle = string.substitute(layerSettings.InfowindowSettings[infoIndex].InfoWindowHeaderField, attributes);
+                infoTitle = string.substitute(this.operationalLayers[infoIndex].InfowindowSettings.InfoWindowHeaderField, attributes);
             } catch (e) {
                 infoTitle = sharedNls.showNullValue;
             }
@@ -705,6 +662,11 @@ define([
                 topic.publish("setInfoWindowOnMap", infoTitle, divInfoDetailsTab, screenPoint, infoPopupWidth, infoPopupHeight);
             }
         },
+
+        /**
+        * Centralizes the infowindow on map
+        * @memberOf widgets/locator/locator
+        */
         _centralizeInfowindowOnMap: function (infoTitle, divInfoDetailsTab, infoPopupWidth, infoPopupHeight) {
             var extentChanged, screenPoint, extent, mapDefaultExtent;
             if (!dojo.isInfoPopupShared) {
@@ -730,27 +692,16 @@ define([
         * @memberOf widgets/locator/locator
         */
         _calculateCustomMapExtent: function (mapPoint) {
-            var width, infoWidth, height, diff, ratioHeight, ratioWidth, totalYPoint, xmin,
-                ymin, xmax, ymax;
+            var width, height, ratioHeight, totalYPoint, infoWindowHeight, xmin, ymin, xmax, ymax;
+
             width = this.map.extent.getWidth();
-            infoWidth = (this.map.width / 2) + dojo.configData.InfoPopupWidth / 2 + 400;
             height = this.map.extent.getHeight();
-            if (infoWidth > this.map.width) {
-                diff = infoWidth - this.map.width;
-            } else {
-                diff = 0;
-            }
             ratioHeight = height / this.map.height;
-            ratioWidth = width / this.map.width;
             totalYPoint = dojo.configData.InfoPopupHeight + 30 + 61;
+            infoWindowHeight = height - (ratioHeight * totalYPoint);
             xmin = mapPoint.x - (width / 2);
-            if (dojo.window.getBox().w >= 680) {
-                ymin = mapPoint.y - height + (ratioHeight * totalYPoint);
-                xmax = xmin + width + diff * ratioWidth;
-            } else {
-                ymin = mapPoint.y - (height / 2);
-                xmax = xmin + width;
-            }
+            ymin = mapPoint.y - infoWindowHeight;
+            xmax = xmin + width;
             ymax = ymin + height;
             return new esri.geometry.Extent(xmin, ymin, xmax, ymax, this.map.spatialReference);
         }

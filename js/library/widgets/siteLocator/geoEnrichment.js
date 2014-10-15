@@ -146,6 +146,13 @@ define([
                 domClass.replace(this.ResultBusinessTab, "esriCTAreaOfInterestTabSelected", "esriCTAreaOfInterestTab");
                 domClass.replace(this.businessContainer, "esriCTShowContainerHeight", "esriCTHideContainerHeight");
                 domClass.replace(this.resultDemographicTab, "esriCTReportTabSelected", "esriCTReportTab");
+                if (this.businessTabScrollbar) {
+                    var esriCTShowDemoResultContainerd, esriCTShowDemoResultStylesd;
+                    esriCTShowDemoResultContainerd = document.documentElement.clientHeight - this.mainResultDiv.offsetTop - 10;
+                    esriCTShowDemoResultStylesd = { height: esriCTShowDemoResultContainerd + "px" };
+                    domAttr.set(this.mainResultDiv, "style", esriCTShowDemoResultStylesd);
+                    this.resizeScrollbar(this.businessTabScrollbar, this.mainResultDiv, query(".esriCTSortPanelHead")[0]);
+                }
             }
         },
 
@@ -173,7 +180,7 @@ define([
                 on(window, "resize", lang.hitch(this, function () {
                     if (this.workflowCount === 2) {
                         var esriCTShowDemoResultContainerd, esriCTShowDemoResultStylesd;
-                        esriCTShowDemoResultContainerd = document.documentElement.clientHeight - this.ResultDemographicTabTitle.offsetTop - 50;
+                        esriCTShowDemoResultContainerd = document.documentElement.clientHeight - this.ResultDemographicTabTitle.offsetTop - 55;
                         esriCTShowDemoResultStylesd = { height: esriCTShowDemoResultContainerd + "px" };
                         domAttr.set(this.DemoInfoMainDiv, "style", esriCTShowDemoResultStylesd);
                         this.resizeScrollbar(this.DemoInfoMainScrollbar, this.DemoInfoMainDiv, this.DemoInfoMainDivContent);
@@ -221,13 +228,14 @@ define([
                         this._setBusinessValues(this.employeFinalData, this.mainResultDiv, this.enrichData);
                     }
                 } else {
-                    arrFilter = dojo.toFromBussinessFilter.split("$");
-                    for (i = 0; i < arrFilter.length; i++) {
-                        if (arrFilter[i].toString().split(checkBox.value).length > 1) {
-                            arrFilter.splice(i, 1);
+                    if (dojo.toFromBussinessFilter) {
+                        arrFilter = dojo.toFromBussinessFilter.split("$");
+                        for (i = 0; i < arrFilter.length; i++) {
+                            if (arrFilter[i].toString().split(checkBox.value).length > 1) {
+                                arrFilter.splice(i, 1);
+                            }
                         }
                     }
-                    dojo.toFromBussinessFilter = arrFilter.join("$");
                     alert(sharedNls.errorMessages.invalidInput);
                 }
             } else if (fromNode.value !== "" && toNode.value !== "") {
@@ -334,20 +342,47 @@ define([
         },
 
         /**
-        * Perform data enrichment based on parameters
+        * Perform spatial analysis to check if geometry for enrichment is intersected by web map extent
         * @param {object} Geometry used to perform enrichment analysis
         * @param {Number} Count of tab(workflow)
         * @param {object} parameter for standerd serach
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _enrichData: function (geometry, workflowCount, standardSearchCandidate) {
+            var geometryService;
+            if (geometry) {
+                if (workflowCount === 2) {
+                    this.showBuffer(geometry);
+                }
+                geometryService = new GeometryService(dojo.configData.GeometryService.toString());
+                geometryService.intersect(geometry, dojo.webMapExtent, lang.hitch(this, function (interSectGeometry) {
+                    if (interSectGeometry[0].rings.length > 0) {
+                        this._enrichDataRequest(geometry, workflowCount, standardSearchCandidate);
+                    } else {
+                        topic.publish("hideProgressIndicator");
+                        alert(sharedNls.errorMessages.invalidSearch);
+                    }
+                }), lang.hitch(this, function (Error) {
+                    topic.publish("hideProgressIndicator");
+                    alert(sharedNls.errorMessages.invalidSearch);
+                }));
+            } else {
+                this._enrichDataRequest(geometry, workflowCount, standardSearchCandidate);
+            }
+
+        },
+
+        /**
+        * Perform data enrichment based on parameters
+        * @param {object} Geometry used to perform enrichment analysis
+        * @param {Number} Count of tab(workflow)
+        * @param {object} parameter for standerd serach
+        * @memberOf widgets/Sitelocator/Geoenrichment
+        */
+        _enrichDataRequest: function (geometry, workflowCount, standardSearchCandidate) {
             var studyAreas, enrichUrl, geoEnrichmentRequest, dataCollections, analysisVariables, i, isRetunrnGeometry = true;
             try {
                 if (geometry !== null && workflowCount !== 3) {
-                    if (workflowCount === 2) {
-                        this.showBuffer(geometry);
-                    }
-
                     studyAreas = [{ "geometry": { "rings": geometry[0].rings, "spatialReference": { "wkid": this.map.spatialReference.wkid} }, "attributes": { "id": "Polygon 1", "name": "Optional Name 1"}}];
                     this.arrStudyAreas[this.workflowCount] = studyAreas;
                 }
@@ -409,16 +444,16 @@ define([
                         this.arrStudyAreas[this.workflowCount] = studyAreas;
                         this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                         this.featureGeometry[this.workflowCount] = null;
-                    } else if (geometry.type === "polygon") {
+                    } else if (geometry[0].type === "polygon") {
                         isRetunrnGeometry = false;
-                        this.lastGeometry[this.workflowCount] = [geometry];
+                        this.lastGeometry[this.workflowCount] = geometry;
                         this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                         this.featureGeometry[this.workflowCount] = null;
-                        this.showBuffer([geometry]);
-                        studyAreas = [{ "geometry": { "rings": geometry.rings, "spatialReference": { "wkid": this.map.spatialReference.wkid} }, "attributes": { "id": "Polygon 1", "name": "Optional Name 1"}}];
+                        this.showBuffer(geometry);
+                        studyAreas = [{ "geometry": { "rings": geometry[0].rings, "spatialReference": { "wkid": this.map.spatialReference.wkid} }, "attributes": { "id": "Polygon 1", "name": "Optional Name 1"}}];
                         this.arrStudyAreas[this.workflowCount] = studyAreas;
                     } else {
-                        studyAreas = [{ "geometry": { "x": geometry.x, "y": geometry.y }, "spatialReference": { "wkid": this.map.spatialReference.wkid}}];
+                        studyAreas = [{ "geometry": { "x": geometry[0].x, "y": geometry[0].y }, "spatialReference": { "wkid": this.map.spatialReference.wkid}}];
                         this.arrStudyAreas[this.workflowCount] = studyAreas;
                     }
                     analysisVariables = this._setAnalysisVariables(dojo.configData.Workflows[workflowCount].FilterSettings.InfoPanelSettings.GeoEnrichmentContents.DisplayFields);
@@ -459,7 +494,7 @@ define([
         */
         _geoEnrichmentRequestHandler: function (data, id) {
             topic.publish("hideProgressIndicator");
-            var headerInfo, enrichGeo, attachMentNode, image, esriCTBuildingSitesResultContainer, esriCTSitesResultContainer, esriCTBuildingSitesResultStyles, esriCTDemoGraphicContHeight, esriCTDemoGraphicContStyle, geoenrichtOuterDiv, geoenrichtOuterDivContent, esriCTSitesResultStyles;
+            var headerInfo, enrichGeo, attachMentNode, image, esriCTBuildingSitesResultContainer, geometryService, esriCTSitesResultContainer, esriCTBuildingSitesResultStyles, geoenrichtOuterDiv, geoenrichtOuterDivContent, esriCTSitesResultStyles;
             if (!id && this.arrGeoenrichData[this.workflowCount]) {
                 this.arrGeoenrichData[this.workflowCount][this.arrGeoenrichData[this.workflowCount].length - 1].data = data;
             }
@@ -520,36 +555,68 @@ define([
                 this._setResultData(data);
             }
             if (this.workflowCount === 3) {
-                if (data.results[0].value.FeatureSet[0].features[0].geometry) {
-                    enrichGeo = new Polygon(data.results[0].value.FeatureSet[0].features[0].geometry);
-                    enrichGeo.spatialReference = this.map.spatialReference;
-                    this.lastGeometry[this.workflowCount] = [enrichGeo];
-                    this.showBuffer([enrichGeo]);
+                if (data.results[0].value.FeatureSet[0].features.length > 0) {
+
+                    if (data.results[0].value.FeatureSet[0].features[0].geometry) {
+                        topic.publish("showProgressIndicator");
+                        enrichGeo = new Polygon(data.results[0].value.FeatureSet[0].features[0].geometry);
+                        enrichGeo.spatialReference = this.map.spatialReference;
+                        geometryService = new GeometryService(dojo.configData.GeometryService.toString());
+                        geometryService.intersect([enrichGeo], dojo.webMapExtent, lang.hitch(this, function (interSectGeometry) {
+                            topic.publish("hideProgressIndicator");
+                            if (interSectGeometry[0].rings.length > 0) {
+                                this.lastGeometry[this.workflowCount] = [enrichGeo];
+                                this.showBuffer([enrichGeo]);
+                                this._setComunitiesEnrichData(data);
+                            } else {
+                                alert(sharedNls.errorMessages.invalidSearch);
+                            }
+                        }), lang.hitch(this, function (Error) {
+                            topic.publish("hideProgressIndicator");
+                        }));
+
+                    } else {
+                        this._setComunitiesEnrichData(data);
+                    }
+
+                } else {
+                    this.map.graphics.clear();
+                    alert(sharedNls.errorMessages.invalidSearch);
                 }
-                domConstruct.empty(this.communityMainDiv);
-                domConstruct.create("div", { "class": "esriCTCommunityTitleDiv", "innerHTML": dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.GeoEnrichmentContents.DisplayTitle }, this.communityMainDiv);
-                this._downloadDropDown(dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.DownloadSettings, this.communityMainDiv);
-                geoenrichtOuterDiv = domConstruct.create("div", { "class": "esriCTDemoInfoMainDiv" }, this.communityMainDiv);
-                geoenrichtOuterDivContent = domConstruct.create("div", { "class": "esriCTDemoInfoMainDivBuildingContent" }, geoenrichtOuterDiv);
-                this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.GeoEnrichmentContents, geoenrichtOuterDivContent);
-                if (this.comunitiesDemoInfoMainScrollbar) {
-                    this.comunitiesDemoInfoMainScrollbar.removeScrollBar();
-                }
-                esriCTDemoGraphicContHeight = document.documentElement.clientHeight - geoenrichtOuterDiv.offsetTop;
-                esriCTDemoGraphicContStyle = { height: esriCTDemoGraphicContHeight + "px" };
-                domAttr.set(geoenrichtOuterDiv, "style", esriCTDemoGraphicContStyle);
-                this.comunitiesDemoInfoMainScrollbar = new ScrollBar({ domNode: geoenrichtOuterDiv });
-                this.comunitiesDemoInfoMainScrollbar.setContent(geoenrichtOuterDivContent);
-                this.comunitiesDemoInfoMainScrollbar.createScrollBar();
-                on(window, "resize", lang.hitch(this, function () {
-                    var esriCTDemoResultContainerd, esriCTDemoResultStylesd;
-                    esriCTDemoResultContainerd = document.documentElement.clientHeight - geoenrichtOuterDiv.offsetTop;
-                    esriCTDemoResultStylesd = { height: esriCTDemoResultContainerd + "px" };
-                    domAttr.set(geoenrichtOuterDiv, "style", esriCTDemoResultStylesd);
-                    this.resizeScrollbar(this.comunitiesDemoInfoMainScrollbar, geoenrichtOuterDiv, geoenrichtOuterDivContent);
-                }));
 
             }
+        },
+
+        /**
+        * Set Geoenrichment data for communities tab
+        * @param {object} Geoenrichment result data
+        * @memberOf widgets/Sitelocator/Geoenrichment
+        */
+        _setComunitiesEnrichData: function (data) {
+            var esriCTDemoGraphicContHeight, esriCTDemoGraphicContStyle, geoenrichtOuterDiv, geoenrichtOuterDivContent;
+            domConstruct.empty(this.communityMainDiv);
+            domConstruct.create("div", { "class": "esriCTCommunityTitleDiv", "innerHTML": dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.GeoEnrichmentContents.DisplayTitle }, this.communityMainDiv);
+            this._downloadDropDown(dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.DownloadSettings, this.communityMainDiv);
+            geoenrichtOuterDiv = domConstruct.create("div", { "class": "esriCTDemoInfoMainDiv" }, this.communityMainDiv);
+            geoenrichtOuterDivContent = domConstruct.create("div", { "class": "esriCTDemoInfoMainDivBuildingContent" }, geoenrichtOuterDiv);
+            this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].FilterSettings.InfoPanelSettings.GeoEnrichmentContents, geoenrichtOuterDivContent);
+            if (this.comunitiesDemoInfoMainScrollbar) {
+                this.comunitiesDemoInfoMainScrollbar.removeScrollBar();
+            }
+            esriCTDemoGraphicContHeight = document.documentElement.clientHeight - geoenrichtOuterDiv.offsetTop;
+            esriCTDemoGraphicContStyle = { height: esriCTDemoGraphicContHeight + "px" };
+            domAttr.set(geoenrichtOuterDiv, "style", esriCTDemoGraphicContStyle);
+            this.comunitiesDemoInfoMainScrollbar = new ScrollBar({ domNode: geoenrichtOuterDiv });
+            this.comunitiesDemoInfoMainScrollbar.setContent(geoenrichtOuterDivContent);
+            this.comunitiesDemoInfoMainScrollbar.createScrollBar();
+            on(window, "resize", lang.hitch(this, function () {
+                var esriCTDemoResultContainerd, esriCTDemoResultStylesd;
+                esriCTDemoResultContainerd = document.documentElement.clientHeight - geoenrichtOuterDiv.offsetTop;
+                esriCTDemoResultStylesd = { height: esriCTDemoResultContainerd + "px" };
+                domAttr.set(geoenrichtOuterDiv, "style", esriCTDemoResultStylesd);
+                this.resizeScrollbar(this.comunitiesDemoInfoMainScrollbar, geoenrichtOuterDiv, geoenrichtOuterDivContent);
+            }));
+
         },
 
         /**
@@ -720,7 +787,6 @@ define([
             this._showBusinessTab();
             this.currentBussinessData = arrData;
             domConstruct.empty(node);
-            resultpanel = domConstruct.create("div", { "class": "esriCTSortPanelHead" }, node);
             domConstruct.empty(this.downloadDiv);
             this._downloadDropDown(dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.DownloadSettings, this.downloadDiv);
             if (arrData) {
@@ -760,7 +826,7 @@ define([
                     on(window, "resize", lang.hitch(this, function () {
                         if (node.offsetTop > 0) {
                             var esriCTBusinessResultContainerd, esriCTBusinessResultStylesd;
-                            esriCTBusinessResultContainerd = document.documentElement.clientHeight - node.offsetTop;
+                            esriCTBusinessResultContainerd = document.documentElement.clientHeight - node.offsetTop - 4;
                             esriCTBusinessResultStylesd = { height: esriCTBusinessResultContainerd + "px" };
                             domAttr.set(node, "style", esriCTBusinessResultStylesd);
                             this.resizeScrollbar(this.businessTabScrollbar, node, resultpanel);
@@ -833,6 +899,7 @@ define([
                         selectDownloadList.reset();
                     } else {
                         if (arrDwnloadDisplayFieldValue[value].GeoProcessingServiceURL) {
+                            dojo.downloadWindow = window.open('', "_blank");
                             topic.publish("showProgressIndicator");
                             webMapJsonData = this._createMapJsonData();
                             params = {
@@ -875,17 +942,7 @@ define([
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _downloadPDFFile: function (outputFile) {
-            var form, fileTypeInput;
-            form = document.createElement("form");
-            fileTypeInput = document.createElement("input");
-            fileTypeInput.value = "pdf";
-            form.appendChild(fileTypeInput);
-            fileTypeInput.name = "format";
-            form.method = "post";
-            form.action = dojo.configData.ProxyUrl + "?" + outputFile.value.url;
-            form.target = "_blank";
-            document.body.appendChild(form);
-            form.submit();
+            dojo.downloadWindow.location = outputFile.value.url;
         },
 
         /**
