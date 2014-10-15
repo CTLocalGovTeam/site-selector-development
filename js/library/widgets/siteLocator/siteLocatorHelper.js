@@ -96,11 +96,13 @@ define([
                     bufferDistance = dojo.configData.DistanceUnitSettings.MinimumValue;
                 } else {
                     bufferDistance = 0;
+                    dojo.configData.DistanceUnitSettings.MinimumValue = bufferDistance;
                 }
             }
             horizontalSlider = new HorizontalSlider({
                 intermediateChanges: true,
                 "class": "horizontalSlider",
+                minimum: dojo.configData.DistanceUnitSettings.MinimumValue,
                 value: bufferDistance,
                 id: sliderId
             }, sliderContainer);
@@ -115,10 +117,8 @@ define([
             }
             if (dojo.configData.DistanceUnitSettings.MinimumValue >= 0) {
                 horizontalRule.domNode.firstChild.innerHTML = dojo.configData.DistanceUnitSettings.MinimumValue;
-                horizontalSlider.minimum = dojo.configData.DistanceUnitSettings.MinimumValue;
             } else {
                 horizontalRule.domNode.firstChild.innerHTML = 0;
-                horizontalSlider.minimum = 0;
             }
 
             domStyle.set(horizontalRule.domNode.lastChild, "text-align", "right");
@@ -142,7 +142,6 @@ define([
                 clearTimeout(sliderTimeOut);
                 sliderTimeOut = setTimeout(function () {
                     if (_self.featureGeometry && _self.featureGeometry[_self.workflowCount]) {
-
                         _self._createBuffer(_self.featureGeometry[_self.workflowCount]);
                     }
                 }, 500);
@@ -209,7 +208,8 @@ define([
                 alert(sharedNls.errorMessages.disableTab);
             } else {
                 if (window.location.toString().split("$workflowCount=").length > 1) {
-                    this._showTab(arrEnabledTab[window.location.toString().split("$workflowCount=")[1].split("$")[0]].Container, arrEnabledTab[window.location.toString().split("$workflowCount=")[1].split("$")[0]].Content);
+
+                    this._showTab(query(".esriCTTab")[window.location.toString().split("$workflowCount=")[1].split("$")[0]], query(".esriCTConetentTab")[window.location.toString().split("$workflowCount=")[1].split("$")[0]]);
                 } else {
                     this._showTab(arrEnabledTab[0].Container, arrEnabledTab[0].Content);
                 }
@@ -223,7 +223,7 @@ define([
         * @memberOf widgets/Sitelocator/Sitelocator
         */
         _showTab: function (tabNode, contentNode) {
-            var i, srcContainer, srcContent, contentnodeDiv, esriCTDemoResultStylesd;
+            var i, srcContainer, srcContent, esriCTDemoResultStylesd;
             for (i = 0; i < this.divDirectionContainer.children.length; i++) {
                 if (contentNode === this.TabContentContainer.children[i]) {
                     domStyle.set(this.TabContentContainer.children[i], "display", "block");
@@ -244,7 +244,6 @@ define([
                     } else if (this.lastGeometry[this.workflowCount]) {
                         this.map.setExtent(this.lastGeometry[this.workflowCount][0].getExtent(), true);
                     }
-
                     if (this.featureGeometry[this.workflowCount]) {
                         this.addPushPin(this.featureGeometry[this.workflowCount]);
                     }
@@ -264,6 +263,23 @@ define([
                     }
                 }
             }
+
+            this._resizeBuildingAndSites();
+            if (this.workflowCount === 3 && this.comunitiesDemoInfoMainScrollbar) {
+                srcContainer = query('.esriCTDemoInfoMainDiv', this.communityMainDiv)[0];
+                srcContent = query('.esriCTDemoInfoMainDivBuildingContent')[query('.esriCTDemoInfoMainDivBuildingContent').length - 1];
+                esriCTDemoResultStylesd = { height: document.documentElement.clientHeight - srcContainer.offsetTop + "px" };
+                domAttr.set(srcContainer, "style", esriCTDemoResultStylesd);
+                this.resizeScrollbar(this.comunitiesDemoInfoMainScrollbar, srcContainer, srcContent);
+            }
+        },
+
+        /**
+        * Building and sites resize handler
+        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        */
+        _resizeBuildingAndSites: function () {
+            var contentnodeDiv, srcContainer, srcContent;
             if (this.buildingTabData) {
                 if (this.workflowCount === 0) {
                     srcContainer = query('.esriCTDemoInfoMainDiv', this.mainDivBuilding)[0];
@@ -286,16 +302,7 @@ define([
                     this._resizeSitesContainer(this.outerResultContainerSites, contentnodeDiv);
                 }
             }
-
-            if (this.workflowCount === 3 && this.comunitiesDemoInfoMainScrollbar) {
-                srcContainer = query('.esriCTDemoInfoMainDiv', this.communityMainDiv)[0];
-                srcContent = query('.esriCTDemoInfoMainDivBuildingContent')[query('.esriCTDemoInfoMainDivBuildingContent').length - 1];
-                esriCTDemoResultStylesd = { height: document.documentElement.clientHeight - srcContainer.offsetTop + "px" };
-                domAttr.set(srcContainer, "style", esriCTDemoResultStylesd);
-                this.resizeScrollbar(this.comunitiesDemoInfoMainScrollbar, srcContainer, srcContent);
-            }
         },
-
         /**
         * Add pushpin on mappoint
         * @param {object} mappoint for pushpin
@@ -487,6 +494,7 @@ define([
                 }
             }
         },
+
         /**
         * Creates list of objects to be displayed in pagination
         * @param {array} list of data for a batch
@@ -686,7 +694,7 @@ define([
             resultSelectQuery = new esri.tasks.Query();
             resultSelectQuery.returnGeometry = true;
             resultSelectQuery.outSpatialReference = this.map.spatialReference;
-            resultSelectQuery.objectIds = [dataSelected.featureData.ObjectID];
+            resultSelectQuery.objectIds = [dataSelected.featureData[this.opeartionLayer.objectIdField]];
             for (i = 0; i < dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields.length; i++) {
                 outfields.push(dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields[i].FieldName);
             }
@@ -702,7 +710,7 @@ define([
                     }
                     this.isSharedExtent = false;
                 } else {
-                    symbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, dojo.configData.LocatorRippleSize, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([parseInt(dojo.configData.RippleColor.split(",")[0], 10), parseInt(dojo.configData.RippleColor.split(",")[1], 10), parseInt(dojo.configData.RippleColor.split(",")[2], 10), 0.65]), 4), new dojo.Color([0, 0, 0, 0]));
+                    symbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, dojo.configData.LocatorRippleSize, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([parseInt(dojo.configData.RippleColor.split(",")[0], 10), parseInt(dojo.configData.RippleColor.split(",")[1], 10), parseInt(dojo.configData.RippleColor.split(",")[2], 10), 0.65]), 4), new dojo.Color([0, 0, 0, 0.2]));
                     graphic = new Graphic(featureSet.features[0].geometry, symbol, {}, null);
                     graphic.attributes.layerURL = this.opeartionLayer.url;
                     if (!this.isSharedExtent) {
@@ -737,19 +745,19 @@ define([
                 this.arrReportDataJson[this.workflowCount].attachmentData = arrAttachmentURL;
                 if (this.arrGeoenrichData[this.workflowCount] !== null) {
                     for (enrichIndex = 0; enrichIndex < this.arrGeoenrichData[this.workflowCount].length; enrichIndex++) {
-                        if (this.arrGeoenrichData[this.workflowCount][enrichIndex].ID === dataSelected.featureData.ObjectID) {
+                        if (this.arrGeoenrichData[this.workflowCount][enrichIndex].ID === dataSelected.featureData[this.opeartionLayer.objectIdField]) {
                             this._geoEnrichmentRequestHandler(this.arrGeoenrichData[this.workflowCount][enrichIndex].data, this.arrGeoenrichData[this.workflowCount][enrichIndex].ID);
                             isGeoenriched = true;
                             break;
                         }
                     }
                     if (!isGeoenriched) {
-                        this.arrGeoenrichData[this.workflowCount].push({ ID: dataSelected.featureData.ObjectID });
+                        this.arrGeoenrichData[this.workflowCount].push({ ID: dataSelected.featureData[this.opeartionLayer.objectIdField] });
                     }
 
                 } else {
                     this.arrGeoenrichData[this.workflowCount] = [];
-                    this.arrGeoenrichData[this.workflowCount].push({ ID: dataSelected.featureData.ObjectID });
+                    this.arrGeoenrichData[this.workflowCount].push({ ID: dataSelected.featureData[[this.opeartionLayer.objectIdField]] });
                 }
 
                 if (!isGeoenriched) {
@@ -778,6 +786,8 @@ define([
 
         /**
         * Back button handler building tab
+        * @param {object} Attachment div node
+        * @param {object} Parent div node for attachment
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _getBackToTab: function (attachmentNode, mainDivNode) {
@@ -810,6 +820,100 @@ define([
                 }
                 this._createDisplayList(this.sitesTabData, this.outerResultContainerSites);
             }
+        },
+
+        /**
+        * Enables and disables search for communities tab
+        * @param {object} Search checkbox
+        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        */
+        _communitiesSearchRadioButtonHandler: function (rdoCommunitiesAddressSearch) {
+            domClass.remove(this.divSearchCommunities, "esriCTDisabledAddressColorChange");
+            domClass.remove(this.txtAddressCommunities, "esriCTDisabledAddressColorChange");
+            domClass.remove(this.closeCommunities, "esriCTDisabledAddressColorChange");
+            domClass.remove(this.clearhideCommunities, "esriCTDisabledAddressColorChange");
+            this.txtAddressCommunities.disabled = !rdoCommunitiesAddressSearch.checked;
+            this.closeCommunities.disabled = !rdoCommunitiesAddressSearch.checked;
+            this.esriCTimgLocateCommunities.disabled = !rdoCommunitiesAddressSearch.checked;
+            this.divSearchCommunities.disabled = !rdoCommunitiesAddressSearch.checked;
+            if (this.comAreaList) {
+                this.comAreaList.disabled = rdoCommunitiesAddressSearch.checked;
+                this.comAreaList.reset();
+            }
+            dojo.communitySelectionFeature = null;
+
+        },
+
+        /**
+        * Enables and disables search for building tab
+        * @param {object} Search checkbox
+        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        */
+        _buildingSearchButtonHandler: function (chkSerachContentBuilding) {
+            var slider;
+            this.txtAddressBuilding.disabled = !chkSerachContentBuilding.checked;
+            this.closeBuilding.disabled = !chkSerachContentBuilding.checked;
+            this.esriCTimgLocateBuilding.disabled = !chkSerachContentBuilding.checked;
+            this.divSearchBuilding.disabled = !chkSerachContentBuilding.checked;
+            this.esriCTimgLocateBuilding.disabled = !chkSerachContentBuilding.checked;
+            slider = dijit.byId("sliderhorizontalSliderContainerBuliding");
+            slider.disabled = !chkSerachContentBuilding.checked;
+            if (!chkSerachContentBuilding.checked) {
+                domConstruct.empty(this.divAddressResultsBuilding);
+                domStyle.set(this.divAddressScrollContainerBuilding, "display", "none");
+                domStyle.set(this.divAddressScrollContentBuilding, "display", "none");
+                this.lastGeometry[this.workflowCount] = null;
+                this.featureGeometry[this.workflowCount] = null;
+                this.map.graphics.clear();
+                this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                dojo.arrAddressMapPoint[this.workflowCount] = null;
+                this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
+                domClass.add(this.divSearchBuilding, "esriCTDisabledAddressColorChange");
+                domClass.add(this.txtAddressBuilding, "esriCTDisabledAddressColorChange");
+                domClass.add(this.closeBuilding, "esriCTDisabledAddressColorChange");
+                domClass.add(this.clearhideBuilding, "esriCTDisabledAddressColorChange");
+            } else {
+                domClass.remove(this.divSearchBuilding, "esriCTDisabledAddressColorChange");
+                domClass.remove(this.txtAddressBuilding, "esriCTDisabledAddressColorChange");
+                domClass.remove(this.closeBuilding, "esriCTDisabledAddressColorChange");
+                domClass.remove(this.clearhideBuilding, "esriCTDisabledAddressColorChange");
+            }
+        },
+
+        /**
+        * Enables and disables search for sites tab
+        * @param {object} Search checkbox
+        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        */
+        _sitesSearchButtonHandler: function (chksearchContentSites) {
+            var slider;
+            this.txtAddressSites.disabled = !chksearchContentSites.checked;
+            this.closeSites.disabled = !chksearchContentSites.checked;
+            this.esriCTimgLocateSites.disabled = !chksearchContentSites.checked;
+            this.divSearchSites.disabled = !chksearchContentSites.checked;
+            slider = dijit.byId("sliderhorizontalSliderContainerSites");
+            slider.disabled = !chksearchContentSites.checked;
+            if (!chksearchContentSites.checked) {
+                domConstruct.empty(this.divAddressResultsSites);
+                domStyle.set(this.divAddressScrollContainerSites, "display", "none");
+                domStyle.set(this.divAddressScrollContentSites, "display", "none");
+                this.lastGeometry[this.workflowCount] = null;
+                this.featureGeometry[this.workflowCount] = null;
+                this.map.graphics.clear();
+                this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                dojo.arrAddressMapPoint[this.workflowCount] = null;
+                this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
+                domClass.add(this.divSearchSites, "esriCTDisabledAddressColorChange");
+                domClass.add(this.txtAddressSites, "esriCTDisabledAddressColorChange");
+                domClass.add(this.closeSites, "esriCTDisabledAddressColorChange");
+                domClass.add(this.clearhideSites, "esriCTDisabledAddressColorChange");
+            } else {
+                domClass.remove(this.divSearchSites, "esriCTDisabledAddressColorChange");
+                domClass.remove(this.txtAddressSites, "esriCTDisabledAddressColorChange");
+                domClass.remove(this.closeSites, "esriCTDisabledAddressColorChange");
+                domClass.remove(this.clearhideSites, "esriCTDisabledAddressColorChange");
+            }
+
         },
 
         /**

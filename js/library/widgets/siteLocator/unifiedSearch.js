@@ -113,9 +113,16 @@ define([
             topic.subscribe("geoLocation-Complete", lang.hitch(this, function (mapPoint) {
                 if (this.workflowCount === obj.addressWorkflowCount) {
                     if (this.workflowCount === 0) {
+                        this.chkSerachContentBuilding.checked = true;
+                        this._buildingSearchButtonHandler(this.chkSerachContentBuilding);
                         this._getBackToTab(query(".esriCTAttachmentOuterDiv")[this.workflowCount], query(".esriCTMainDivBuilding")[0]);
                     } else if (this.workflowCount === 1) {
+                        this.chksearchContentSites.checked = true;
+                        this._sitesSearchButtonHandler(this.chksearchContentSites);
                         this._getBackToTab(query(".esriCTAttachmentOuterDiv")[this.workflowCount], query(".esriCTMainDivSites")[0]);
+                    } else if (this.workflowCount === 3) {
+                        this.rdoCommunitiesAddressSearch.checked = true;
+                        this._communitiesSearchRadioButtonHandler(this.rdoCommunitiesAddressSearch);
                     }
                     if (html.coords(this.applicationHeaderSearchContainer).h > 0) {
                         dojo.arrAddressMapPoint[this.workflowCount] = mapPoint.x + "," + mapPoint.y;
@@ -143,11 +150,14 @@ define([
                 if (evt.address.address) {
                     domAttr.set(obj.txtAddress, "defaultAddress", evt.address.address.Address);
                     domAttr.set(obj.txtAddress, "value", evt.address.address.Address);
+                    domConstruct.empty(obj.divAddressResults, obj.divAddressScrollContent);
+                    domStyle.set(obj.divAddressScrollContainer, "display", "none");
+                    domStyle.set(obj.divAddressScrollContent, "display", "none");
                     this.featureGeometry[this.workflowCount] = mapPoint;
                     this.addPushPin(this.featureGeometry[this.workflowCount]);
                     if (this.workflowCount === 3) {
                         topic.publish("showProgressIndicator");
-                        this._enrichData(mapPoint, this.workflowCount, null);
+                        this._enrichData([mapPoint], this.workflowCount, null);
                     } else {
                         this._createBuffer(mapPoint);
                     }
@@ -711,6 +721,7 @@ define([
                     domClass.add(obj.locatorScrollbar._scrollBarContent, "esriCTZeroHeight");
                     obj.locatorScrollbar.removeScrollBar();
                 }
+                this._resizeBuildingAndSites();
             }
         },
 

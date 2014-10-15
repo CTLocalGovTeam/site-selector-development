@@ -287,80 +287,16 @@ define([
             })));
 
             this.own(on(this.rdoCommunitiesAddressSearch, "click", lang.hitch(this, function (value) {
-                domClass.remove(this.divSearchCommunities, "esriCTDisabledAddressColorChange");
-                domClass.remove(this.txtAddressCommunities, "esriCTDisabledAddressColorChange");
-                domClass.remove(this.closeCommunities, "esriCTDisabledAddressColorChange");
-                domClass.remove(this.clearhideCommunities, "esriCTDisabledAddressColorChange");
-                this.comAreaList.disabled = !this.rdoCommunitiesAddressSearch.checked;
-                this.txtAddressCommunities.disabled = !this.rdoCommunitiesAddressSearch.checked;
-                this.closeCommunities.disabled = !this.rdoCommunitiesAddressSearch.checked;
-                this.esriCTimgLocateCommunities.disabled = !this.rdoCommunitiesAddressSearch.checked;
-                this.divSearchCommunities.disabled = !this.rdoCommunitiesAddressSearch.checked;
-                this.comAreaList.disabled = this.rdoCommunitiesAddressSearch.checked;
-                dojo.communitySelectionFeature = null;
-                this.comAreaList.reset();
+                this._communitiesSearchRadioButtonHandler(this.rdoCommunitiesAddressSearch);
             })));
 
             this.own(on(this.chkSerachContentBuilding, "click", lang.hitch(this, function (value) {
-                var slider;
-                this.txtAddressBuilding.disabled = !this.chkSerachContentBuilding.checked;
-                this.closeBuilding.disabled = !this.chkSerachContentBuilding.checked;
-                this.esriCTimgLocateBuilding.disabled = !this.chkSerachContentBuilding.checked;
-                this.divSearchBuilding.disabled = !this.chkSerachContentBuilding.checked;
-                this.esriCTimgLocateBuilding.disabled = !this.chkSerachContentBuilding.checked;
-                slider = dijit.byId("sliderhorizontalSliderContainerBuliding");
-                slider.disabled = !this.chkSerachContentBuilding.checked;
-                if (!this.chkSerachContentBuilding.checked) {
-                    domConstruct.empty(this.divAddressResultsBuilding);
-                    domStyle.set(this.divAddressScrollContainerBuilding, "display", "none");
-                    domStyle.set(this.divAddressScrollContentBuilding, "display", "none");
-                    this.lastGeometry[this.workflowCount] = null;
-                    this.featureGeometry[this.workflowCount] = null;
-                    this.map.graphics.clear();
-                    this.map.getLayer("esriGraphicsLayerMapSettings").clear();
-                    dojo.arrAddressMapPoint[this.workflowCount] = null;
-                    this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
-                    domClass.add(this.divSearchBuilding, "esriCTDisabledAddressColorChange");
-                    domClass.add(this.txtAddressBuilding, "esriCTDisabledAddressColorChange");
-                    domClass.add(this.closeBuilding, "esriCTDisabledAddressColorChange");
-                    domClass.add(this.clearhideBuilding, "esriCTDisabledAddressColorChange");
-                } else {
-                    domClass.remove(this.divSearchBuilding, "esriCTDisabledAddressColorChange");
-                    domClass.remove(this.txtAddressBuilding, "esriCTDisabledAddressColorChange");
-                    domClass.remove(this.closeBuilding, "esriCTDisabledAddressColorChange");
-                    domClass.remove(this.clearhideBuilding, "esriCTDisabledAddressColorChange");
-                }
+                this._buildingSearchButtonHandler(this.chkSerachContentBuilding);
 
             })));
 
             this.own(on(this.chksearchContentSites, "click", lang.hitch(this, function (value) {
-                var slider;
-                this.txtAddressSites.disabled = !this.chksearchContentSites.checked;
-                this.closeSites.disabled = !this.chksearchContentSites.checked;
-                this.esriCTimgLocateSites.disabled = !this.chksearchContentSites.checked;
-                this.divSearchSites.disabled = !this.chksearchContentSites.checked;
-                slider = dijit.byId("sliderhorizontalSliderContainerSites");
-                slider.disabled = !this.chksearchContentSites.checked;
-                if (!this.chksearchContentSites.checked) {
-                    domConstruct.empty(this.divAddressResultsSites);
-                    domStyle.set(this.divAddressScrollContainerSites, "display", "none");
-                    domStyle.set(this.divAddressScrollContentSites, "display", "none");
-                    this.lastGeometry[this.workflowCount] = null;
-                    this.featureGeometry[this.workflowCount] = null;
-                    this.map.graphics.clear();
-                    this.map.getLayer("esriGraphicsLayerMapSettings").clear();
-                    dojo.arrAddressMapPoint[this.workflowCount] = null;
-                    this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
-                    domClass.add(this.divSearchSites, "esriCTDisabledAddressColorChange");
-                    domClass.add(this.txtAddressSites, "esriCTDisabledAddressColorChange");
-                    domClass.add(this.closeSites, "esriCTDisabledAddressColorChange");
-                    domClass.add(this.clearhideSites, "esriCTDisabledAddressColorChange");
-                } else {
-                    domClass.remove(this.divSearchSites, "esriCTDisabledAddressColorChange");
-                    domClass.remove(this.txtAddressSites, "esriCTDisabledAddressColorChange");
-                    domClass.remove(this.closeSites, "esriCTDisabledAddressColorChange");
-                    domClass.remove(this.clearhideSites, "esriCTDisabledAddressColorChange");
-                }
+                this._sitesSearchButtonHandler(this.chksearchContentSites);
 
             })));
             // Dynamic UI for  tab//
@@ -503,6 +439,9 @@ define([
                         } else {
                             this._fromToQuery(txtFrom, txtTo, chkAreaSites);
                         }
+                        txtFrom.value = "";
+                        txtTo.value = "";
+
                     } else {
                         domClass.remove(txtFrom, "esriCTDisabledAddressColorChange");
                         domClass.remove(txtTo, "esriCTDisabledAddressColorChange");
@@ -569,7 +508,7 @@ define([
                     additionalFieldCheckBox = domConstruct.create("div", { "class": "esriCTCheckBox" }, checkBoxAdditionalWithText);
                     additionalCheckBox = domConstruct.create("input", { "class": "esriCTChkBox", "type": "checkbox", "name": arrAdditionalFields.FilterFieldName, "id": arrAdditionalFields.FilterOptions[j].FieldValue.toString() + index.toString(), "value": arrAdditionalFields.FilterOptions[j].FieldValue }, additionalFieldCheckBox);
                     domConstruct.create("label", { "class": "css-label", "for": arrAdditionalFields.FilterOptions[j].FieldValue.toString() + index.toString() }, additionalFieldCheckBox);
-                    if (window.location.toString().split(arrAdditionalFields.FilterOptions[j].FieldValue).length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
+                    if (window.location.toString().replace(/%20/g, " ").replace(/%27/g, "'").split("UPPER('%" + arrAdditionalFields.FilterOptions[j].FieldValue + "%')").length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
                         additionalCheckBox.checked = true;
                         isShowMoreOptionShared = true;
                     }
@@ -598,7 +537,7 @@ define([
                 arrPolygon.push(featureSet.features[i].geometry);
             }
             geometryService.union(arrPolygon, lang.hitch(this, function (geometry) {
-                this._enrichData(geometry, 3, null);
+                this._enrichData([geometry], 3, null);
             }), lang.hitch(this, function (Error) {
                 topic.publish("hideProgressIndicator");
             }));
@@ -747,7 +686,6 @@ define([
                         if (this.workflowCount === 2) {
                             this._enrichData(geometries, this.workflowCount, null);
                         } else {
-
                             if (this.workflowCount === 0) {
                                 this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
                             } else {
@@ -826,13 +764,6 @@ define([
         _setDefaultTextboxValue: function (txtAddressParam) {
             var locatorSettings;
             locatorSettings = dojo.configData.LocatorSettings;
-
-            /**
-            * txtAddress Textbox for search text
-            * @member {textbox} txtAddress
-            * @private
-            * @memberOf widgets/Sitelocator/Sitelocator
-            */
             domAttr.set(txtAddressParam, "defaultAddress", locatorSettings.LocatorDefaultAddress);
         },
 

@@ -1,4 +1,4 @@
-/*global define */
+﻿/*global define */
 /** @license
 | Version 10.2
 | Copyright 2013 Esri
@@ -26,6 +26,60 @@ html, body
     font-family: Verdana !important;
     visibility: visible !important;
     color: #808080;
+}
+
+::-webkit-scrollbar-track
+{
+    background-color: #EFEFEF;
+}
+::-webkit-scrollbar
+{
+    width: 12px;
+    background-color: #8d8d8e;
+}
+::-webkit-scrollbar-button
+{
+    background: #8d8d8e;
+}
+::-webkit-scrollbar-thumb
+{
+    background-color: #8d8d8e;
+}
+::-webkit-scrollbar-button:horizontal:decrement
+{
+    width: 14px; /*left scroll button width*/
+    height: 14px;
+    background-image: url(../images/scrollarrowHr.png);
+    background-color: #8d8d8e;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+::-webkit-scrollbar-button:horizontal:increment
+{
+    width: 14px; /* 40 right scroll button width, #ff5900 */
+    height: 14px;
+    background-image: url(../images/scrollarrowHl.png);
+    background-color: #8d8d8e;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+::-webkit-scrollbar-button:vertical:decrement
+{
+    height: 14px; /*up scroll button height*/
+    background-image: url(../images/scrollarrowVt.png);
+    background-repeat: no-repeat;
+    background-color: #8d8d8e;
+}
+
+::-webkit-scrollbar-button:vertical:increment
+{
+    height: 14px; /*down scroll button height*/
+    background-image: url(../images/scrollarrowVb.png);
+    background-repeat: no-repeat;
+    background-color: #8d8d8e;
 }
 
 .esriCTFullHeight
@@ -224,9 +278,9 @@ input[type="text"]
 .esriCTAddressScrollContainer
 {
     overflow: hidden;
-    width: 336px;
+    width: 342px;
     float: left;
-    margin-left: 38px;
+    margin-left: 15px;
     margin-top: 5px;
 }
 
@@ -346,7 +400,7 @@ input[type="text"]
 .esriCTDivAppContainer
 {
     position: absolute;
-    z-index: 996;
+    z-index: 999;
     top: 48px;
     right: 0px;
     width: 287px;
@@ -712,7 +766,7 @@ input[type="text"]
 .esriGovtSplashContent
 {
     overflow: hidden;
-    width: 90% !important;
+    width: 92% !important;
     margin-top: 10px;
     padding-left: 15px;
     position: relative;
@@ -784,15 +838,6 @@ input[type="text"]
 
 /* CSS for Scroll Bar */
 
-.scrollbar_track
-{
-    position: absolute;
-    background-color: transparent;
-    right: -2px;
-    top: 0px;
-    cursor: pointer;
-}
-
 .scroll_container
 {
     overflow: hidden;
@@ -802,29 +847,24 @@ input[type="text"]
 
 .scrollbar_content
 {
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling: touch;
     border: none;
 }
 
 .scrollbar_content_splashScreen
 {
-    overflow: hidden;
+    overflow-y: auto;
     border: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 .splashScreenscrollBarheight
 {
-    height: 226px !important;
+    height: 222px !important;
 }
 
-.scrollbar_handle
-{
-    position: relative;
-    width: 10px;
-    background-color: #C0C0C0;
-    cursor: default;
-    opacity: 0.89999997615814208984375;
-}
 
 .esriScrollBarPosition
 {
@@ -1096,7 +1136,6 @@ input[type="text"]
     float: left;
     padding: 0 0 0px 18px;
     width: 100%;
-    margin-bottom: 15px;
 }
 
 .esriCTClearBusiness
@@ -1145,6 +1184,7 @@ input[type="text"]
 .esriCTSliderText
 {
     float: left;
+    margin-bottom:10px;
 }
 
 .esriCTSearchContainerComm
@@ -1360,7 +1400,7 @@ input[type="text"]
 
 .esriCTinfoWindow
 {
-    z-index: 1001 !important;
+    z-index: 999 !important;
     background: #FFF;
     height: 300px;
     width: 350px;
@@ -1526,7 +1566,7 @@ input
 .esriControlsBR
 {
     bottom: 5px !important;
-    z-index: 1001;
+    z-index: 999 !important;
 }
 
 /* Horizontal Slider Styles*/
@@ -1549,7 +1589,7 @@ input
 
 .dijitRuleContainer
 {
-    margin-top: -10px;
+    margin-top: 10px;
 }
 
 .dijitRuleLabelsContainer
@@ -1647,7 +1687,7 @@ input
 
 .esriCTSlider
 {
-    height: 30px;
+    height: 25px;
     clear: both;
 }
 
@@ -1805,9 +1845,6 @@ input
 {
     float: left;
     width: 90%;
-    height: 160px;
-    overflow: hidden;
-    position: relative;
     right: 2px;
 }
 
@@ -1924,7 +1961,7 @@ input
 
 .esriCTDemoInfoMainDivBuildingContent
 {
-    width: 386px !important;
+    width: 375px !important;
     margin-left: -17px;
 }
 #By_dropdown
@@ -2241,6 +2278,7 @@ div.esriCTPrev
 {
     display: table-cell;
     vertical-align: middle;
+    padding-left: 3px;
 }
 
 .esriCTAddressSize
@@ -2253,11 +2291,6 @@ div.esriCTPrev
 {
     float: left;
     width: 100%;
-}
-
-.esriControlsBR
-{
-    z-index: 1000 !important;
 }
 
 .esriCTDistanceUnit
@@ -2298,6 +2331,7 @@ div.esriCTPrev
 {
     display: table-cell;
     vertical-align: middle;
+    padding-left:3px;
 }
 
 .esriCTSortingDiv
@@ -2463,7 +2497,7 @@ input[type="radio"]
 {
     width: 48%;
     float: right;
-    margin-bottom: 10px;
+    padding-top: 5px;
 }
 
 .esriCTChkBox

@@ -29,7 +29,6 @@ define([], function () {
         // 4.  Set URL for help page                         - [ Tag(s) to look for: HelpURL ]
         // 5.  Specify header widget settings                - [ Tag(s) to look for: AppHeaderWidgets ]
         // 6.  Specify URLs for base maps                    - [ Tag(s) to look for: BaseMapLayers ]
-        // 7.  Set initial map extent                        - [ Tag(s) to look for: DefaultExtent ]
         // 8.  Specify URLs for operational layers           - [ Tag(s) to look for: OperationalLayers]
         // 9.  Customize zoom level for address search       - [ Tag(s) to look for: ZoomLevel ]
         // 10.  Customize address search settings            - [ Tag(s) to look for: LocatorSettings]
@@ -66,7 +65,6 @@ define([], function () {
         // Header Widget Settings
         //------------------------------------------------------------------------------------------------------------------------
         // Set widgets settings such as widget title, widgetPath, mapInstanceRequired to be displayed in header panel
-        // Title: Name of the widget, will displayed as title of widget in header panel
         // WidgetPath: path of the widget respective to the widgets package.
         // MapInstanceRequired: true if widget is dependent on the map instance.
 
@@ -280,7 +278,7 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Dominant Tapestry Segment",
-                                FieldName: "Policy.TAPSEGNAM"
+                                FieldName: "TapestryHouseholds.DOMTAP"
                             }, {
                                 DisplayText: "Labor Force Participation Rate",
                                 FieldName: "Industry.CIVLBFR_CY"
@@ -452,7 +450,7 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Dominant Tapestry Segment",
-                                FieldName: "Policy.TAPSEGNAM"
+                                FieldName: "TapestryHouseholds.DOMTAP"
                             }, {
                                 DisplayText: "Labor Force Participation Rate",
                                 FieldName: "Industry.CIVLBFR_CY"
@@ -552,7 +550,7 @@ define([], function () {
                             DisplayFields: [
                                 {
                                     DisplayText: "Dominant Tapestry Segment",
-                                    FieldName: "Policy.TAPSEGNAM"
+                                    FieldName: "TapestryHouseholds.DOMTAP"
                                 }, {
                                     DisplayText: "Labor Force Participation Rate",
                                     FieldName: "Industry.CIVLBFR_CY"
@@ -634,7 +632,7 @@ define([], function () {
                             DisplayFields: [
                                 {
                                     DisplayText: "Dominant Tapestry Segment",
-                                    FieldName: "Policy.TAPSEGNAM"
+                                    FieldName: "TapestryHouseholds.DOMTAP"
                                 }, {
                                     DisplayText: "Labor Force Participation Rate",
                                     FieldName: "Industry.CIVLBFR_CY"
@@ -726,7 +724,7 @@ define([], function () {
 
         // Set URL for TinyURL service, and URLs for social media
         MapSharingOptions: {
-            TinyURLServiceURL: "http://api.bit.ly/v3/shorten?login=esri&apiKey=R_65fd9891cd882e2a96b99d4bda1be00e&uri=${0}&format=json",
+            TinyURLServiceURL: "https://api-ssl.bitly.com/v3/shorten?longUrl=${0}",
             TinyURLResponseAttribute: "data.url",
             FacebookShareURL: "http://www.facebook.com/sharer.php?u=${0}&t=Site%20Selector",
             TwitterShareURL: "http://mobile.twitter.com/compose/tweet?status=Site%20Selector ${0}",
