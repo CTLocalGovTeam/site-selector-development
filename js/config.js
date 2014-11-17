@@ -29,11 +29,11 @@ define([], function () {
         // 4.  Set URL for help page                         - [ Tag(s) to look for: HelpURL ]
         // 5.  Specify header widget settings                - [ Tag(s) to look for: AppHeaderWidgets ]
         // 6.  Specify URLs for base maps                    - [ Tag(s) to look for: BaseMapLayers ]
-        // 8.  Specify URLs for operational layers           - [ Tag(s) to look for: OperationalLayers]
-        // 9.  Customize zoom level for address search       - [ Tag(s) to look for: ZoomLevel ]
-        // 10.  Customize address search settings            - [ Tag(s) to look for: LocatorSettings]
-        // 11.  Set URL for geometry service                 - [ Tag(s) to look for: GeometryService ]
-        // 12. Specify URLs for map sharing                  - [ Tag(s) to look for: MapSharingOptions,TinyURLServiceURL, TinyURLResponseAttribute, FacebookShareURL, TwitterShareURL, ShareByMailLink ]
+        // 7.  Specify URLs for operational layers           - [ Tag(s) to look for: OperationalLayers]
+        // 8.  Customize zoom level for address search       - [ Tag(s) to look for: ZoomLevel ]
+        // 9.  Customize address search settings            - [ Tag(s) to look for: LocatorSettings]
+        // 10.  Set URL for geometry service                 - [ Tag(s) to look for: GeometryService ]
+        // 11. Specify URLs for map sharing                  - [ Tag(s) to look for: MapSharingOptions,TinyURLServiceURL, TinyURLResponseAttribute, FacebookShareURL, TwitterShareURL, ShareByMailLink ]
 
         // ------------------------------------------------------------------------------------------------------------------------
         // GENERAL SETTINGS
@@ -133,7 +133,7 @@ define([], function () {
             LineSymbolColor: "255,0,0",
             LineSymbolTransparency: "0.30"
         },
-
+        DatePattern: "MMMM dd, yyyy",
         RippleColor: "0,255,255",
         LocatorRippleSize: 40,
 
@@ -278,7 +278,7 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Dominant Tapestry Segment",
-                                FieldName: "TapestryHouseholds.DOMTAP"
+                                FieldName: "Policy.TSEGNAME"
                             }, {
                                 DisplayText: "Labor Force Participation Rate",
                                 FieldName: "Industry.CIVLBFR_CY"
@@ -450,7 +450,7 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Dominant Tapestry Segment",
-                                FieldName: "TapestryHouseholds.DOMTAP"
+                                FieldName: "Policy.TSEGNAME"
                             }, {
                                 DisplayText: "Labor Force Participation Rate",
                                 FieldName: "Industry.CIVLBFR_CY"
@@ -550,7 +550,7 @@ define([], function () {
                             DisplayFields: [
                                 {
                                     DisplayText: "Dominant Tapestry Segment",
-                                    FieldName: "TapestryHouseholds.DOMTAP"
+                                    FieldName: "Policy.TSEGNAME"
                                 }, {
                                     DisplayText: "Labor Force Participation Rate",
                                     FieldName: "Industry.CIVLBFR_CY"
@@ -632,7 +632,7 @@ define([], function () {
                             DisplayFields: [
                                 {
                                     DisplayText: "Dominant Tapestry Segment",
-                                    FieldName: "TapestryHouseholds.DOMTAP"
+                                    FieldName: "Policy.TSEGNAME"
                                 }, {
                                     DisplayText: "Labor Force Participation Rate",
                                     FieldName: "Industry.CIVLBFR_CY"

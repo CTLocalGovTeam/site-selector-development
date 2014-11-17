@@ -76,7 +76,7 @@ define([
         areaSortSites: null,
         lastGeometry: [null, null, null, null],
         arrGeoenrichData: [null, null, null, null],
-
+        isIndexShared: false,
         /**
         * create horizontal slider for all required tab
         * @param container node,horizontal rule node and slider value
@@ -267,10 +267,12 @@ define([
             this._resizeBuildingAndSites();
             if (this.workflowCount === 3 && this.comunitiesDemoInfoMainScrollbar) {
                 srcContainer = query('.esriCTDemoInfoMainDiv', this.communityMainDiv)[0];
-                srcContent = query('.esriCTDemoInfoMainDivBuildingContent')[query('.esriCTDemoInfoMainDivBuildingContent').length - 1];
-                esriCTDemoResultStylesd = { height: document.documentElement.clientHeight - srcContainer.offsetTop + "px" };
-                domAttr.set(srcContainer, "style", esriCTDemoResultStylesd);
-                this.resizeScrollbar(this.comunitiesDemoInfoMainScrollbar, srcContainer, srcContent);
+                if (srcContainer) {
+                    srcContent = query('.esriCTDemoInfoMainDivBuildingContent')[query('.esriCTDemoInfoMainDivBuildingContent').length - 1];
+                    esriCTDemoResultStylesd = { height: document.documentElement.clientHeight - srcContainer.offsetTop + "px" };
+                    domAttr.set(srcContainer, "style", esriCTDemoResultStylesd);
+                    this.resizeScrollbar(this.comunitiesDemoInfoMainScrollbar, srcContainer, srcContent);
+                }
             }
         },
 
@@ -313,6 +315,9 @@ define([
             geoLocationPushpin = dojoConfig.baseURL + dojo.configData.LocatorSettings.DefaultLocatorSymbol;
             locatorMarkupSymbol = new esri.symbol.PictureMarkerSymbol(geoLocationPushpin, dojo.configData.LocatorSettings.MarkupSymbolSize.width, dojo.configData.LocatorSettings.MarkupSymbolSize.height);
             graphic = new esri.Graphic(mapPoint, locatorMarkupSymbol, {}, null);
+            if (this.workflowCount === 3) {
+                this.featureGraphics[this.workflowCount] = graphic;
+            }
             this.map.getLayer("esriGraphicsLayerMapSettings").clear();
             this.map.getLayer("esriGraphicsLayerMapSettings").add(graphic);
         },
@@ -582,11 +587,13 @@ define([
                     }
                 }
             }
-            if (window.location.toString().split("$selectedObjectIndex=").length > 1 && dojo.selectedObjectIndex !== null && isNaN(dojo.selectedObjectIndex)) {
-                this.isSharedExtent = true;
-                this._getAttchmentImageAndInformation(Number(window.location.toString().split("$selectedObjectIndex=")[1].split("$")[0]));
+            if (window.location.toString().split("$selectedObjectIndex=").length > 1 && !this.isIndexShared) {
+                if (Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === dojo.workflowCount) {
+                    this.isSharedExtent = true;
+                    this.isIndexShared = true;
+                    this._getAttchmentImageAndInformation(Number(window.location.toString().split("$selectedObjectIndex=")[1].split("$")[0]));
+                }
             }
-            dojo.selectedObjectIndex = null;
         },
 
         /**
@@ -626,18 +633,16 @@ define([
         _getAttchmentImageAndInformation: function (value) {
             var index, dataSelected;
             if (isNaN(value)) {
-                index = domAttr.get(value.currentTarget, "index");
+                index = domAttr.get(value.currentTarget, "index").toString();
             } else {
-                index = value;
+                index = value.toString();
             }
-            dojo.selectedObjectIndex = index;
+            dojo.selectedObjectIndex[this.workflowCount] = index;
             topic.publish("showProgressIndicator");
-
             if (this.workflowCount === 0) {
-
                 dataSelected = this.buildingTabData[index];
                 this._attachMentQuery(value, dataSelected, this.attachmentOuterDiv, this.mainDivBuilding, this.searchContentBuilding);
-            } else {
+            } else if (this.workflowCount === 1) {
                 dataSelected = this.sitesTabData[index];
                 this._attachMentQuery(value, dataSelected, this.attachmentOuterDivSites, this.mainDivSites, this.searchContentSites);
             }
@@ -665,7 +670,7 @@ define([
             if (dataSelected.attachmentData) {
                 attachmentDiv = domConstruct.create("div", { "class": "esriCTAttachmentDiv" }, attachmentNode);
                 attachmentImageClickDiv = domConstruct.create("img", { "src": dataSelected.attachmentData[0].url }, attachmentDiv);
-                if (dataSelected.attachmentData.length > 1) {
+                if (dataSelected.attachmentData.length > 0) {
                     for (k = 0; k < dataSelected.attachmentData.length; k++) {
                         arrAttachmentURL.push(dataSelected.attachmentData[k].url);
                     }
@@ -722,6 +727,11 @@ define([
                 this.map.getLayer("esriFeatureGraphicsLayer").clear();
                 this.featureGraphics[this.workflowCount] = graphic;
                 this.map.getLayer("esriFeatureGraphicsLayer").add(graphic);
+                if (this.opeartionLayer && this.opeartionLayer.visibleAtMapScale) {
+                    this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].show();
+                } else {
+                    this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].hide();
+                }
                 propertyHeaderInfo = domConstruct.create("div", { "class": "esriCTHeaderInfoDiv" }, attachmentNode);
                 domAttr.set(propertyHeaderInfo, "innerHTML", dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.DownloadSettings[0].DisplayOptionTitle);
                 for (j = 0; j < dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.LayerContents.DisplayFields.length; j++) {
@@ -791,10 +801,11 @@ define([
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _getBackToTab: function (attachmentNode, mainDivNode) {
-            domConstruct.empty(attachmentNode);
+            domStyle.set(attachmentNode, "display", "none");
             domStyle.set(mainDivNode, "display", "block");
             this.map.getLayer("esriFeatureGraphicsLayer").clear();
             this.featureGraphics[this.workflowCount] = null;
+            dojo.selectedObjectIndex[this.workflowCount] = undefined;
             if (this.workflowCount === 0) {
                 if (this.outerResultContainerBuilding) {
                     while (this.outerResultContainerBuilding.hasChildNodes()) {

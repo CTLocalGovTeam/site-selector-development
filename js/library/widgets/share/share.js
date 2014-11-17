@@ -157,8 +157,8 @@ define([
             if (dojo.standerdGeoQueryAttribute && dojo.workflowCount === 3) {
                 urlStr += "$standerdGeoQueryAttribute=" + dojo.standerdGeoQueryAttribute;
             }
-            if (dojo.selectedObjectIndex) {
-                urlStr += "$selectedObjectIndex=" + dojo.selectedObjectIndex;
+            if (dojo.selectedObjectIndex && dojo.selectedObjectIndex[dojo.workflowCount]) {
+                urlStr += "$selectedObjectIndex=" + dojo.selectedObjectIndex[dojo.workflowCount].toString();
             }
             if (dojo.paginationIndex && dojo.paginationIndex[dojo.workflowCount]) {
                 urlStr += "$paginationIndex=" + dojo.paginationIndex[dojo.workflowCount];

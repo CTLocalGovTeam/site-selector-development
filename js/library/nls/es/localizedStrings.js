@@ -47,7 +47,7 @@ define({
             searchCommunityText: "@es@ Search communities in",
             searchBusinessText: "@es@ Search business near an address",
             serachSiteText: "@es@ Search sites near an address",
-            CountStatus: "${s} - ${e} of ${t}",
+            countStatus: "de",
             webpageDisplayText: "@es@ Copy/Paste HTML into your web page",
             textDownload: "@es@ Download",
             result: "@es@ Back To Result",
@@ -58,6 +58,8 @@ define({
         },
         errorMessages: {
             invalidSearch: "@es@ No results found",
+            downloadError: "@es@ Unable to complete operation",
+            geometryIntersectError: "@es@ The searched area is outside the area of interest and will not be analyzed.",
             falseConfigParams: "@es@ Required configuration key values are either null or not exactly matching with layer attributes. This message may appear multiple times",
             invalidLocation: "@es@ Current location not found",
             invalidProjection: "@es@ Unable to plot current location on the map",
