@@ -54,6 +54,7 @@ define([
                     /**
                     * minimize other open header panel widgets and call geolocation service
                     */
+                    topic.publish("showProgressIndicator");
                     topic.publish("setMaxLegendLength");
                     this._showCurrentLocation();
                 })));
@@ -104,9 +105,11 @@ define([
                     self._addGraphic(mapPoint);
                 }, function () {
                     alert(sharedNls.errorMessages.invalidProjection);
+                    topic.publish("hideProgressIndicator");
                 });
             }, function () {
                 alert(sharedNls.errorMessages.invalidLocation);
+                topic.publish("hideProgressIndicator");
             });
         },
 

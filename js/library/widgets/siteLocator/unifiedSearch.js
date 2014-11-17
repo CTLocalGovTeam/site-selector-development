@@ -130,6 +130,7 @@ define([
                         dojo.strGeoLocationMapPoint = null;
 
                     } else {
+                        topic.publish("hideProgressIndicator");
                         dojo.strGeoLocationMapPoint = mapPoint.x + "," + mapPoint.y;
                     }
                 }
@@ -165,6 +166,9 @@ define([
 
                 }
             }));
+            locator.on("error", function (error) {
+                alert(error.error.details[0]);
+            });
 
         },
 

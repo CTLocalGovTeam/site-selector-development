@@ -131,6 +131,7 @@ define([
             dojo.arrAddressMapPoint = [null, null, null, null];
             dojo.arrBufferDistance = [null, null, null, null];
             dojo.arrWhereClause = [null, null, null, null];
+            dojo.selectedObjectIndex = [null, null];
             this.domNode = domConstruct.create("div", { "title": sharedNls.tooltips.reports, "class": "esriCTHeaderSearch" }, null);
             if (window.location.toString().split("$workflowCount=").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === 0 && window.location.toString().split("$address=").length > 1) {
                 domAttr.set(this.txtAddressBuilding, "defaultAddress", window.location.toString().split("$address=")[1].split("$")[0].toString().split("%20").join(" "));
@@ -292,12 +293,10 @@ define([
 
             this.own(on(this.chkSerachContentBuilding, "click", lang.hitch(this, function (value) {
                 this._buildingSearchButtonHandler(this.chkSerachContentBuilding);
-
             })));
 
             this.own(on(this.chksearchContentSites, "click", lang.hitch(this, function (value) {
                 this._sitesSearchButtonHandler(this.chksearchContentSites);
-
             })));
             // Dynamic UI for  tab//
             this._createFilter(dojo.configData.Workflows[1].SearchSettings[0].FilterSettings.FilterRangeFields, this.sitesFromToMainDiv, 1);
@@ -406,6 +405,8 @@ define([
                 domAttr.set(spanTextFrom, "innerHTML", sharedNls.titles.fromText);
                 domAttr.set(spanTextTo, "innerHTML", sharedNls.titles.toText);
                 domAttr.set(areaText, "innerHTML", value.DisplayText);
+
+
                 if ((window.location.toString().split(value.FieldName).length > 1 || window.location.toString().split(value.VariableNameSuffix).length > 1) && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
                     chkAreaSites.checked = true;
                     if (value.FieldName) {
@@ -436,6 +437,8 @@ define([
                         domClass.add(txtTo, "esriCTDisabledAddressColorChange");
                         if (this.workflowCount === 2) {
                             this._fromToDatachangeHandler(txtFrom, txtTo, chkAreaSites);
+                            txtFrom.removeAttribute("FieldValue");
+                            txtTo.removeAttribute("FieldValue");
                         } else {
                             this._fromToQuery(txtFrom, txtTo, chkAreaSites);
                         }
@@ -451,6 +454,8 @@ define([
                 this.own(on(txtFrom, "keydown", lang.hitch(this, function (value) {
                     if (value.keyCode === dojo.keys.ENTER) {
                         if (this.workflowCount === 2) {
+                            txtFrom.setAttribute("FieldValue", Number(txtFrom.value));
+                            txtTo.setAttribute("FieldValue", Number(txtTo.value));
                             this._fromToDatachangeHandler(txtFrom, txtTo, chkAreaSites);
                         } else {
                             this._fromToQuery(txtFrom, txtTo, chkAreaSites);
@@ -460,6 +465,8 @@ define([
                 this.own(on(txtTo, "keydown", lang.hitch(this, function (value) {
                     if (value.keyCode === dojo.keys.ENTER) {
                         if (this.workflowCount === 2) {
+                            txtFrom.setAttribute("FieldValue", Number(txtFrom.value));
+                            txtTo.setAttribute("FieldValue", Number(txtTo.value));
                             this._fromToDatachangeHandler(txtFrom, txtTo, chkAreaSites);
                         } else {
                             this._fromToQuery(txtFrom, txtTo, chkAreaSites);

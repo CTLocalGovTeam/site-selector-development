@@ -79,7 +79,6 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _fromToQuery: function (fromNode, toNode, chkBox) {
-
             var isfilterRemoved = false;
             if (Number(fromNode.value) >= 0 && Number(toNode.value) >= 0 && Number(fromNode.value) < Number(toNode.value) && lang.trim(fromNode.value) !== "" && lang.trim(toNode.value) !== "") {
                 if (this.workflowCount === 0) {
@@ -144,24 +143,16 @@ define([
                     if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
 
                         this.queryArrayBuildingAND.splice(array.indexOf(this.queryArrayBuildingAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")), 1);
-                        //this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
+                        this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
                     }
                 } else {
                     if (Number(fromNode.getAttribute("FieldValue")) <= Number(toNode.getAttribute("FieldValue")) && array.indexOf(this.queryArraySitesAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")) !== -1) {
                         this.queryArraySitesAND.splice(array.indexOf(this.queryArraySitesAND, chkBox.value + ">=" + fromNode.getAttribute("FieldValue") + " AND " + chkBox.value + "<=" + toNode.getAttribute("FieldValue")), 1);
-                        //this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
+                        this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
                     }
                 }
                 if (chkBox.checked) {
                     alert(sharedNls.errorMessages.invalidInput);
-                } else {
-                    if (this.workflowCount === 0) {
-                        this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
-
-                    } else {
-                        this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
-
-                    }
                 }
             }
         },
@@ -174,7 +165,6 @@ define([
         chkQueryHandler: function (chkBoxNode) {
             var arrAndQuery = [], arrOrQuery = [];
             topic.publish("showProgressIndicator");
-
             if (this.workflowCount === 0) {
                 arrAndQuery = this.queryArrayBuildingAND;
                 arrOrQuery = this.queryArrayBuildingOR;
@@ -304,11 +294,12 @@ define([
                             domConstruct.empty(this.attachmentOuterDivSites);
                             delete this.sitesTabData;
                         }
-                        alert(sharedNls.errorMessages.invalidSearch);
+                        alert(sharedNls.errorMessages.geometryIntersectError);
 
                     }
                 }), lang.hitch(this, function (Error) {
                     topic.publish("hideProgressIndicator");
+                    alert(sharedNls.errorMessages.geometryIntersectError);
                 }));
             } else {
                 queryLayerTask.executeForIds(queryLayer, lang.hitch(this, this._queryLayerhandler), lang.hitch(this, this._queryErrorHandler));
@@ -380,6 +371,7 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         performQuery: function (layer, featureSet, curentIndex) {
+            var onCompleteArray, i, arrIds = [], finalIndex, layerFeatureSet, layerAttachmentInfos, deferredListResult, j;
             try {
                 if (dojo.paginationIndex) {
                     dojo.paginationIndex[this.workflowCount] = curentIndex;
@@ -389,9 +381,8 @@ define([
                 }
                 if (featureSet.length !== 0) {
                     topic.publish("showProgressIndicator");
-                    var i, arrIds = [], finalIndex;
                     this.count = 0;
-                    this.layerAttachmentInfos = [];
+                    onCompleteArray = [];
                     finalIndex = curentIndex + 10;
                     if (curentIndex + 10 > featureSet.length) {
                         finalIndex = featureSet.length;
@@ -400,11 +391,30 @@ define([
                         arrIds.push(featureSet[i]);
                         if (layer.hasAttachments && dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.ShowAttachments) {
                             this.count++;
-                            this.itemquery(null, featureSet[i], layer);
+                            this.itemquery(null, featureSet[i], layer, onCompleteArray);
                         }
                     }
                     this.count++;
-                    this.itemquery(arrIds, null, layer);
+                    layerAttachmentInfos = [];
+                    this.itemquery(arrIds, null, layer, onCompleteArray);
+                    deferredListResult = new DeferredList(onCompleteArray);
+                    deferredListResult.then(lang.hitch(this, function (result) {
+                        if (result) {
+                            for (j = 0; j < result.length; j++) {
+                                if (result[j][1]) {
+                                    if (result[j][1].features) {
+                                        layerFeatureSet = result[j][1];
+                                    } else {
+                                        layerAttachmentInfos.push(result[j][1]);
+                                    }
+                                }
+                            }
+                        }
+                        this.mergeItemData(layerFeatureSet, layerAttachmentInfos, layer);
+                    }), function (err) {
+                        alert(err.message);
+                    });
+
 
                 } else {
                     if (this.workflowCount === 0) {
@@ -423,8 +433,8 @@ define([
         * @param {object} layer on which query is performed
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
-        itemquery: function (arrIds, objectId, layer) {
-            var layerFeatureSet, self = this, queryobject, queryObjectTask, oufields = [], i;
+        itemquery: function (arrIds, objectId, layer, onCompleteArray) {
+            var queryobject, queryObjectTask, oufields = [], i, queryOnRouteTask;
             if (arrIds !== null) {
                 queryObjectTask = new QueryTask(layer.url);
                 queryobject = new esri.tasks.Query();
@@ -435,34 +445,12 @@ define([
                 queryobject.outFields = oufields;
                 queryobject.returnGeometry = false;
                 queryobject.objectIds = arrIds;
-                queryObjectTask.execute(queryobject, function (featureSet) {
-                    self.count--;
-                    layerFeatureSet = featureSet;
-                    if (self.count === 0) {
-                        self.mergeItemData(layerFeatureSet, self.layerAttachmentInfos);
-                    }
-                }, function (error) {
-                    self.count--;
-                    if (self.count === 0) {
-                        self.mergeItemData(layerFeatureSet, self.layerAttachmentInfos);
-                    }
-                });
+
+                queryOnRouteTask = queryObjectTask.execute(queryobject);
+                onCompleteArray.push(queryOnRouteTask);
             } else if (objectId !== null) {
-                layer.queryAttachmentInfos(objectId, function (response) {
-                    self.count--;
-                    if (response.length > 0) {
-                        self.layerAttachmentInfos.push(response);
-                    }
-                    if (self.count === 0) {
-                        self.mergeItemData(layerFeatureSet, self.layerAttachmentInfos);
-                    }
-                },
-                    function (error) {
-                        self.count--;
-                        if (self.count === 0) {
-                            self.mergeItemData(layerFeatureSet, self.layerAttachmentInfos);
-                        }
-                    });
+                queryOnRouteTask = layer.queryAttachmentInfos(objectId);
+                onCompleteArray.push(queryOnRouteTask);
             }
 
         },
@@ -473,14 +461,13 @@ define([
         * @param {array} array of attachments
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
-
-        mergeItemData: function (layerFeatureSet, layerAttachmentInfos) {
+        mergeItemData: function (layerFeatureSet, layerAttachmentInfos, layer) {
             var arrTabData = [], i, j;
             topic.publish("hideProgressIndicator");
             for (i = 0; i < layerFeatureSet.features.length; i++) {
                 arrTabData.push({ featureData: layerFeatureSet.features[i].attributes });
                 for (j = 0; j < layerAttachmentInfos.length; j++) {
-                    if (layerFeatureSet.features[i].attributes.OBJECTID === layerAttachmentInfos[j][0].id) {
+                    if (layerAttachmentInfos[j][0] && layerFeatureSet.features[i].attributes[layer.objectIdField] === layerAttachmentInfos[j][0].objectId) {
                         arrTabData[i].attachmentData = layerAttachmentInfos[j];
                         break;
                     }
@@ -526,7 +513,7 @@ define([
             } else {
                 domAttr.set(tenthIndex, "innerHTML", currentIndex + 10);
             }
-            domAttr.set(ofTextDiv, "innerHTML", "of");
+            domAttr.set(ofTextDiv, "innerHTML", sharedNls.titles.countStatus);
             domAttr.set(TotalCount, "innerHTML", this.buildingResultSet.length);
             domAttr.set(spanContent, "innerHTML", sharedNls.titles.sortBy);
             domAttr.set(firstIndex, "innerHTML", Math.floor(currentIndex / 10) + 1);
@@ -682,7 +669,7 @@ define([
             } else {
                 domAttr.set(tenthIndex, "innerHTML", currentIndexSites + 10);
             }
-            domAttr.set(ofTextDiv, "innerHTML", "of");
+            domAttr.set(ofTextDiv, "innerHTML", sharedNls.titles.countStatus);
             domAttr.set(TotalCount, "innerHTML", this.sitesResultSet.length);
             domAttr.set(spanContent, "innerHTML", sharedNls.titles.sortBy);
             domAttr.set(firstIndex, "innerHTML", Math.floor(currentIndexSites / 10) + 1);

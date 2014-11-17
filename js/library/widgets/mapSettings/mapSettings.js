@@ -45,9 +45,10 @@ define([
     "esri/layers/ArcGISDynamicMapServiceLayer",
     "widgets/infoWindow/infoWindow",
     "dojo/string",
+    "dojo/number",
     "esri/geometry/Point",
     "dojo/domReady!"
-], function (declare, domConstruct, domStyle, lang, on, array, esriUtils, dom, domAttr, query, Query, QueryTask, domClass, _WidgetBase, sharedNls, esriMap, ImageParameters, FeatureLayer, GraphicsLayer, BaseMapGallery, GeometryExtent, HomeButton, Deferred, DeferredList, topic, ArcGISDynamicMapServiceLayer, InfoWindow, string, Point) {
+], function (declare, domConstruct, domStyle, lang, on, array, esriUtils, dom, domAttr, query, Query, QueryTask, domClass, _WidgetBase, sharedNls, esriMap, ImageParameters, FeatureLayer, GraphicsLayer, BaseMapGallery, GeometryExtent, HomeButton, Deferred, DeferredList, topic, ArcGISDynamicMapServiceLayer, InfoWindow, string, number, Point) {
 
     //========================================================================================================================//
 
@@ -83,7 +84,7 @@ define([
             });
             mapDeferred.then(lang.hitch(this, function (response) {
                 this.map = response.map;
-                dojo.webMapExtent = new GeometryExtent(response.map.extent.xmin, response.map.extent.ymin, response.map.extent.xmax, response.map.extent.ymax, this.map.spatialReference); //response.map.extent;
+                dojo.webMapExtent = new GeometryExtent(response.map.extent.xmin, response.map.extent.ymin, response.map.extent.xmax, response.map.extent.ymax, this.map.spatialReference);
                 dojo.selectedBasemapIndex = null;
                 if (response.itemInfo.itemData.baseMap.baseMapLayers) {
                     this._setBasemapLayerId(response.itemInfo.itemData.baseMap.baseMapLayers);
@@ -211,7 +212,7 @@ define([
                 }
             }));
             this.map.on("extent-change", lang.hitch(this, function (evt) {
-                var layer, mapPoint;
+                var mapPoint;
                 if (window.location.toString().split("$mapPointForInfowindow=").length > 1 && !this.isInfoPopupShown) {
                     this.isInfoPopupShown = true;
                     dojo.isInfoPopupShared = true;
@@ -220,13 +221,6 @@ define([
                     dojo.mapPointForInfowindow = mapPoint.x + "," + mapPoint.y;
                 } else {
                     this._onSetMapTipPosition();
-                    for (layer in this.map._layers) {
-                        if (this.map._layers.hasOwnProperty(layer)) {
-                            if (!this.map.getLayer(layer).visibleAtMapScale) {
-                                this.infoWindowPanel.hide();
-                            }
-                        }
-                    }
                 }
             }));
         },
@@ -573,7 +567,7 @@ define([
         */
         _createInfoWindowContent: function (mapPoint, featureArray, count, isInfoArrowClicked, isFeatureListClicked) {
             var infoPopupFieldsCollection, infoPopupHeight, infoPopupWidth, divInfoDetailsTab, key, screenPoint,
-                divInfoRow, i, j, fieldNames, link, divLink, infoTitle, attributes, infoIndex;
+                divInfoRow, i, j, fieldNames, link, divLink, infoTitle, attributes, infoIndex, utcMilliseconds;
             if (featureArray[count].attr && featureArray[count].attr.attributes) {
                 attributes = featureArray[count].attr.attributes;
             } else if (featureArray[count].attribute) {
@@ -610,6 +604,24 @@ define([
             infoPopupWidth = dojo.configData.InfoPopupWidth;
             divInfoDetailsTab = domConstruct.create("div", { "class": "esriCTInfoDetailsTab" }, null);
             this.divInfoDetailsContainer = domConstruct.create("div", { "class": "divInfoDetailsContainer" }, divInfoDetailsTab);
+            for (j = 0; j < featureArray[count].fields.length; j++) {
+                if (featureArray[count].fields[j].type === "esriFieldTypeDate") {
+                    if (attributes[featureArray[count].fields[j].name]) {
+                        if (Number(attributes[featureArray[count].fields[j].name])) {
+                            utcMilliseconds = Number(attributes[featureArray[count].fields[j].name]);
+                            attributes[featureArray[count].fields[j].name] = dojo.date.locale.format(this.utcTimestampFromMs(utcMilliseconds), {
+                                datePattern: dojo.configData.DatePattern,
+                                selector: "date"
+                            });
+                        }
+                    }
+                } else if (featureArray[count].fields[j].type !== "esriFieldTypeOID" && featureArray[count].fields[j].type !== "esriFieldTypeString") {
+                    if (attributes[featureArray[count].fields[j].name] && Number(attributes[featureArray[count].fields[j].name])) {
+                        attributes[featureArray[count].fields[j].name] = number.format(Number(attributes[featureArray[count].fields[j].name]), { places: 0 });
+                    }
+                }
+            }
+
             for (key = 0; key < infoPopupFieldsCollection.length; key++) {
                 divInfoRow = domConstruct.create("div", { "className": "esriCTDisplayRow" }, this.divInfoDetailsContainer);
                 // Create the row's label
@@ -617,7 +629,7 @@ define([
                 this.divInfoFieldValue = domConstruct.create("div", { "className": "esriCTValueField" }, divInfoRow);
                 for (i in attributes) {
                     if (attributes.hasOwnProperty(i)) {
-                        if (!attributes[i]) {
+                        if (!attributes[i] && attributes[i] !== 0) {
                             attributes[i] = sharedNls.showNullValue;
                         }
                     }
@@ -661,6 +673,14 @@ define([
                 topic.publish("hideProgressIndicator");
                 topic.publish("setInfoWindowOnMap", infoTitle, divInfoDetailsTab, screenPoint, infoPopupWidth, infoPopupHeight);
             }
+        },
+
+        utcTimestampFromMs: function (utcMilliseconds) { // returns Date
+            return this.localToUtc(new Date(utcMilliseconds));
+        },
+
+        localToUtc: function (localTimestamp) { // returns Date
+            return new Date(localTimestamp.getTime() + (localTimestamp.getTimezoneOffset() * 60000));
         },
 
         /**

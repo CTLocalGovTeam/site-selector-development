@@ -88,7 +88,10 @@
 {
     color: #028D6A;
 }
-
+.esriCTInnerDownloadDiv
+{
+    background: none repeat scroll 0% 0% #028D6A;
+}
 /* Share Container Styles */
 
 .esriCTDivAppHolder

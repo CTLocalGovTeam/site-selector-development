@@ -129,13 +129,11 @@ define([
         * set title of infowindow
         * @memberOf widgets/infoWindow/infoWindow
         */
-        setTitle: function (str) {
-            var infoTitle, len = 30;
-            infoTitle = (str.length > len) ? str.substring(0, len) + "..." : str;
+        setTitle: function (infoTitle) {
             if (infoTitle.length > 0) {
                 this.esriCTheadderPanel.innerHTML = "";
                 this.esriCTheadderPanel.innerHTML = infoTitle;
-                this.esriCTheadderPanel.title = str;
+                this.esriCTheadderPanel.title = infoTitle;
             } else {
                 this.esriCTheadderPanel.innerHTML = dojo.configData.ShowNullValueAs;
             }
