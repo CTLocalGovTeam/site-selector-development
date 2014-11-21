@@ -154,10 +154,12 @@ def create_print_table(table_data):
                                        styles_table['TblBody']))
 
                 if k == sorted_table_headers[0]:
-                    value = (Paragraph((table_data[k][i].split(":"))[1],
+                    temp = (table_data[k][i].split(":"))[1]
+                    value = (Paragraph(temp.replace('&','and'),
                                        styles_table['TblBody']))
                 else:
-                    value = (Paragraph((table_data[k][i].split(":"))[1],
+                    temp_v = (table_data[k][i].split(":"))[1]
+                    value = (Paragraph(temp_v.replace('&','and'),
                                        styles_table_right['TblBody']))
                 table_str = []
                 table_str.append(table_key)
@@ -272,16 +274,6 @@ def footer(canvas, DOC):
     pagey = 0.75*DOC.bottomMargin
     canvas.line(pagex, pagey, (PAGE_WIDTH - pagex), pagey)
     canvas.restoreState()
-
-def check_if_image(attachment_url):
-    """Checks the extensions of attachments, returns boolean true if image"""
-    list_image_formats = ['png', 'jpeg', 'jfif', 'exif', 'tiff', 'gif',
-                          'bmp', 'img', 'jpg']
-    extention = (attachment_url[-4:]).split('.')
-    if extention[1].lower() in list_image_formats:
-        return 'true'
-    else:
-        return 'false'
 
 def calculate_scale(imagewidth, ymin, xmax):
     """Calculates the scale of the map.
@@ -474,8 +466,6 @@ try:
             ATTACHMENT_URL_LIST = convert(ATTACHMENT_URL_LIST)
             ATTACHMENT_URL_LIST = ATTACHMENT_URL_LIST[1:-1].split(",")
             for item in ATTACHMENT_URL_LIST:
-                is_image = check_if_image(item[1:-1])
-                if is_image == 'true':
                     image_str = urllib.urlopen(item[1:-1]).read()
                     attachmentimage = Image(StringIO(image_str), mask='auto')
                     image_height = attachmentimage.imageHeight
@@ -500,5 +490,5 @@ try:
     arcpy.SetParameter(5, PDFREPORTNAME)
     print PDFREPORTNAME
 except Exception as exception:
-    arcpy.AddError(str(exception))
+    arcpy.AddError(str(exception.message))
     print exception
