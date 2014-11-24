@@ -351,10 +351,11 @@ define([
         * @memberOf widgets/Sitelocator/Geoenrichment
         */
         _enrichData: function (geometry, workflowCount, standardSearchCandidate) {
-            var geometryService, relationParams;
+            var geometryService, relationParams, standardGeoQueryURL, standardGeoQueryRequest;
             if (geometry) {
                 if (workflowCount === 2) {
                     this.showBuffer(geometry);
+                    this._clearBussinessData();
                 }
                 geometryService = new GeometryService(dojo.configData.GeometryService.toString());
                 relationParams = new RelationParameters();
@@ -375,7 +376,37 @@ define([
                     alert(sharedNls.errorMessages.geometryIntersectError);
                 });
             } else {
-                this._enrichDataRequest(geometry, workflowCount, standardSearchCandidate);
+                dojo.standerdGeoQueryAttribute = standardSearchCandidate.attributes.CountryAbbr + "," + standardSearchCandidate.attributes.DataLayerID + "," + standardSearchCandidate.attributes.AreaID;
+                standardGeoQueryURL = dojo.configData.GeoEnrichmentService + "/StandardGeographyQuery/execute";
+                standardGeoQueryRequest = esriRequest({
+                    url: standardGeoQueryURL,
+                    content: {
+                        f: "pjson",
+                        outSR: this.map.spatialReference.wkid,
+                        sourceCountry: standardSearchCandidate.attributes.CountryAbbr,
+                        geographylayers: standardSearchCandidate.attributes.DataLayerID,
+                        geographyids: [standardSearchCandidate.attributes.AreaID],
+                        returnGeometry: true
+                    },
+                    handleAs: "json"
+                });
+                standardGeoQueryRequest.then(lang.hitch(this, function (data) {
+                    var geometryPoly = new Polygon();
+                    if (data.results && data.results[0] && data.results[0].value && data.results[0].value.features[0] && data.results[0].value.features[0].geometry) {
+                        geometryPoly.rings = data.results[0].value.features[0].geometry.rings;
+                        geometryPoly.setSpatialReference(this.map.spatialReference);
+                        this.lastGeometry[this.workflowCount] = [geometryPoly];
+                        this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                        this.showBuffer([geometryPoly]);
+                        this._enrichData([geometryPoly], workflowCount, null);
+                    } else {
+                        topic.publish("hideProgressIndicator");
+                        alert(sharedNls.errorMessages.invalidSearch);
+                    }
+                }), function (error) {
+                    topic.publish("hideProgressIndicator");
+                    alert(error.message);
+                });
             }
 
         },
@@ -394,7 +425,6 @@ define([
             } else {
                 domConstruct.empty(this.communityMainDiv);
                 this.comunitiesDemoInfoMainScrollbar = null;
-                dojo.standerdGeoQueryAttribute = null;
                 dojo.communitySelectionFeature = null;
             }
         },
@@ -573,7 +603,6 @@ define([
                         this._resizeSitesPanel(geoenrichtOuterDiv, geoenrichtOuterDivContent);
                     }));
                 }
-                this.map.setExtent(this.map.extent);
             }
             if (this.workflowCount === 2) {
                 this.ResultBusinessTabTitle.innerHTML = dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[0].DisplayTitle;
@@ -1027,6 +1056,20 @@ define([
             }
             jsonObject.exportOptions = { "outputSize": [1366, 412] };
             return jsonObject;
+        },
+
+        /**
+        * Clears the bussiness data
+        * @memberOf widgets/Sitelocator/Geoenrichment
+        */
+        _clearBussinessData: function () {
+            this.businessData = [];
+            this.enrichData = [];
+            this.salesFinalData = [];
+            this.employeFinalData = [];
+            this.revenueData = [];
+            this.totalArray = [];
+            domStyle.set(this.resultDiv, "display", "none");
         },
 
         /**

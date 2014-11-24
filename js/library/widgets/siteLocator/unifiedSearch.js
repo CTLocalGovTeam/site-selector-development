@@ -568,7 +568,6 @@ define([
                     domStyle.set(obj.divAddressScrollContainer, "display", "none");
                     domStyle.set(obj.divAddressScrollContent, "display", "none");
                     _this._enrichData(null, obj.addressWorkflowCount, candidate);
-                    dojo.standerdGeoQueryAttribute = candidate.attributes.CountryAbbr + "," + candidate.attributes.DataLayerID + "," + candidate.attributes.AreaID;
                 } else {
                     if (_this.map.infoWindow) {
                         _this.map.infoWindow.hide();
