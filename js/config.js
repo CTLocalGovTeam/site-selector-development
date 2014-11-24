@@ -207,7 +207,7 @@ define([], function () {
                 ],
                 InfoPanelSettings: {
                     ResultContents: {
-                        ShowAttachments: false,
+                        ShowAttachments: true,
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
@@ -242,7 +242,7 @@ define([], function () {
                         ]
                     },
                     LayerContents: {
-                        ShowAttachments: false,
+                        ShowAttachments: true,
                         DisplayTitle: "Property Information",
                         DisplayFields: [
                             {
@@ -379,7 +379,7 @@ define([], function () {
                 ],
                 InfoPanelSettings: {
                     ResultContents: {
-                        ShowAttachments: false,
+                        ShowAttachments: true,
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
@@ -413,7 +413,7 @@ define([], function () {
                         ]
                     },
                     LayerContents: {
-                        ShowAttachments: false,
+                        ShowAttachments: true,
                         DisplayTitle: "Site Information",
                         DisplayFields: [
                             {

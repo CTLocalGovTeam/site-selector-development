@@ -238,8 +238,8 @@ define([
                     }
                     if (this.featureGraphics[i]) {
                         this.map.getLayer("esriFeatureGraphicsLayer").add(this.featureGraphics[i]);
-                        this.map.setLevel(dojo.configData.ZoomLevel);
                         this.map.centerAt(this.featureGraphics[i].geometry);
+                        this.map.setLevel(dojo.configData.ZoomLevel);
                         this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].show();
                     } else if (this.lastGeometry[this.workflowCount]) {
                         this.map.setExtent(this.lastGeometry[this.workflowCount][0].getExtent(), true);
@@ -511,7 +511,6 @@ define([
                 var contentNode, i, contentOuter, attchImages, featureInfo, j, k, esriCTBuildingSitesResultContainer, esriCTBuildingSitesResultStyle, esriCTSitesResultContainer, esriCTSitesResultStyle;
                 topic.publish("hideProgressIndicator");
                 domConstruct.empty(containerNode);
-
                 if (this.workflowCount === 0) {
                     if (this.buldingShowOption === this.workflowCount + "_" + sharedNls.titles.hideText.toString()) {
                         esriCTBuildingSitesResultContainer = document.documentElement.clientHeight - containerNode.offsetTop;

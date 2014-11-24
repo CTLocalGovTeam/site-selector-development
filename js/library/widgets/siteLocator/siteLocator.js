@@ -367,7 +367,7 @@ define([
                 clearTimeout(timeOut);
                 timeOut = setTimeout(lang.hitch(this, function () {
                     topic.publish("showProgressIndicator");
-                    this.doLayerQuery(this.workflowCount, null, window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split("$whereClause=")[1].split("$")[0].toString());
+                    this.doLayerQuery(this.workflowCount, null, window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split("$whereClause=")[1].split("$")[0].toString().toString().replace(/PERCENT/g, "%"));
                 }, 500));
 
             }
@@ -515,7 +515,7 @@ define([
                     additionalFieldCheckBox = domConstruct.create("div", { "class": "esriCTCheckBox" }, checkBoxAdditionalWithText);
                     additionalCheckBox = domConstruct.create("input", { "class": "esriCTChkBox", "type": "checkbox", "name": arrAdditionalFields.FilterFieldName, "id": arrAdditionalFields.FilterOptions[j].FieldValue.toString() + index.toString(), "value": arrAdditionalFields.FilterOptions[j].FieldValue }, additionalFieldCheckBox);
                     domConstruct.create("label", { "class": "css-label", "for": arrAdditionalFields.FilterOptions[j].FieldValue.toString() + index.toString() }, additionalFieldCheckBox);
-                    if (window.location.toString().replace(/%20/g, " ").replace(/%27/g, "'").split("UPPER('%" + arrAdditionalFields.FilterOptions[j].FieldValue + "%')").length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
+                    if (window.location.toString().replace(/%20/g, " ").replace(/%27/g, "'").split("UPPER('PERCENT" + arrAdditionalFields.FilterOptions[j].FieldValue + "PERCENT')").length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
                         additionalCheckBox.checked = true;
                         isShowMoreOptionShared = true;
                     }
@@ -719,13 +719,7 @@ define([
                     domConstruct.empty(this.attachmentOuterDivSites);
                     delete this.sitesTabData;
                 } else if (this.workflowCount === 2) {
-                    this.businessData = [];
-                    this.enrichData = [];
-                    this.salesFinalData = [];
-                    this.employeFinalData = [];
-                    this.revenueData = [];
-                    this.totalArray = [];
-                    domStyle.set(this.resultDiv, "display", "none");
+                    this._clearBussinessData();
                 }
                 this.lastGeometry[this.workflowCount] = null;
                 this.map.graphics.clear();

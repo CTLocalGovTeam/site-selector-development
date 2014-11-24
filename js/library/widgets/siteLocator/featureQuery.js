@@ -232,7 +232,8 @@ define([
                 }
             }
             if (window.location.toString().split("$whereClause=").length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === this.workflowCount) {
-                queryString = window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split("$whereClause=")[1].split("$")[0];
+                queryString = window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split("$whereClause=")[1].split("$")[0].toString().replace(/PERCENT/g, "%");
+
             }
             if (queryString) {
                 this.doLayerQuery(this.workflowCount, geometry, queryString);
@@ -272,6 +273,7 @@ define([
             if (where !== null) {
                 queryLayer.where = where;
                 dojo.arrWhereClause[this.workflowCount] = where;
+                dojo.arrWhereClause[this.workflowCount] = dojo.arrWhereClause[this.workflowCount].toString().replace(/%/g, "PERCENT");
             } else {
                 dojo.arrWhereClause[this.workflowCount] = "1=1";
             }
