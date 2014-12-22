@@ -95,6 +95,15 @@ def export_web_map(web_map_json):
 
     pil_image = PILImage.open(webmap)
     map_image_width, image_height = ImageReader(pil_image).getSize()
+
+    reduce_by = 0.1
+    aspectratio = image_height/(float(map_image_width))
+    while (600 <= image_height or
+                           500 <= map_image_width):
+                        map_image_width = map_image_width - reduce_by
+                        image_height = map_image_width*aspectratio
+                        reduce_by += 0.1
+
     webmap_image_width = map_image_width
 
     webmap_image = Image(webmap, width=map_image_width, height=image_height)
@@ -102,93 +111,74 @@ def export_web_map(web_map_json):
 
 def create_print_table(table_data):
     """Formats report data into table"""
-    table_counter = 0
-    h_alignment = ""
-    temp_list = []
-    styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name='Header', alignment=TA_CENTER,
-                              spaceAfter=4, borderPadding=(10, 10, 10),
-                              leftIndent=10, fontName='VeraBd', fontSize=7.5))
 
-    row_color = Color(0.9529411764705882, 0.9529411764705882,
-                      0.9529411764705882, 1)
+    column_counter = 0
+    data_list = []
+    table_keys = table_data.keys()
+    header_list = []
+    rows_count = []
+
+    header_style = ParagraphStyle("headerStyle", alignment=TA_CENTER,
+                              spaceAfter=4, borderPadding=(10, 10, 10),
+                              leftIndent=10, fontName='VeraBd', fontSize=7.5,
+                              wordWrap='CJK')
+
+    key_style = ParagraphStyle(name='keyStyle', alignment=TA_LEFT,
+                                        spaceAfter=4, fontName='Vera',
+                                        fontSize=7.5,
+                                        wordWrap='CJK')
+
+    val_style = ParagraphStyle(name='valStyle', alignment=TA_RIGHT,
+                                        spaceAfter=4, fontName='Vera',
+                                        fontSize=7.5,
+                                        wordWrap='CJK')
+
+    for header in table_keys:
+        header_list += [Paragraph(header, header_style), "", ""]
+        rows_count.append(len(table_data[header]))
+    header_list.pop()
+    data_list.append(header_list)
+
+    rows_number = max(rows_count)
 
     column_header_color = Color(0.8666666666666667, 0.8745098039215686,
                                 0.8745098039215686, 1)
+    table_style = TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                                ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                                ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
+                                ('BACKGROUND', (0, 0), (1, 0),
+                                 column_header_color),
+                                ('BACKGROUND', (3, 0), (4, 0),
+                                 column_header_color),
+                                ('SPAN', (0, 0), (1, 0)),
+                                ('SPAN', (3, 0), (4, 0)),
+                                ])
+    row_color = Color(0.9529411764705882, 0.9529411764705882,
+                      0.9529411764705882, 1)
 
-    sorted_table_headers = []
-    for index in SORTEDTABLESINDEX:
-        sorted_table_headers.append(index[1])
-
-    for k in sorted_table_headers:
-        attribute_data = []
-        table_style = TableStyle([('SPAN', (0, 0), (-1, 0)),
-                                  ('ALIGN', (0, 0), (-1, 0), 'LEFT'),
-                                  ('BACKGROUND', (0, 0), (-1, 0),
-                                   column_header_color)])
-
-        data = []
-        data += [[Paragraph(k, styles['Header'])]]
-
-        row_count = []
-        table_keys = table_data.keys()
-        row_count.append(len(table_data[table_keys[0]]))
-        row_count.append(len(table_data[table_keys[1]]))
-
-        styles_table = getSampleStyleSheet()
-        styles_table.add(ParagraphStyle(name='TblBody', alignment=TA_LEFT,
-                                        spaceAfter=4, fontName='Vera',
-                                        fontSize=7.5))
-
-        styles_table_right = getSampleStyleSheet()
-        styles_table_right.add(ParagraphStyle(name='TblBody',
-                                              alignment=TA_RIGHT, spaceAfter=4,
-                                              fontName='Vera', fontSize=7.5))
-
-        for i in xrange((max(row_count))):
-
-            table_style.wordWrap = 'CJK'
+    for i in xrange(rows_number):
+        if i % 2 != 0:
+            table_style.add('BACKGROUND', (0, (i+1)), (1, (i+1)),
+                            row_color)
+            table_style.add('BACKGROUND', (3, (i+1)), (4, (i+1)),
+                            row_color)
+        values_list = []
+        for header in table_keys:
             try:
-                #Add keys and values as paragraph to wrap texts
-                table_key = (Paragraph((table_data[k][i].split(":"))[0],
-                                       styles_table['TblBody']))
+                row_value = table_data[header][i]
+                key =  Paragraph(row_value.split(":")[0], key_style)
+                val = Paragraph(row_value.split(":")[1], val_style)
 
-                if k == sorted_table_headers[0]:
-                    temp = (table_data[k][i].split(":"))[1]
-                    value = (Paragraph(temp.replace('&','and'),
-                                       styles_table['TblBody']))
-                else:
-                    temp_v = (table_data[k][i].split(":"))[1]
-                    value = (Paragraph(temp_v.replace('&','and'),
-                                       styles_table_right['TblBody']))
-                table_str = []
-                table_str.append(table_key)
-                table_str.append(value)
-                data.append(table_str)
-                attribute_data.append(data)
-            except Exception:
-                data.append("  ")
-                attribute_data.append(data)
-            if i % 2 != 0:
-                table_style.add('BACKGROUND', (0, (i+1)), (-1, (i+1)),
-                                row_color)
+                values_list += [key, val,""]
+            except IndexError:
+                values_list += ["", "",""]
 
-                if table_counter == 1:
-                    h_alignment = 'RIGHT'
-                else:
-                    h_alignment = 'LEFT'
+        values_list.pop()
+        data_list.append(values_list)
 
-        temp_table = Table(attribute_data[table_counter], vAlign='TOP',
-                           colWidths=(150, 100), hAlign=h_alignment,
-                           style=table_style)
-        temp_list.append(temp_table)
-        table_counter += 1
-
-    table_data = [[temp_list[0], temp_list[1]]]
-    table_holder = Table(table_data, vAlign='TOP', colWidths=(265),
-                         style=[('VALIGN', (0, 0), (1, 0), 'TOP'),
-                                ('HALIGN', (1, 0), (1, 0), 'RIGHT')])
-    return table_holder
+    data_table = Table(data_list, colWidths=(145, 100, 10, 145, 100),
+                        style=table_style)
+    return data_table
 
 def on_first_page(canvas, DOC): #pylint: disable=W0621
     """Draws header and footer on first page"""
@@ -298,7 +288,7 @@ def convert(data):
         return data
 
 try:
-    DPI = 96
+    DPI = 200
     WEBMAP_WIDTH = 0
     arcpy.env.overwriteOutput = True
     ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -400,23 +390,6 @@ try:
 
     # Putting the table
     arcpy.AddMessage("Formatting Table...")
-    ATTRIBUTEDATA = arcpy.GetParameterAsText(3).strip() #pylint: disable=E1103
-    TEMPDICT = {}
-    TABLEKEYSINDEX = {}
-    if len(ATTRIBUTEDATA) > 0:
-        RECEIVEDDATA = json.loads(ATTRIBUTEDATA)[0]
-        for key in RECEIVEDDATA.keys():
-            TEMPDICT = {key : ATTRIBUTEDATA.find(key)}
-            TABLEKEYSINDEX.update(TEMPDICT)
-        SORTEDTABLESINDEX = sorted((value, key) for (key, value)
-                                   in TABLEKEYSINDEX.items())
-
-        TABLEHOLDER = create_print_table(RECEIVEDDATA)
-
-        arcpy.AddMessage("Printing Table...")
-
-        ELEMENTSOFDOC.append(TABLEHOLDER)
-        ELEMENTSOFDOC.append(Spacer(1, 0.25*inch))
 
     # Drawing the webmap
     if len(arcpy.GetParameterAsText(2).strip()) > 0: #pylint: disable=E1103
@@ -426,7 +399,8 @@ try:
      #To override the outputsize and dpi and obtain the extent of the webmap
         if "exportOptions" in WEBMAPJSON.keys():
             LISTATT = WEBMAPJSON["exportOptions"]
-            LISTATT['outputSize'] = [500, 365]
+            #LISTATT['outputSize'] = [500, 365]
+            LISTATT['outputSize'] = [1000, 730]
             LISTATT['dpi'] = DPI
         if "mapOptions" in WEBMAPJSON.keys():
             LISTEXTENTS = WEBMAPJSON["mapOptions"]
@@ -449,12 +423,34 @@ try:
             STYLE_RF = getSampleStyleSheet()
             STYLE_RF.add(ParagraphStyle(name='RF', alignment=TA_RIGHT,
                                         fontName='Vera', fontSize=10,
+                                        spaceBefore =0.25*cm,
                                         rightIndent=-1.15*cm, spaceAfter=0))
             arcpy.AddMessage("Printing scale...")
             ELEMENTSOFDOC.append(Paragraph('Scale 1:'+str(RF),
                                            STYLE_RF['RF']))
-            ELEMENTSOFDOC.append(PageBreak())
+
             del WEBMAP_IMAGE
+
+    #Receiving and formatting the attribute data in table format
+    ATTRIBUTEDATA = arcpy.GetParameterAsText(3).strip() #pylint: disable=E1103
+    TEMPDICT = {}
+    TEMP_Data = []
+    TABLEKEYSINDEX = {}
+    if len(ATTRIBUTEDATA) > 0:
+        RECEIVEDDATA = json.loads(ATTRIBUTEDATA)[0]
+        for key in RECEIVEDDATA.keys():
+
+            TEMPDICT = {key : ATTRIBUTEDATA.find(key)}
+            TABLEKEYSINDEX.update(TEMPDICT)
+        SORTEDTABLESINDEX = sorted((value, key) for (key, value)
+                                   in TABLEKEYSINDEX.items())
+
+        TABLEHOLDER = create_print_table(RECEIVEDDATA)
+
+        arcpy.AddMessage("Printing Table...")
+        ELEMENTSOFDOC.append(Spacer(1, 0.50*cm))
+        ELEMENTSOFDOC.append(TABLEHOLDER)
+        #ELEMENTSOFDOC.append(Spacer(1, 0.2*inch))
 
     #Drawing the attachment images
     arcpy.AddMessage("Printing attachment images...")
@@ -482,11 +478,13 @@ try:
                                             width=image_width,
                                             height=image_height, mask='auto')
                     STORY.append(attachmentimage)
+                    STORY.append(Spacer(1, 0.50*cm))
 
             ELEMENTSOFDOC += STORY
             ELEMENTSOFDOC.append(PageBreak())
     DOC.build(ELEMENTSOFDOC, onFirstPage=on_first_page,
               onLaterPages=on_later_pages, canvasmaker=NumberedCanvas)
+
     arcpy.SetParameter(5, PDFREPORTNAME)
     print PDFREPORTNAME
 except Exception as exception:

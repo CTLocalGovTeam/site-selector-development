@@ -458,9 +458,9 @@
     height: 100%;
 }
 
-.dijitSliderImageHandleH
+.claro .dijitSliderImageHandleH
 {
-    background-image: url('../images/blueThumb.png') !important;
+    background-image: url('../images/blueThumb.png');
 }
 
 .claro .dijitSliderProgressBarH .dijitSliderThumbHover
@@ -528,7 +528,7 @@
 
 .esriCTsliderDisplayText
 {
-    color: #007AC2 !important;
+    color: #007AC2;
 }
 .infopanel
 {
@@ -559,3 +559,23 @@ label.css-label
 }
 /*End of Site locator*/
 
+div.esriCTPrev
+{
+    float: left;
+    color: #fff;
+    cursor: pointer;
+    background-image: url('../images/bigBlueLeftarrow-blue.png');
+    width: 60px;
+    height: 60px;
+}
+
+.esriCTNext
+{
+    float: right;
+    color: #fff;
+    cursor: pointer;
+    background-image: url('../images/bigBlueRightArrow.png');
+    width: 60px;
+    height: 60px;
+    margin-right: -2px;
+}

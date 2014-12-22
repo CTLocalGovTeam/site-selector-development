@@ -101,9 +101,7 @@ define([
                 var deferred = new Deferred();
                 widgets[widgetConfig.WidgetPath] = null;
                 require([widgetConfig.WidgetPath], function (Widget) {
-
-                    widgets[widgetConfig.WidgetPath] = new Widget({ map: widgetConfig.MapInstanceRequired ? mapInstance : null });
-
+                    widgets[widgetConfig.WidgetPath] = new Widget({map: mapInstance});
                     deferred.resolve(widgetConfig.WidgetPath);
                 });
                 deferredArray.push(deferred.promise);
@@ -239,7 +237,6 @@ define([
                     deferred.then(function () {
                         basemapDeferred.resolve(baseMapArray);
                     });
-
                 });
             }
         },
@@ -405,7 +402,6 @@ define([
                     }
                     /** If array contains more than one layer object, loop through each layer, create object for each one of them
                     and push it into "basemapLayersArray", finally push "basemapLayersArray" into "baseMapArray" */
-
                     deferred = new Deferred();
                     deferred.resolve();
                 });

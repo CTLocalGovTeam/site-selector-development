@@ -27,6 +27,7 @@ html, body
     visibility: visible !important;
     color: #808080;
 }
+
 .esriCTBody {
     position: relative !important;
 }
@@ -35,19 +36,23 @@ html, body
 {
     background-color: #EFEFEF;
 }
+
 ::-webkit-scrollbar
 {
     width: 12px;
     background-color: #8d8d8e;
 }
+
 ::-webkit-scrollbar-button
 {
     background: #8d8d8e;
 }
+
 ::-webkit-scrollbar-thumb
 {
     background-color: #8d8d8e;
 }
+
 ::-webkit-scrollbar-button:horizontal:decrement
 {
     width: 14px; /*left scroll button width*/
@@ -57,7 +62,6 @@ html, body
     background-repeat: no-repeat;
     background-position: center;
 }
-
 
 ::-webkit-scrollbar-button:horizontal:increment
 {
@@ -301,6 +305,11 @@ input[type="text"]
 {
     background-color: #DFDFDF !important;
     cursor: default !important;
+}
+
+.esriCTesriCTsliderDisplayGrayText
+{
+    color: #808080!important;
 }
 
 .esriCTCursorPointer
@@ -765,7 +774,6 @@ input[type="text"]
     z-index: 10002;
 }
 
-
 .esriGovtSplashContent
 {
     overflow: hidden;
@@ -867,7 +875,6 @@ input[type="text"]
 {
     height: 222px !important;
 }
-
 
 .esriScrollBarPosition
 {
@@ -1033,7 +1040,6 @@ input[type="text"]
     width: 25px;
     height: 25px;
 }
-
 
 /*Site locator tab block*/
 
@@ -1306,6 +1312,7 @@ input[type="text"]
     position: relative;
     cursor: default !important;
 }
+
 .esriCTdivInfoTotalFeatureCount
 {
     float: left;
@@ -1321,6 +1328,7 @@ input[type="text"]
     width: 20px;
     display: none;
 }
+
 .esriCTdivInfoWindowCrasual
 {
     float: right;
@@ -1374,6 +1382,7 @@ input[type="text"]
 }
 
 /*Start of Infowindow style*/
+
 .esriCTTInfoWindowContainer
 {
     z-index: 100002;
@@ -1618,6 +1627,11 @@ input
     margin-left: 10px !important;
 }
 
+.esriCTGrayThumb
+{
+    background-image: url('../images/grayThumb.png') !important;
+}
+
 .claro .dijitSliderProgressBarH .dijitSliderThumbHover
 {
     border: 0px !important;
@@ -1641,6 +1655,11 @@ input
 {
     height: 3px !important;
     border-color: #fff;
+}
+
+.esriCTSliderProgressBar
+{
+    background-color: #808080 !important;
 }
 
 .claro .dijitSlider .dijitSliderRemainingBarH, .claro .dijitSlider .dijitSliderRightBumper
@@ -1887,7 +1906,7 @@ input
 
 .esriCTDemoTitleDiv
 {
-    margin: 15px 0px 0px 35px;
+    margin: 15px 0px 0px 18px;
     color: #808080;
     font-weight: bold;
     font-size: 11px;
@@ -1896,9 +1915,8 @@ input
 
 .esriCTDemoInfoMainDiv
 {
-   width: 96%;
+    width: 100%;
     position: relative;
-    margin-left: 15px;
     float: left;
 }
 
@@ -1968,7 +1986,6 @@ input
 .esriCTDemoInfoMainDivBuildingContent
 {
     width: 375px !important;
-    margin-left: -17px;
 }
 #By_dropdown
 {
@@ -2112,12 +2129,13 @@ input
 .esriCTAttchImages img
 {
     width: 160px;
-   /* height: 80px;*/
+    height: 160px;
 }
 
 .esriCTAttachmentDiv img
 {
     height: 175px;
+    width:175px;
 }
 
 .esriCTHorizantalLine
@@ -2253,7 +2271,6 @@ div.esriCTPrev
     float: left;
     color: #fff;
     cursor: pointer;
-    background-image: url('../images/bigleft-arrow.png');
     width: 60px;
     height: 60px;
 }
@@ -2263,7 +2280,6 @@ div.esriCTPrev
     float: right;
     color: #fff;
     cursor: pointer;
-    background-image: url('../images/bigright-arrow.png');
     width: 60px;
     height: 60px;
     margin-right: -2px;
