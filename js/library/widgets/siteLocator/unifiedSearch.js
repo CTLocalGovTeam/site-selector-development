@@ -232,14 +232,8 @@ define([
             options[locatorSettings.LocatorParameters.SearchBoundaryField] = baseMapExtent;
             locator.outSpatialReference = this.map.spatialReference;
             searchFields = [];
-            if (dojo.configData.Workflows[obj.addressWorkflowCount].FilterSettings) {
-                addressFieldValues = dojo.configData.Workflows[obj.addressWorkflowCount].FilterSettings.LocatorFilterFieldValues; //*****pass config seting based on tab selection******//
-                addressFieldName = dojo.configData.Workflows[obj.addressWorkflowCount].FilterSettings.LocatorFilterFieldName.toString();
-
-            } else {
-                addressFieldValues = dojo.configData.Workflows[obj.addressWorkflowCount].SearchSettings[0].FilterSettings.LocatorFilterFieldValues; //*****pass config seting based on tab selection******//
-                addressFieldName = dojo.configData.Workflows[obj.addressWorkflowCount].SearchSettings[0].FilterSettings.LocatorFilterFieldName.toString();
-            }
+            addressFieldValues = dojo.configData.LocatorSettings.LocatorFilterFieldValues; //*****pass config seting based on tab selection******//
+            addressFieldName = dojo.configData.LocatorSettings.LocatorFilterFieldName.toString();
             for (s in addressFieldValues) {
                 if (addressFieldValues.hasOwnProperty(s)) {
                     searchFields.push(addressFieldValues[s]);
@@ -514,6 +508,7 @@ define([
                                 * before the timeout
                                 */
                                 this.stagedSearch = setTimeout(lang.hitch(this, function () {
+
                                     this.stagedSearch = this._locateAddress(evt, obj);
                                 }), 500);
                             }
@@ -611,6 +606,7 @@ define([
                 domStyle.set(obj.divAddressScrollContent, "display", "none");
             }
             this._createBuffer(mapPoint);
+
         },
 
         /**

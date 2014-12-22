@@ -27,13 +27,13 @@ define([], function () {
         // 2.  Set path for application icon                 - [ Tag(s) to look for: ApplicationIcon ]
         // 3.  Set path for application favicon              - [ Tag(s) to look for: ApplicationFavicon ]
         // 4.  Set URL for help page                         - [ Tag(s) to look for: HelpURL ]
-        // 5.  Specify header widget settings                - [ Tag(s) to look for: AppHeaderWidgets ]
-        // 6.  Specify URLs for base maps                    - [ Tag(s) to look for: BaseMapLayers ]
-        // 7.  Specify URLs for operational layers           - [ Tag(s) to look for: OperationalLayers]
-        // 8.  Customize zoom level for address search       - [ Tag(s) to look for: ZoomLevel ]
-        // 9.  Customize address search settings            - [ Tag(s) to look for: LocatorSettings]
-        // 10.  Set URL for geometry service                 - [ Tag(s) to look for: GeometryService ]
-        // 11. Specify URLs for map sharing                  - [ Tag(s) to look for: MapSharingOptions,TinyURLServiceURL, TinyURLResponseAttribute, FacebookShareURL, TwitterShareURL, ShareByMailLink ]
+        // 5.  Specify URLs for base maps                    - [ Tag(s) to look for: BaseMapLayers ]
+        // 6.  Specify URLs for operational layers           - [ Tag(s) to look for: OperationalLayers]
+        // 7.  Customize zoom level for address search       - [ Tag(s) to look for: ZoomLevel ]
+        // 8.  Customize address search settings            - [ Tag(s) to look for: LocatorSettings]
+        // 9.  Set URL for geometry service                 - [ Tag(s) to look for: GeometryService ]
+        // 10. Specify URLs for map sharing                  - [ Tag(s) to look for: MapSharingOptions,TinyURLServiceURL, TinyURLResponseAttribute, FacebookShareURL, TwitterShareURL, ShareByMailLink ]
+        // 11.  Specify header widget settings                - [ Tag(s) to look for: AppHeaderWidgets ]
 
         // ------------------------------------------------------------------------------------------------------------------------
         // GENERAL SETTINGS
@@ -60,30 +60,6 @@ define([], function () {
         },
 
         ThemeColor: "js/library/themes/styles/blueTheme.css",
-
-        //------------------------------------------------------------------------------------------------------------------------
-        // Header Widget Settings
-        //------------------------------------------------------------------------------------------------------------------------
-        // Set widgets settings such as widget title, widgetPath, mapInstanceRequired to be displayed in header panel
-        // WidgetPath: path of the widget respective to the widgets package.
-        // MapInstanceRequired: true if widget is dependent on the map instance.
-
-        AppHeaderWidgets: [
-            {
-                WidgetPath: "widgets/siteLocator/siteLocator",
-                MapInstanceRequired: true
-            }, {
-                WidgetPath: "widgets/geoLocation/geoLocation",
-                MapInstanceRequired: true
-            }, {
-                WidgetPath: "widgets/share/share",
-                MapInstanceRequired: true
-            }, {
-                WidgetPath: "widgets/help/help",
-                MapInstanceRequired: false
-            }
-        ],
-
 
         PortalAPIURL: "http://www.arcgis.com/sharing/rest/",
         // Specify the title of group that contains basemaps
@@ -172,8 +148,6 @@ define([], function () {
                         SearchExpression: "UPPER(BUILDINGNAME) LIKE UPPER('${0}%') OR UPPER(ARC_City) LIKE UPPER('${0}%') OR UPPER(STATE) LIKE UPPER('${0}%')",
 
                         FilterSettings: {
-                            LocatorFilterFieldName: "Addr_Type",
-                            LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
                                     DisplayText: "Area (sqft)",
@@ -340,8 +314,6 @@ define([], function () {
                         SearchDisplayFields: "${SiteName}, ${ARC_City}, ${StreetAddress}",
                         SearchExpression: "UPPER(SiteName) LIKE UPPER('${0}%') OR UPPER(ARC_City) LIKE UPPER('${0}%') OR UPPER(StreetAddress) LIKE UPPER('${0}%')",
                         FilterSettings: {
-                            LocatorFilterFieldName: "Addr_Type",
-                            LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                             FilterRangeFields: [
                                 {
                                     DisplayText: "Area (acres)",
@@ -509,8 +481,6 @@ define([], function () {
                 Name: "Business",
                 Enabled: true,
                 FilterSettings: {
-                    LocatorFilterFieldName: "Addr_Type",
-                    LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
                     BusinesSortOptions: { Option: "Count,Revenue,Employees" },
                     FilterRangeFields: [
                         {
@@ -697,6 +667,8 @@ define([], function () {
         // AddressMatchScore: Setting the minimum score for filtering the candidate results.
         // MaxResults: Maximum number of locations to display in the results menu.
         LocatorSettings: {
+            LocatorFilterFieldName: "Addr_Type",
+            LocatorFilterFieldValues: ['PointAddress', 'BuildingName', 'StreetAddress', 'StreetInt', 'StreetName', 'Postal', 'POI', 'Locality'],
             DefaultLocatorSymbol: "/js/library/themes/images/redpushpin.png",
             MarkupSymbolSize: {
                 width: 35,
@@ -729,6 +701,25 @@ define([], function () {
             FacebookShareURL: "http://www.facebook.com/sharer.php?u=${0}&t=Site%20Selector",
             TwitterShareURL: "http://mobile.twitter.com/compose/tweet?status=Site%20Selector ${0}",
             ShareByMailLink: "mailto:%20?subject=Check%20out%20this%20map!&body=${0}"
-        }
+        },
+
+        //------------------------------------------------------------------------------------------------------------------------
+        // Header Widget Settings
+        //------------------------------------------------------------------------------------------------------------------------
+        // Set widgets settings such as widget title, widgetPath, mapInstanceRequired to be displayed in header panel
+        // WidgetPath: path of the widget respective to the widgets package.
+
+        AppHeaderWidgets: [
+            {
+                WidgetPath: "widgets/siteLocator/siteLocator"
+            }, {
+                WidgetPath: "widgets/geoLocation/geoLocation"
+            }, {
+                WidgetPath: "widgets/share/share"
+            }, {
+                WidgetPath: "widgets/help/help"
+            }
+        ]
+
     };
 });

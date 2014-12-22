@@ -54,7 +54,6 @@ define([
                     /**
                     * minimize other open header panel widgets and call geolocation service
                     */
-                    topic.publish("showProgressIndicator");
                     topic.publish("setMaxLegendLength");
                     this._showCurrentLocation();
                 })));
@@ -80,6 +79,7 @@ define([
                 mapPoint = new Point(position.coords.longitude, position.coords.latitude, new SpatialReference({
                     wkid: 4326
                 }));
+                topic.publish("showProgressIndicator");
 
                 /**
                 * projects the device location on the map

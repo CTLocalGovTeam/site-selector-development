@@ -168,9 +168,9 @@
     border: 1px solid #028D6A;
 }
 
-.dijitSliderImageHandleH
+.claro .dijitSliderImageHandleH
 {
-    background-image: url('../images/sliderThumbGreen.png') !important;
+    background-image: url('../images/sliderThumbGreen.png');
 }
 
 .claro .dijitSliderProgressBarH .dijitSliderThumbHover
@@ -364,13 +364,36 @@
 }
 .esriCTsliderDisplayText
 {
-    color: #028D6A !important;
+    color: #028D6A;
 }
 
 label.css-label
 {
     background-image: url(../images/checkbox-green.png);
 }
+
+div.esriCTPrev
+{
+    float: left;
+    color: #fff;
+    cursor: pointer;
+    background-image: url('../images/bigGreenLeftArrow.png');
+    width: 60px;
+    height: 60px;
+}
+
+.esriCTNext
+{
+    float: right;
+    color: #fff;
+    cursor: pointer;
+    background-image: url('../images/bigGreenRightArrow.png');
+    width: 60px;
+    height: 60px;
+    margin-right: -2px;
+}
+
+
 /*End of Site locator*/
 
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (-webkit-min-device-pixel-ratio: 2)
@@ -473,7 +496,4 @@ label.css-label
     {
         background-image: url("../images/img44x44/Help.png") !important;
     }
-
-
-
 }

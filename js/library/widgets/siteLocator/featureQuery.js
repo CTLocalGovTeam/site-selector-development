@@ -128,6 +128,7 @@ define([
                         toNode.setAttribute("FieldValue", null);
                     }
                     if ((fromNode.value !== "" && toNode.value !== "") || isfilterRemoved) {
+
                         if (this.featureGeometry[this.workflowCount] && !this.lastGeometry[this.workflowCount]) {
                             topic.publish("hideProgressIndicator");
                             alert(sharedNls.errorMessages.bufferSliderValue);
@@ -203,6 +204,7 @@ define([
             } else {
                 this._callAndOrQuery(arrAndQuery, arrOrQuery);
             }
+
         },
 
         /**
@@ -247,11 +249,13 @@ define([
                     domConstruct.empty(this.outerResultContainerBuilding);
                     domConstruct.empty(this.attachmentOuterDiv);
                     delete this.buildingTabData;
+                    this.siteLocatorScrollbarAttributeBuilding = null;
                 } else {
                     domStyle.set(this.outerDivForPeginationSites, "display", "none");
                     domConstruct.empty(this.outerResultContainerSites);
                     domConstruct.empty(this.attachmentOuterDivSites);
                     delete this.sitesTabData;
+                    this.siteLocatorScrollbarSites = null;
                 }
             }
         },
@@ -264,18 +268,20 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         doLayerQuery: function (tabCount, geometry, where) {
-            var queryLayer, queryLayerTask, geometryService;
+            var queryLayer, queryLayerTask, geometryService, dateObj;
+            dateObj = new Date().getTime().toString();
             this.lastGeometry[this.workflowCount] = geometry;
             this.showBuffer(geometry);
             queryLayerTask = new QueryTask(this.opeartionLayer.url);
             queryLayer = new esri.tasks.Query();
             queryLayer.returnGeometry = false;
             if (where !== null) {
-                queryLayer.where = where;
+                queryLayer.where = dateObj + "=" + dateObj + " AND " + where;
                 dojo.arrWhereClause[this.workflowCount] = where;
                 dojo.arrWhereClause[this.workflowCount] = dojo.arrWhereClause[this.workflowCount].toString().replace(/%/g, "PERCENT");
             } else {
                 dojo.arrWhereClause[this.workflowCount] = "1=1";
+                queryLayer.where = dateObj + "=" + dateObj;
             }
             if (geometry !== null) {
                 geometryService = new GeometryService(dojo.configData.GeometryService.toString());
@@ -290,14 +296,15 @@ define([
                             domConstruct.empty(this.outerResultContainerBuilding);
                             domConstruct.empty(this.attachmentOuterDiv);
                             delete this.buildingTabData;
+                            this.siteLocatorScrollbarAttributeBuilding = null;
                         } else {
                             domStyle.set(this.outerDivForPeginationSites, "display", "none");
                             domConstruct.empty(this.outerResultContainerSites);
                             domConstruct.empty(this.attachmentOuterDivSites);
                             delete this.sitesTabData;
+                            this.siteLocatorScrollbarSites = null;
                         }
                         alert(sharedNls.errorMessages.geometryIntersectError);
-
                     }
                 }), lang.hitch(this, function (Error) {
                     topic.publish("hideProgressIndicator");
@@ -323,7 +330,8 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _queryLayerhandler: function (featureSet) {
-            if (featureSet !== null) {
+
+            if (featureSet !== null && featureSet.length > 0) {
                 if (this.workflowCount === 0) {
                     domStyle.set(this.outerDivForPegination, "display", "block");
                     this.buildingResultSet = featureSet;
@@ -347,18 +355,19 @@ define([
                     this.performQuery(this.opeartionLayer, featureSet, 0);
                 }
             } else {
-
                 if (this.workflowCount === 0) {
                     domStyle.set(this.outerDivForPegination, "display", "none");
                     domConstruct.empty(this.outerResultContainerBuilding);
                     domConstruct.empty(this.attachmentOuterDiv);
                     delete this.buildingTabData;
+                    this.siteLocatorScrollbarAttributeBuilding = null;
 
                 } else {
                     domStyle.set(this.outerDivForPeginationSites, "display", "none");
                     domConstruct.empty(this.outerResultContainerSites);
                     domConstruct.empty(this.attachmentOuterDivSites);
                     delete this.sitesTabData;
+                    this.siteLocatorScrollbarSites = null;
                 }
                 topic.publish("hideProgressIndicator");
                 alert(sharedNls.errorMessages.invalidSearch);

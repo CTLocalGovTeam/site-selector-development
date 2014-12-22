@@ -57,6 +57,7 @@ define([
         map: null,
         tempGraphicsLayerId: "esriGraphicsLayerMapSettings",
         featureGraphicsLayerId: "esriFeatureGraphicsLayer",
+        bufferGraphicLayerId: "esriBufferGraphicsLayer",
         sharedNls: sharedNls,
         isInfoPopupShown: false,
 
@@ -448,7 +449,7 @@ define([
         },
 
         _mapOnLoad: function () {
-            var home, mapDefaultExtent, graphicsLayer, imgCustomLogo, extent, featureGrapgicLayer, imgSource;
+            var home, mapDefaultExtent, graphicsLayer, imgCustomLogo, extent, featureGrapgicLayer, imgSource, bufferGraphicLayer;
 
             /**
             * set map extent to default extent
@@ -485,6 +486,9 @@ define([
             featureGrapgicLayer = new GraphicsLayer();
             featureGrapgicLayer.id = this.featureGraphicsLayerId;
             this.map.addLayer(featureGrapgicLayer);
+            bufferGraphicLayer = new GraphicsLayer();
+            bufferGraphicLayer.id = this.bufferGraphicLayerId;
+            this.map.addLayer(bufferGraphicLayer);
         },
 
         _getQueryString: function (key) {
@@ -617,7 +621,7 @@ define([
                     }
                 } else if (featureArray[count].fields[j].type !== "esriFieldTypeOID" && featureArray[count].fields[j].type !== "esriFieldTypeString") {
                     if (attributes[featureArray[count].fields[j].name] && Number(attributes[featureArray[count].fields[j].name])) {
-                        attributes[featureArray[count].fields[j].name] = number.format(Number(attributes[featureArray[count].fields[j].name]), { places: 0 });
+                        attributes[featureArray[count].fields[j].name] = number.format(Number(attributes[featureArray[count].fields[j].name]), { places: 2 });
                     }
                 }
             }
@@ -634,6 +638,8 @@ define([
                         }
                     }
                 }
+
+
                 try {
                     fieldNames = string.substitute(infoPopupFieldsCollection[key].FieldName, attributes);
                 } catch (ex) {
@@ -646,6 +652,7 @@ define([
                 } else {
                     this.divInfoFieldValue.innerHTML = fieldNames;
                 }
+
 
             }
             for (j in attributes) {
@@ -680,7 +687,7 @@ define([
         },
 
         localToUtc: function (localTimestamp) { // returns Date
-            return new Date(localTimestamp.getTime() + (localTimestamp.getTimezoneOffset() * 60000));
+            return new Date(localTimestamp.getTime());
         },
 
         /**

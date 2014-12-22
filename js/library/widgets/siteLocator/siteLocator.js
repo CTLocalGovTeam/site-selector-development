@@ -189,6 +189,7 @@ define([
             } else {
                 this._createHorizontalSlider(this.horizontalSliderContainerBusiness, this.horizontalRuleContainerBusiness, this.businessSliderText, this.bufferDistanceUnitBusiness, 2, null);
             }
+
             arrSort = this._setSelectionOption(dojo.configData.Workflows[2].FilterSettings.BusinesSortOptions.Option.split(","));
             arrSort.splice(0, 0, { "label": sharedNls.titles.select, "value": sharedNls.titles.select });
             selectSortOption = new SelectList({ options: arrSort, id: "sortBy" }, this.SortBy);
@@ -327,6 +328,7 @@ define([
             }
             if (window.location.toString().split("$strGeoLocationMapPoint=").length > 1) {
                 mapPoint = new Point(window.location.toString().split("$strGeoLocationMapPoint=")[1].split("$")[0].split(",")[0], window.location.toString().split("$strGeoLocationMapPoint=")[1].split("$")[0].split(",")[1], this.map.spatialReference);
+                dojo.strGeoLocationMapPoint = window.location.toString().split("$strGeoLocationMapPoint=")[1].split("$")[0];
                 this.addPushPin(mapPoint);
             }
             if (window.location.toString().split("$standerdGeoQueryAttribute=").length > 1) {
@@ -405,8 +407,6 @@ define([
                 domAttr.set(spanTextFrom, "innerHTML", sharedNls.titles.fromText);
                 domAttr.set(spanTextTo, "innerHTML", sharedNls.titles.toText);
                 domAttr.set(areaText, "innerHTML", value.DisplayText);
-
-
                 if ((window.location.toString().split(value.FieldName).length > 1 || window.location.toString().split(value.VariableNameSuffix).length > 1) && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
                     chkAreaSites.checked = true;
                     if (value.FieldName) {
@@ -429,6 +429,7 @@ define([
                     domClass.add(txtFrom, "esriCTDisabledAddressColorChange");
                     domClass.add(txtTo, "esriCTDisabledAddressColorChange");
                 }
+
                 this.own(on(chkAreaSites, "click", lang.hitch(this, function (value) {
                     txtFrom.disabled = !chkAreaSites.checked;
                     txtTo.disabled = !chkAreaSites.checked;
@@ -528,6 +529,8 @@ define([
                     domAttr.set(divHideOptionText, "innerHTML", sharedNls.titles.showText);
                     this._showHideMoreOption(additionalFieldsNode, divHideOptionText, node);
                 }
+            } else {
+                domClass.replace(node, "esriCTHorizantalruleHide", "esriCTHorizantalrule");
             }
         },
 
@@ -691,6 +694,12 @@ define([
 
                         this.lastGeometry[this.workflowCount] = geometries;
                         if (this.workflowCount === 2) {
+                            if (this.DemoInfoMainScrollbar && this.businessTabScrollbar) {
+                                this.DemoInfoMainScrollbar = null;
+                                this.businessTabScrollbar = null;
+                            } else if (this.businessTabScrollbar) {
+                                this.businessTabScrollbar = null;
+                            }
                             this._enrichData(geometries, this.workflowCount, null);
                         } else {
                             if (this.workflowCount === 0) {
@@ -713,16 +722,19 @@ define([
                     domConstruct.empty(this.outerResultContainerBuilding);
                     domConstruct.empty(this.attachmentOuterDiv);
                     delete this.buildingTabData;
+                    this.siteLocatorScrollbarAttributeBuilding = null;
                 } else if (this.workflowCount === 1) {
                     domStyle.set(this.outerDivForPeginationSites, "display", "none");
                     domConstruct.empty(this.outerResultContainerSites);
                     domConstruct.empty(this.attachmentOuterDivSites);
                     delete this.sitesTabData;
+                    this.siteLocatorScrollbarSites = null;
                 } else if (this.workflowCount === 2) {
-                    this._clearBussinessData();
+                    this._clearBusinessData();
                 }
                 this.lastGeometry[this.workflowCount] = null;
                 this.map.graphics.clear();
+                this.map.getLayer("esriBufferGraphicsLayer").clear();
                 alert(sharedNls.errorMessages.bufferSliderValue);
                 this.isSharedExtent = false;
 
@@ -736,7 +748,7 @@ define([
         */
         showBuffer: function (bufferedGeometries) {
             var self, symbol;
-            this.map.graphics.clear();
+            this.map.getLayer("esriBufferGraphicsLayer").clear();
             self = this;
             symbol = new SimpleFillSymbol(
                 SimpleFillSymbol.STYLE_SOLID,
@@ -749,7 +761,7 @@ define([
             );
             array.forEach(bufferedGeometries, function (geometry) {
                 var graphic = new Graphic(geometry, symbol);
-                self.map.graphics.add(graphic);
+                self.map.getLayer("esriBufferGraphicsLayer").add(graphic);
             });
             if (!this.isSharedExtent && bufferedGeometries) {
                 this.map.setExtent(bufferedGeometries[0].getExtent(), true);

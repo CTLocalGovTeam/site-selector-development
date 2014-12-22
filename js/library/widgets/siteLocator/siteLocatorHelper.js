@@ -203,6 +203,7 @@ define([
                     countEnabledTab++;
 
                 }
+
             }
             if (countEnabledTab === 0) {
                 alert(sharedNls.errorMessages.disableTab);
@@ -232,14 +233,16 @@ define([
                     this.map.graphics.clear();
                     this.map.getLayer("esriFeatureGraphicsLayer").clear();
                     this.map.getLayer("esriGraphicsLayerMapSettings").clear();
+                    this.map.getLayer("esriBufferGraphicsLayer").clear();
                     if (this.lastGeometry[this.workflowCount]) {
                         this.isSharedExtent = true;
                         this.showBuffer(this.lastGeometry[this.workflowCount]);
                     }
                     if (this.featureGraphics[i]) {
                         this.map.getLayer("esriFeatureGraphicsLayer").add(this.featureGraphics[i]);
-                        this.map.centerAt(this.featureGraphics[i].geometry);
                         this.map.setLevel(dojo.configData.ZoomLevel);
+                        this.map.centerAt(this.featureGraphics[i].geometry);
+
                         this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].show();
                     } else if (this.lastGeometry[this.workflowCount]) {
                         this.map.setExtent(this.lastGeometry[this.workflowCount][0].getExtent(), true);
@@ -248,7 +251,6 @@ define([
                         this.addPushPin(this.featureGeometry[this.workflowCount]);
                     }
                     this.opeartionLayer = this.getCuerntOperatiobalLayer(this.workflowCount);
-
                 } else {
                     domStyle.set(this.TabContentContainer.children[i], "display", "none");
                 }
@@ -673,24 +675,27 @@ define([
                     for (k = 0; k < dataSelected.attachmentData.length; k++) {
                         arrAttachmentURL.push(dataSelected.attachmentData[k].url);
                     }
-                    prevNextdiv = domConstruct.create("div", { "class": "esriCTPrevNext" }, attachmentNode);
-                    prevdiv = domConstruct.create("div", { "class": "esriCTPrev" }, prevNextdiv);
-                    nextdiv = domConstruct.create("div", { "class": "esriCTNext" }, prevNextdiv);
+                    // If attachment length is greater than one then display previous and next arrow
+                    if (dataSelected.attachmentData.length > 1) {
+                        prevNextdiv = domConstruct.create("div", { "class": "esriCTPrevNext" }, attachmentNode);
+                        prevdiv = domConstruct.create("div", { "class": "esriCTPrev" }, prevNextdiv);
+                        nextdiv = domConstruct.create("div", { "class": "esriCTNext" }, prevNextdiv);
 
-                    this.own(on(prevdiv, "click", lang.hitch(this, function (value) {
-                        imageCount--;
-                        if (imageCount < 0) {
-                            imageCount = dataSelected.attachmentData.length - 1;
-                        }
-                        domAttr.set(attachmentImageClickDiv, "src", dataSelected.attachmentData[imageCount].url);
-                    })));
-                    this.own(on(nextdiv, "click", lang.hitch(this, function (value) {
-                        imageCount++;
-                        if (imageCount === dataSelected.attachmentData.length) {
-                            imageCount = 0;
-                        }
-                        domAttr.set(attachmentImageClickDiv, "src", dataSelected.attachmentData[imageCount].url);
-                    })));
+                        this.own(on(prevdiv, "click", lang.hitch(this, function (value) {
+                            imageCount--;
+                            if (imageCount < 0) {
+                                imageCount = dataSelected.attachmentData.length - 1;
+                            }
+                            domAttr.set(attachmentImageClickDiv, "src", dataSelected.attachmentData[imageCount].url);
+                        })));
+                        this.own(on(nextdiv, "click", lang.hitch(this, function (value) {
+                            imageCount++;
+                            if (imageCount === dataSelected.attachmentData.length) {
+                                imageCount = 0;
+                            }
+                            domAttr.set(attachmentImageClickDiv, "src", dataSelected.attachmentData[imageCount].url);
+                        })));
+                    }
                 }
             }
             this._downloadDropDown(dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.DownloadSettings, attachmentNode);
@@ -713,6 +718,7 @@ define([
                         this.map.setExtent(featureSet.features[0].geometry.getExtent());
                     }
                     this.isSharedExtent = false;
+
                 } else {
                     symbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, dojo.configData.LocatorRippleSize, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([parseInt(dojo.configData.RippleColor.split(",")[0], 10), parseInt(dojo.configData.RippleColor.split(",")[1], 10), parseInt(dojo.configData.RippleColor.split(",")[2], 10), 0.65]), 4), new dojo.Color([0, 0, 0, 0.2]));
                     graphic = new Graphic(featureSet.features[0].geometry, symbol, {}, null);
@@ -860,7 +866,9 @@ define([
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _buildingSearchButtonHandler: function (chkSerachContentBuilding) {
-            var slider;
+            var slider, sliderStartPoint, imageSlider = query('.dijitSliderImageHandleH')[0],
+                sliderProgressBar = query('.dijitSliderProgressBar')[0];
+            sliderStartPoint = query('.claro .dijitSlider .dijitSliderLeftBumper')[0];
             this.txtAddressBuilding.disabled = !chkSerachContentBuilding.checked;
             this.closeBuilding.disabled = !chkSerachContentBuilding.checked;
             this.esriCTimgLocateBuilding.disabled = !chkSerachContentBuilding.checked;
@@ -875,18 +883,29 @@ define([
                 this.lastGeometry[this.workflowCount] = null;
                 this.featureGeometry[this.workflowCount] = null;
                 this.map.graphics.clear();
+                this.map.getLayer("esriBufferGraphicsLayer").clear();
                 this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                 dojo.arrAddressMapPoint[this.workflowCount] = null;
                 this._callAndOrQuery(this.queryArrayBuildingAND, this.queryArrayBuildingOR);
+                //Disable the slider value and slider in buildings tab
                 domClass.add(this.divSearchBuilding, "esriCTDisabledAddressColorChange");
                 domClass.add(this.txtAddressBuilding, "esriCTDisabledAddressColorChange");
                 domClass.add(this.closeBuilding, "esriCTDisabledAddressColorChange");
                 domClass.add(this.clearhideBuilding, "esriCTDisabledAddressColorChange");
+                domClass.add(imageSlider, "esriCTGrayThumb");
+                domClass.add(this.sliderDisplayText, "esriCTesriCTsliderDisplayGrayText");
+                domClass.add(sliderProgressBar, "esriCTSliderProgressBar");
+                domClass.add(sliderStartPoint, "esriCTSliderProgressBar");
+
             } else {
                 domClass.remove(this.divSearchBuilding, "esriCTDisabledAddressColorChange");
                 domClass.remove(this.txtAddressBuilding, "esriCTDisabledAddressColorChange");
                 domClass.remove(this.closeBuilding, "esriCTDisabledAddressColorChange");
                 domClass.remove(this.clearhideBuilding, "esriCTDisabledAddressColorChange");
+                domClass.remove(imageSlider, "esriCTGrayThumb");
+                domClass.remove(this.sliderDisplayText, "esriCTesriCTsliderDisplayGrayText");
+                domClass.remove(sliderProgressBar, "esriCTSliderProgressBar");
+                domClass.remove(sliderStartPoint, "esriCTSliderProgressBar");
             }
         },
 
@@ -896,7 +915,9 @@ define([
         * @memberOf widgets/Sitelocator/SitelocatorHelper
         */
         _sitesSearchButtonHandler: function (chksearchContentSites) {
-            var slider;
+            var slider, imageSlider = query('.dijitSliderImageHandleH')[1], sliderProgressBar, sliderStartPoint;
+            sliderStartPoint = query('.claro .dijitSlider .dijitSliderLeftBumper')[1];
+            sliderProgressBar = query('.dijitSliderProgressBar')[1];
             this.txtAddressSites.disabled = !chksearchContentSites.checked;
             this.closeSites.disabled = !chksearchContentSites.checked;
             this.esriCTimgLocateSites.disabled = !chksearchContentSites.checked;
@@ -910,18 +931,28 @@ define([
                 this.lastGeometry[this.workflowCount] = null;
                 this.featureGeometry[this.workflowCount] = null;
                 this.map.graphics.clear();
+                this.map.getLayer("esriBufferGraphicsLayer").clear();
                 this.map.getLayer("esriGraphicsLayerMapSettings").clear();
                 dojo.arrAddressMapPoint[this.workflowCount] = null;
                 this._callAndOrQuery(this.queryArraySitesAND, this.queryArraySitesOR);
+                //Disable the slider value and slider in sites tab
                 domClass.add(this.divSearchSites, "esriCTDisabledAddressColorChange");
                 domClass.add(this.txtAddressSites, "esriCTDisabledAddressColorChange");
                 domClass.add(this.closeSites, "esriCTDisabledAddressColorChange");
                 domClass.add(this.clearhideSites, "esriCTDisabledAddressColorChange");
+                domClass.add(imageSlider, "esriCTGrayThumb");
+                domClass.add(this.sitesSliderText, "esriCTesriCTsliderDisplayGrayText");
+                domClass.add(sliderProgressBar, "esriCTSliderProgressBar");
+                domClass.add(sliderStartPoint, "esriCTSliderProgressBar");
             } else {
                 domClass.remove(this.divSearchSites, "esriCTDisabledAddressColorChange");
                 domClass.remove(this.txtAddressSites, "esriCTDisabledAddressColorChange");
                 domClass.remove(this.closeSites, "esriCTDisabledAddressColorChange");
                 domClass.remove(this.clearhideSites, "esriCTDisabledAddressColorChange");
+                domClass.remove(imageSlider, "esriCTGrayThumb");
+                domClass.remove(this.sitesSliderText, "esriCTesriCTsliderDisplayGrayText");
+                domClass.remove(sliderProgressBar, "esriCTSliderProgressBar");
+                domClass.remove(sliderStartPoint, "esriCTSliderProgressBar");
             }
 
         },
@@ -943,6 +974,5 @@ define([
             }
             return layer;
         }
-
     });
 });
