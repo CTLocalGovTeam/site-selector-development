@@ -1206,7 +1206,7 @@ input[type="text"]
 .esriCTSearchContainerComm select
 {
     width: 150px;
-    height: 30px;
+    height: 40px;
 }
 
 .esriCTDivBusinessSearch
@@ -1976,6 +1976,7 @@ input
     overflow: hidden;
     overflow-y: auto;
     background: #FFFFFF;
+    top:10px;
 }
 
 .esriCTDemoInfoMainDivContent
@@ -2167,6 +2168,7 @@ input
 .esriCTBackToResultImage
 {
     padding: 10px 0 0 12px;
+    clear:both;
 }
 
 .esriCTBackwardImage
@@ -2303,6 +2305,11 @@ div.esriCTPrev
     padding-left: 3px;
 }
 
+.esriCTSelectCommunities table
+{
+   height:30px;
+}
+
 .esriCTAddressSize
 {
     float: left;
@@ -2361,6 +2368,11 @@ div.esriCTPrev
     padding-left:3px;
 }
 
+.esriCTInnerSelectBoxDiv table
+{
+   height:30px;
+}
+
 .esriCTSortingDiv
 {
     float: right;
@@ -2390,7 +2402,10 @@ div.esriCTPrev
     display: table-cell;
     vertical-align: middle;
 }
-
+.esriCTSelectSortBox table
+{
+    height:30px;
+}
 .esriCTdivHideOptionBuilding
 {
     clear: both;
@@ -2558,6 +2573,7 @@ input[type="radio"]
 {
     background-position: 0 -20px;
 }
+
 label.css-label
 {
     -webkit-touch-callout: none;
@@ -2566,4 +2582,14 @@ label.css-label
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.esriCTGeoEnrichmentDivHeight
+{
+    height:163px;
+}
+
+.esriCTGeoEnrichmentOuterDivHeight
+{
+    height:363px;
 }

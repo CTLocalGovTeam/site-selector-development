@@ -173,7 +173,7 @@ define([
         },
 
         /**
-        * perform search by addess if search type is address search
+        * perform search by address if search type is address search
         * @param {object} evt Click event
         * @param {object} Nodes and other variable for all workflows
         * @memberOf widgets/Sitelocator/UnifiedSearch
@@ -202,7 +202,7 @@ define([
         },
 
         /**
-        * perform search by addess if search type is address search
+        * perform search by address if search type is address search
         * @param {object} Nodes and other variable for all workflows
         * @memberOf widgets/Sitelocator/UnifiedSearch
         */
@@ -417,7 +417,7 @@ define([
         },
 
         /**
-        * perform search by addess if search type is address search
+        * perform search by address if search type is address search
         * @param {array} array of address
         * @param {number} count of address in address list
         * @param {object} Nodes and other variable for all workflows
@@ -527,7 +527,7 @@ define([
         },
 
         /**
-        * perform search by addess if search type is address search
+        * perform search by address if search type is address search
         * @param {object} address candidate
         * @param {number} index of address
         * @param {array} array of candidate address
@@ -581,7 +581,7 @@ define([
         },
 
         /**
-        * perform search by addess if search type is address search
+        * perform search by address if search type is address search
         * @param {object} Map point
         * @param {object} Nodes and other variable for all workflows
         * @memberOf widgets/Sitelocator/UnifiedSearch

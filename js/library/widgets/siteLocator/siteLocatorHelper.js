@@ -77,10 +77,11 @@ define([
         lastGeometry: [null, null, null, null],
         arrGeoenrichData: [null, null, null, null],
         isIndexShared: false,
+
         /**
-        * create horizontal slider for all required tab
-        * @param container node,horizontal rule node and slider value
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * create horizontal slider for all tab and set minimum maximum value of slider
+        * @param container node, horizontal rule node and slider value
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _createHorizontalSlider: function (sliderContainer, horizontalRuleContainer, divSliderValue, unitContainer, tabCount, bufferDistance) {
             var _self, horizontalSlider, sliderId, horizontalRule, sliderTimeOut;
@@ -129,9 +130,9 @@ define([
             _self = this;
 
             /**
-            * Call back for slider change event
-            * @param {object} Slider value
-            * @memberOf widgets/Sitelocator/SitelocatorHelper
+            * call back for slider change event
+            * @param {object} slider value
+            * @memberOf widgets/SiteLocator/SiteLocatorHelper
             */
             on(horizontalSlider, "change", function (value) {
                 if (Number(value) > Number(horizontalSlider.maximum)) {
@@ -143,18 +144,31 @@ define([
                 sliderTimeOut = setTimeout(function () {
                     if (_self.featureGeometry && _self.featureGeometry[_self.workflowCount]) {
                         _self._createBuffer(_self.featureGeometry[_self.workflowCount]);
+                        if (_self.workflowCount === 0 && _self.selectBusinessSortForBuilding) {
+                            dojo.sortingData = null;
+                            _self.selectBusinessSortForBuilding.set("value", sharedNls.titles.select);
+                        }
+                        if (_self.workflowCount === 1 && _self.selectBusinessSortForSites) {
+                            dojo.sortingData = null;
+                            _self.selectBusinessSortForSites.set("value", sharedNls.titles.select);
+                        }
+                        if (_self.workflowCount === 2 && _self.selectSortOption) {
+                            _self.selectSortOption.set("value", sharedNls.titles.select);
+                        }
                     }
                 }, 500);
             });
         },
 
         /**
-        * Set visiblity for enabled/disabled tab{work flow}
-        * @memberOf widgets/Sitelocator/Sitelocator
+        * set visibility for enabled/disabled tab{work flow}
+        * @memberOf widgets/SiteLocator/SiteLocator
         */
         _setTabVisibility: function () {
             var j, countEnabledTab = 0, arrEnabledTab = [];
+            // loop all workflows from config file
             for (j = 0; j < dojo.configData.Workflows.length; j++) {
+                // check visibility of workflows and accordingly display the container
                 if (!dojo.configData.Workflows[j].Enabled) {
                     switch (dojo.configData.Workflows[j].Name) {
                     case dojo.configData.Workflows[0].Name:
@@ -175,6 +189,7 @@ define([
                         break;
                     }
                 } else {
+                    // check visibility of workflows and push the data(container and content node) in an array
                     switch (dojo.configData.Workflows[j].Name) {
                     case dojo.configData.Workflows[0].Name:
                         arrEnabledTab.push({ Container: this.esriCTsearchContainerBuilding, Content: this.searchContentBuilding });
@@ -201,30 +216,31 @@ define([
                         break;
                     }
                     countEnabledTab++;
-
                 }
 
             }
             if (countEnabledTab === 0) {
                 alert(sharedNls.errorMessages.disableTab);
             } else {
+                // check the shared URL for "workflowCount" to show selected tab when application is loaded first time while sharing
                 if (window.location.toString().split("$workflowCount=").length > 1) {
-
                     this._showTab(query(".esriCTTab")[window.location.toString().split("$workflowCount=")[1].split("$")[0]], query(".esriCTConetentTab")[window.location.toString().split("$workflowCount=")[1].split("$")[0]]);
                 } else {
+                    // call show tab
                     this._showTab(arrEnabledTab[0].Container, arrEnabledTab[0].Content);
                 }
             }
         },
 
         /**
-        * Show tab based on seleted tab
+        * show tab based on selected tab
         * @param {object} node for tab container
         * @param {object} node for tab content
-        * @memberOf widgets/Sitelocator/Sitelocator
+        * @memberOf widgets/SiteLocator/SiteLocator
         */
         _showTab: function (tabNode, contentNode) {
             var i, srcContainer, srcContent, esriCTDemoResultStylesd;
+            // loop all the child element of main container(divDirectionContainer)
             for (i = 0; i < this.divDirectionContainer.children.length; i++) {
                 if (contentNode === this.TabContentContainer.children[i]) {
                     domStyle.set(this.TabContentContainer.children[i], "display", "block");
@@ -242,7 +258,6 @@ define([
                         this.map.getLayer("esriFeatureGraphicsLayer").add(this.featureGraphics[i]);
                         this.map.setLevel(dojo.configData.ZoomLevel);
                         this.map.centerAt(this.featureGraphics[i].geometry);
-
                         this.map.getLayer("esriFeatureGraphicsLayer").graphics[0].show();
                     } else if (this.lastGeometry[this.workflowCount]) {
                         this.map.setExtent(this.lastGeometry[this.workflowCount][0].getExtent(), true);
@@ -265,7 +280,6 @@ define([
                     }
                 }
             }
-
             this._resizeBuildingAndSites();
             if (this.workflowCount === 3 && this.comunitiesDemoInfoMainScrollbar) {
                 srcContainer = query('.esriCTDemoInfoMainDiv', this.communityMainDiv)[0];
@@ -279,8 +293,8 @@ define([
         },
 
         /**
-        * Building and sites resize handler
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * building and sites scrollbar resize handler
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _resizeBuildingAndSites: function () {
             var contentnodeDiv, srcContainer, srcContent;
@@ -308,9 +322,9 @@ define([
             }
         },
         /**
-        * Add pushpin on mappoint
-        * @param {object} mappoint for pushpin
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * add push pin on map point
+        * @param {object} map point for push pin
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         addPushPin: function (mapPoint) {
             var geoLocationPushpin, locatorMarkupSymbol, graphic;
@@ -325,10 +339,10 @@ define([
         },
 
         /**
-        * Resize Building Panel
-        * @param {object} Containernode for Building tab for Demographic container
-        * @param {object} Contentnode for Building tab for Demographic container
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * resize building Panel
+        * @param {object} container node for Building tab for Demographic container
+        * @param {object} content node for Building tab for Demographic container
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _resizeBuildingPanel: function (geoenrichtOuterDiv, geoenrichtOuterDivContent) {
             var esriCTBuildingResultContainer, esriCTBuildingSitesResultStylesd;
@@ -342,9 +356,9 @@ define([
 
         /**
         * Resize Sites Panel
-        * @param {object} Containernode for Sites tab for Demographic container
-        * @param {object} Contentnode for Sites tab for Demographic container
-        * @memberOf widgets/Sitelocator/Sitelocator
+        * @param {object} container node for Sites tab for Demographic container
+        * @param {object} content node for Sites tab for Demographic container
+        * @memberOf widgets/SiteLocator/SiteLocator
         */
         _resizeSitesPanel: function (geoenrichtOuterDiv, geoenrichtOuterDivContent) {
             if (geoenrichtOuterDiv.offsetTop > 0) {
@@ -358,12 +372,12 @@ define([
 
         /**
         * Resize Building Panel
-        * @param {object} Containernode for Building tab
-        * @param {object} Contentnode for Building tab
-        * @memberOf widgets/Sitelocator/Sitelocator
+        * @param {object} Container node for Building tab
+        * @param {object} Content node for Building tab
+        * @memberOf widgets/SiteLocator/SiteLocator
         */
         _resizeBuildingContainer: function (containerNode, contentNode) {
-
+            // check the number of pixels from the top of the parent element(buildings tab container node) is greater than 0
             if (containerNode.offsetTop > 0) {
                 var desriCTBuildingSitesResultContainer, desriCTBuildingSitesResultStyle;
                 if (this.buldingShowOption === this.workflowCount + "_" + sharedNls.titles.hideText.toString()) {
@@ -379,11 +393,12 @@ define([
 
         /**
         * Resize Sites Panel
-        * @param {object} Containernode for Sites tab
-        * @param {object} Contentnode for Sites tab
-        * @memberOf widgets/Sitelocator/Sitelocator
+        * @param {object} Container node for Sites tab
+        * @param {object} Content node for Sites tab
+        * @memberOf widgets/SiteLocator/SiteLocator
         */
         _resizeSitesContainer: function (containerNode, contentNode) {
+            // check the number of pixels from the top of the parent element(sites tab container node) is greater than 0
             if (containerNode.offsetTop > 0) {
                 var desriCTSitesResultContainer, desriCTSitesResultStyle;
                 if (this.siteShowOption === this.workflowCount + "_" + sharedNls.titles.hideText.toString()) {
@@ -398,11 +413,11 @@ define([
         },
 
         /**
-        * Show hide more option
+        * show hide more option callback to check the additional filters in buildings and sites tab
         * @param {object} show node
         * @param {object} text node
         * @param {object} rule node
-        * @memberOf widgets/Sitelocator/Sitelocator
+        * @memberOf widgets/SiteLocator/SiteLocator
         */
         _showHideMoreOption: function (showHideNode, textNode, ruleNode) {
             var esriCTBuildingSitesStyle, newContentnode, esriCTBuildingSitesResultContainer, contentnode, contentNodeSites, esriCTSitesResultContainer, siteLocatorScrollbarBuildingNew, esriCTBuildingSitesResultStyle, esriCTSitesResultStyle;
@@ -506,7 +521,7 @@ define([
         * Creates list of objects to be displayed in pagination
         * @param {array} list of data for a batch
         * @param {object} Nodes to attach display list
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _createDisplayList: function (listData, containerNode) {
             if (listData) {
@@ -602,7 +617,7 @@ define([
         * @param {object} Scrollbar name
         * @param {object} Scrollbar container node
         * @param {object} scrollbar Content node
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         resizeScrollbar: function (scrollbarName, containerNode, scrollbarContent) {
             if (scrollbarName && containerNode.offsetTop > 0) {
@@ -629,7 +644,7 @@ define([
         /**
         * perform query to get geometry and other data based on object selection from display list
         * @param {object} Selected value
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @memberOf widgets/SiteLocator/SitelocatorHelper
         */
         _getAttchmentImageAndInformation: function (value) {
             var index, dataSelected;
@@ -656,7 +671,7 @@ define([
         * @param {object} html node for attachment
         * @param {object} html node for main container
         * @param {object} html node search content
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _attachMentQuery: function (value, dataSelected, attachmentNode, mainDivNode, searchContentNode) {
             var backwardImage, backToResultDiv, arrAttachmentURL = [], backToResult, attachmentDiv, attachmentImageClickDiv, imageCount = 0, prevNextdiv, prevdiv, nextdiv, outfields = [], resultSelectionQuerytask, resultSelectQuery, i, j, k, geometryService, params, propertyHeaderInfo, attributedata;
@@ -803,7 +818,7 @@ define([
         * Back button handler building tab
         * @param {object} Attachment div node
         * @param {object} Parent div node for attachment
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _getBackToTab: function (attachmentNode, mainDivNode) {
             domStyle.set(attachmentNode, "display", "none");
@@ -840,8 +855,8 @@ define([
 
         /**
         * Enables and disables search for communities tab
-        * @param {object} Search checkbox
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @param {object} Search check box
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _communitiesSearchRadioButtonHandler: function (rdoCommunitiesAddressSearch) {
             domClass.remove(this.divSearchCommunities, "esriCTDisabledAddressColorChange");
@@ -862,8 +877,8 @@ define([
 
         /**
         * Enables and disables search for building tab
-        * @param {object} Search checkbox
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @param {object} Search check box
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _buildingSearchButtonHandler: function (chkSerachContentBuilding) {
             var slider, sliderStartPoint, imageSlider = query('.dijitSliderImageHandleH')[0],
@@ -911,8 +926,8 @@ define([
 
         /**
         * Enables and disables search for sites tab
-        * @param {object} Search checkbox
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @param {object} Search check box
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         _sitesSearchButtonHandler: function (chksearchContentSites) {
             var slider, imageSlider = query('.dijitSliderImageHandleH')[1], sliderProgressBar, sliderStartPoint;
@@ -960,7 +975,7 @@ define([
         /**
         * Get operational layer based on tab(work flow) selection
         * @param {number} count of tab(workflow)
-        * @memberOf widgets/Sitelocator/SitelocatorHelper
+        * @memberOf widgets/SiteLocator/SiteLocatorHelper
         */
         getCuerntOperatiobalLayer: function (tabCount) {
             var layer, opeartionLayer;
