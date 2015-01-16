@@ -70,6 +70,7 @@ define([
     //========================================================================================================================//
 
     return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, geoEnrichment], {
+        isSharedSort: false,
 
         /**
         * Performs from to filter query
@@ -166,14 +167,23 @@ define([
         chkQueryHandler: function (chkBoxNode) {
             var arrAndQuery = [], arrOrQuery = [];
             topic.publish("showProgressIndicator");
+            dojo.sortingData = null;
             if (this.workflowCount === 0) {
+                if (this.selectBusinessSortForBuilding) {
+                    this.selectBusinessSortForBuilding.set("value", sharedNls.titles.select);
+                    this.selectedValue = null;
+                }
                 arrAndQuery = this.queryArrayBuildingAND;
                 arrOrQuery = this.queryArrayBuildingOR;
             } else {
+                if (this.selectBusinessSortForSites) {
+                    this.selectBusinessSortForSites.set("value", sharedNls.titles.select);
+                    this.selectedValue = null;
+                }
                 arrAndQuery = this.queryArraySitesAND;
                 arrOrQuery = this.queryArraySitesOR;
             }
-            if (chkBoxNode.target.checked) {
+            if (chkBoxNode.target && chkBoxNode.target.checked) {
                 if (chkBoxNode.target.parentElement.getAttribute("isRegularFilterOptionFields") === "true") {
                     if (array.indexOf(arrAndQuery, chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'") === -1) {
                         arrAndQuery.push(chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'");
@@ -183,14 +193,18 @@ define([
                         arrOrQuery.push("UPPER(" + chkBoxNode.target.name + ") LIKE UPPER('%" + chkBoxNode.target.value + "%')");
                     }
                 }
+            } else if (chkBoxNode.checked) {
+                if (array.indexOf(arrOrQuery, "UPPER(" + chkBoxNode.name + ") LIKE UPPER('%" + chkBoxNode.value + "%')") === -1) {
+                    arrOrQuery.push("UPPER(" + chkBoxNode.name + ") LIKE UPPER('%" + chkBoxNode.value + "%')");
+                }
             } else {
-
                 if (chkBoxNode.target.parentElement.getAttribute("isRegularFilterOptionFields") === "true") {
                     arrAndQuery.splice(array.indexOf(arrAndQuery, chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'"), 1);
                 } else {
                     arrOrQuery.splice(array.indexOf(arrOrQuery, "UPPER(" + chkBoxNode.target.name + ") LIKE UPPER('%" + chkBoxNode.target.value + "%')"), 1);
                 }
             }
+
             if (this.workflowCount === 0) {
                 this.queryArrayBuildingAND = arrAndQuery;
                 this.queryArrayBuildingOR = arrOrQuery;
@@ -232,10 +246,6 @@ define([
                 } else {
                     queryString = orString;
                 }
-            }
-            if (window.location.toString().split("$whereClause=").length > 1 && !dojo.arrWhereClause[this.workflowCount] && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === this.workflowCount) {
-                queryString = window.location.href.toString().replace(/%20/g, " ").replace(/%27/g, "'").replace(/%3E/g, ">").replace(/%3C/g, "<").split("$whereClause=")[1].split("$")[0].toString().replace(/PERCENT/g, "%");
-
             }
             if (queryString) {
                 this.doLayerQuery(this.workflowCount, geometry, queryString);
@@ -330,7 +340,6 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _queryLayerhandler: function (featureSet) {
-
             if (featureSet !== null && featureSet.length > 0) {
                 if (this.workflowCount === 0) {
                     domStyle.set(this.outerDivForPegination, "display", "block");
@@ -400,14 +409,14 @@ define([
                     }
                     for (i = curentIndex; i < finalIndex; i++) {
                         arrIds.push(featureSet[i]);
-                        if (layer.hasAttachments && dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.ShowAttachments) {
-                            this.count++;
-                            this.itemquery(null, featureSet[i], layer, onCompleteArray);
-                        }
                     }
+                    if (layer.hasAttachments && dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.ShowAttachments) {
+                        this.count++;
+                        this.itemquery(null, featureSet[i], layer, onCompleteArray);
+                    }
+                    this.itemquery(arrIds, null, layer, onCompleteArray);
                     this.count++;
                     layerAttachmentInfos = [];
-                    this.itemquery(arrIds, null, layer, onCompleteArray);
                     deferredListResult = new DeferredList(onCompleteArray);
                     deferredListResult.then(lang.hitch(this, function (result) {
                         if (result) {
@@ -456,14 +465,14 @@ define([
                 queryobject.outFields = oufields;
                 queryobject.returnGeometry = false;
                 queryobject.objectIds = arrIds;
-
+                if (this.selectedValue) {
+                    queryobject.orderByFields = [this.selectedValue];
+                }
                 queryOnRouteTask = queryObjectTask.execute(queryobject);
-                onCompleteArray.push(queryOnRouteTask);
             } else if (objectId !== null) {
                 queryOnRouteTask = layer.queryAttachmentInfos(objectId);
-                onCompleteArray.push(queryOnRouteTask);
             }
-
+            onCompleteArray.push(queryOnRouteTask);
         },
 
         /**
@@ -498,7 +507,7 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _paginationForResults: function (index) {
-            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForBuilding, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForBuilding, timeOut, currentIndex = index, strLastUpdate;
+            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForBuilding, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, timeOut, currentIndex = index, strLastUpdate;
             domConstruct.empty(this.outerDivForPegination);
             rangeDiv = domConstruct.create("div", { "class": "esriCTRangeDiv" }, this.outerDivForPegination);
             currentIndexNode = domConstruct.create("div", { "class": "esriCTIndex" }, rangeDiv);
@@ -595,12 +604,19 @@ define([
                     }
                 }
             }
-            selectBusinessSortForBuilding = new SelectList({
+            this.selectBusinessSortForBuilding = new SelectList({
                 options: this.areaSortBuilding,
                 maxHeight: 100
             }, selectForBuilding);
 
-            this.own(on(selectBusinessSortForBuilding, "change", lang.hitch(this, function (value) {
+            if (window.location.toString().split("$strSortingData=").length > 1 && !this.isSharedSort) {
+                this.isSharedSort = true;
+                this.siteLocatorScrollbarAttributeBuilding = null;
+                this.buildingResultSet = null;
+                this.selectBusinessSortForBuilding.set("value", window.location.toString().split("$strSortingData=")[1].split("$")[0]);
+            }
+
+            this.own(on(this.selectBusinessSortForBuilding, "change", lang.hitch(this, function (value) {
                 if (value.toLowerCase() !== sharedNls.titles.select.toLowerCase()) {
                     this._selectionChangeForBuildingSort(value);
                 }
@@ -654,7 +670,7 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         _paginationForResultsSites: function (index) {
-            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForSites, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, selectBusinessSortForSites, timeOut, currentIndexSites = index, strLastUpdate;
+            var rangeDiv, paginationCountDiv, leftArrow, firstIndex, selectSortBox, lastIndex, rightArrow, sortingDiv, sortContentDiv, spanContent, selectForSites, currentIndexNode, hyphen, tenthIndex, ofTextDiv, TotalCount, currentPage = 1, total, result, i, timeOut, currentIndexSites = index, strLastUpdate;
             domConstruct.empty(this.outerDivForPeginationSites);
             rangeDiv = domConstruct.create("div", { "class": "esriCTRangeDiv" }, this.outerDivForPeginationSites);
             currentIndexNode = domConstruct.create("div", { "class": "esriCTIndex" }, rangeDiv);
@@ -752,11 +768,19 @@ define([
                     }
                 }
             }
-            selectBusinessSortForSites = new SelectList({
+            this.selectBusinessSortForSites = new SelectList({
                 options: this.areaSortSites,
                 maxHeight: 100
             }, selectForSites);
-            this.own(on(selectBusinessSortForSites, "change", lang.hitch(this, function (value) {
+
+            if (window.location.toString().split("$strSortingData=").length > 1 && !this.isSharedSort) {
+                this.isSharedSort = true;
+                this.siteLocatorScrollbarSites = null;
+                this.sitesResultSet = null;
+                this.selectBusinessSortForSites.set("value", window.location.toString().split("$strSortingData=")[1].split("$")[0]);
+            }
+
+            this.own(on(this.selectBusinessSortForSites, "change", lang.hitch(this, function (value) {
                 if (value.toLowerCase() !== sharedNls.titles.select.toLowerCase()) {
                     this._selectionChangeForBuildingSort(value);
                 }
@@ -810,7 +834,12 @@ define([
         */
         _selectionChangeForBuildingSort: function (value) {
             var querySort, queryTask, andString, orString, queryString;
+            this.siteLocatorScrollbarAttributeBuilding = null;
+            this.siteLocatorScrollbarSites = null;
+            this.buildingResultSet = null;
+            this.sitesResultSet = null;
             this.selectedValue = value;
+            dojo.sortingData = this.selectedValue;
             queryTask = new QueryTask(this.opeartionLayer.url);
             querySort = new esri.tasks.Query();
             if (this.lastGeometry[this.workflowCount]) {
@@ -822,6 +851,14 @@ define([
             if (this.queryArrayBuildingOR.length > 0) {
                 orString = this.queryArrayBuildingOR.join(" OR ");
             }
+            if (this.queryArraySitesAND.length > 0) {
+                andString = this.queryArraySitesAND.join(" AND ");
+            }
+
+            if (this.queryArraySitesOR.length > 0) {
+                andString = this.queryArraySitesOR.join(" OR ");
+            }
+
             if (andString) {
                 queryString = andString;
             }

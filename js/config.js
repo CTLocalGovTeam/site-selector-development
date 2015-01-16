@@ -63,9 +63,9 @@ define([], function () {
 
         PortalAPIURL: "http://www.arcgis.com/sharing/rest/",
         // Specify the title of group that contains basemaps
-        BasemapGroupTitle: "Basemaps",
+        BasemapGroupTitle: "Basemapsdev",
         // Specify the user name of owner of the group that contains basemaps
-        BasemapGroupOwner: "GISITAdmin",
+        BasemapGroupOwner: "lkingdev",
         // Specify spatial reference for basemaps, since all basemaps need to use the same spatial reference
         BasemapSpatialReferenceWKID: 102100,
         // Specify path to image used to display the thumbnail for a basemap when portal does not provide it
@@ -134,24 +134,24 @@ define([], function () {
         // GeoEnrichmentContents: Configure settings to display data collections or variables from geoenrichment.
         // DownloadSettings: Configure settings for downloading reports from geoprocessing service or geoenrichment.
 
-        WebMapId: "70a04b42349d46368e92d0492331fead",
+        WebMapId: "81ceb15ac37c4227aa21bbeb37de3c75",
         Workflows: [
             {
                 Name: "Buildings",
                 Enabled: true,
                 SearchSettings: [
                     {
-                        Title: "SitesandBuilding - Buildings",
-                        QueryLayerId: "2",
+                        Title: "MarylandBuildingsAndSites",
+                        QueryLayerId: "1",
                         SearchDisplayTitle: "Buildings",
-                        SearchDisplayFields: "${BUILDINGNAME}, ${ARC_City}, ${STATE}",
-                        SearchExpression: "UPPER(BUILDINGNAME) LIKE UPPER('${0}%') OR UPPER(ARC_City) LIKE UPPER('${0}%') OR UPPER(STATE) LIKE UPPER('${0}%')",
+                        SearchDisplayFields: "${FACNAME}, ${FACTYPE}, ${SITEZIP}",
+                        SearchExpression: "UPPER(FACNAME) LIKE UPPER('${0}%') OR UPPER(FACTYPE) LIKE UPPER('${0}%') OR UPPER(SITEZIP) LIKE UPPER('${0}%')",
 
                         FilterSettings: {
                             FilterRangeFields: [
                                 {
                                     DisplayText: "Area (sqft)",
-                                    FieldName: "TOTALSQFT"
+                                    FieldName: "BLDGAREA"
                                 }
                             ],
                             RegularFilterOptionFields: [
@@ -159,7 +159,7 @@ define([], function () {
 
                             AdditionalFilterOptions: {
                                 Enabled: true,
-                                FilterFieldName: "ZONING",
+                                FilterFieldName: "ZONEDESC",
                                 FilterOptions: [
                                     {
                                         DisplayText: "Agricultural",
@@ -185,32 +185,28 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "BUILDINGNAME",
+                                FieldName: "FACNAME",
                                 SortingEnabled: true
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "ADDRESS",
+                                FieldName: "FULLADDR",
                                 SortingEnabled: false
                             }, {
-                                DisplayText: "City:",
-                                FieldName: "ARC_City",
-                                SortingEnabled: true
-                            }, {
-                                DisplayText: "State:",
-                                FieldName: "STATE",
+                                DisplayText: "Municipality:",
+                                FieldName: "MUNICIPALITY",
                                 SortingEnabled: true
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "ZIP",
+                                FieldName: "SITEZIP",
+                                SortingEnabled: true
+                            }, {
+                                DisplayText: "County:",
+                                FieldName: "SITECOUNTY",
                                 SortingEnabled: true
                             }, {
                                 DisplayText: "Area (sqft):",
-                                FieldName: "TOTALSQFT",
+                                FieldName: "BLDGAREA",
                                 SortingEnabled: true
-                            }, {
-                                DisplayText: "Active to users:",
-                                FieldName: "ACTIVETOUSERS",
-                                SortingEnabled: false
                             }
 
                         ]
@@ -221,25 +217,22 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "BUILDINGNAME"
+                                FieldName: "FACNAME"
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "ADDRESS"
+                                FieldName: "FULLADDR"
                             }, {
-                                DisplayText: "City:",
-                                FieldName: "ARC_City"
-                            }, {
-                                DisplayText: "State:",
-                                FieldName: "STATE"
+                                DisplayText: "County:",
+                                FieldName: "SITECOUNTY"
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "ZIP"
+                                FieldName: "SITEZIP"
                             }, {
                                 DisplayText: "Type:",
-                                FieldName: "ZONING"
+                                FieldName: "ZONEDESC"
                             }, {
                                 DisplayText: "Area (sqft):",
-                                FieldName: "TOTALSQFT"
+                                FieldName: "BLDGAREA"
                             }
                         ]
                     },
@@ -298,7 +291,7 @@ define([], function () {
                     DownloadSettings: [
                         {
                             DisplayOptionTitle: "Property Information",
-                            GeoProcessingServiceURL: "http://csslesxi3-vm4.cybertech.com/arcgis/rest/services/SiteSelector/GeneratePDFReport/GPServer/SiteSelectorPDFGen",
+                            GeoProcessingServiceURL: "http://54.241.236.56:6080/arcgis/rest/services/SiteSelector_UAT/GeneratePDFReport/GPServer/SiteSelectorPDFGen",
                             Filetype: "PDF" //allowed PDF
                         }
                     ]
@@ -308,28 +301,23 @@ define([], function () {
                 Enabled: true,
                 SearchSettings: [
                     {
-                        Title: "SitesandBuilding - Sites",
-                        QueryLayerId: "1",
+                        Title: "MarylandBuildingsAndSites",
+                        QueryLayerId: "0",
                         SearchDisplayTitle: "Sites",
-                        SearchDisplayFields: "${SiteName}, ${ARC_City}, ${StreetAddress}",
-                        SearchExpression: "UPPER(SiteName) LIKE UPPER('${0}%') OR UPPER(ARC_City) LIKE UPPER('${0}%') OR UPPER(StreetAddress) LIKE UPPER('${0}%')",
+                        SearchDisplayFields: "${FACNAME}, ${FACTYPE}, ${FULLADDR}",
+                        SearchExpression: "UPPER(FACNAME) LIKE UPPER('${0}%') OR UPPER(FACTYPE) LIKE UPPER('${0}%') OR UPPER(FULLADDR) LIKE UPPER('${0}%')",
                         FilterSettings: {
                             FilterRangeFields: [
                                 {
                                     DisplayText: "Area (acres)",
-                                    FieldName: "SiteSizeAcres"
+                                    FieldName: "TOTAREA"
                                 }
                             ],
                             RegularFilterOptionFields: [
-                                {
-                                    DisplayText: "Within city",
-                                    FieldName: "WithinCityLimits",
-                                    FieldValue: "Y"
-                                }
                             ],
                             AdditionalFilterOptions: {
                                 Enabled: true,
-                                FilterFieldName: "Zoning",
+                                FilterFieldName: "ZONEDESC",
                                 FilterOptions: [
                                     {
                                         DisplayText: "Residential",
@@ -355,31 +343,23 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "SiteName",
+                                FieldName: "FACNAME",
                                 SortingEnabled: true
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "StreetAddress",
+                                FieldName: "FULLADDR",
                                 SortingEnabled: true
                             }, {
-                                DisplayText: "City:",
-                                FieldName: "ARC_City",
+                                DisplayText: "County:",
+                                FieldName: "SITECOUNTY",
                                 SortingEnabled: false
                             }, {
                                 DisplayText: "Area (acres):",
-                                FieldName: "SiteSizeAcres",
+                                FieldName: "TOTAREA",
                                 SortingEnabled: true
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "ZipCode",
-                                SortingEnabled: false
-                            }, {
-                                DisplayText: "Within city:",
-                                FieldName: "WithinCityLimits",
-                                SortingEnabled: false
-                            }, {
-                                DisplayText: "Active to users:",
-                                FieldName: "SiteActivetoUsers",
+                                FieldName: "SITEZIP",
                                 SortingEnabled: false
                             }
                         ]
@@ -390,25 +370,22 @@ define([], function () {
                         DisplayFields: [
                             {
                                 DisplayText: "Name:",
-                                FieldName: "SiteName"
+                                FieldName: "FACNAME"
                             }, {
                                 DisplayText: "Address:",
-                                FieldName: "StreetAddress"
+                                FieldName: "FULLADDR"
                             }, {
-                                DisplayText: "State:",
-                                FieldName: "State"
-                            }, {
-                                DisplayText: "City:",
-                                FieldName: "ARC_City"
+                                DisplayText: "County:",
+                                FieldName: "SITECOUNTY"
                             }, {
                                 DisplayText: "Zipcode:",
-                                FieldName: "ZipCode"
+                                FieldName: "SITEZIP"
                             }, {
                                 DisplayText: "Type:",
-                                FieldName: "Zoning"
+                                FieldName: "ZONEDESC"
                             }, {
                                 DisplayText: "Area (acres):",
-                                FieldName: "SiteSizeAcres"
+                                FieldName: "TOTAREA"
                             }
                         ]
                     },
@@ -468,7 +445,7 @@ define([], function () {
                     DownloadSettings: [
                         {
                             DisplayOptionTitle: "Site Information",
-                            GeoProcessingServiceURL: "http://csslesxi3-vm4.cybertech.com/arcgis/rest/services/SiteSelector/GeneratePDFReport/GPServer/SiteSelectorPDFGen",
+                            GeoProcessingServiceURL: "http://54.241.236.56:6080/arcgis/rest/services/SiteSelector_UAT/GeneratePDFReport/GPServer/SiteSelectorPDFGen",
                             Filetype: "PDF" //allowed PDF
                         }, {
                             DisplayOptionTitle: "Traffic Count Profile",
@@ -590,7 +567,7 @@ define([], function () {
                         FeatureLimit: 10
                     },
                     FilterLayer: {
-                        Title: "Communities",
+                        Title: "EconomicDevelopment - Municipalities",
                         QueryLayerId: "54",
                         FilterFieldName: "COUNTY",
                         OutFields: ["COUNTY"]

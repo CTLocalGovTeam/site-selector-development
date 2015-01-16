@@ -175,6 +175,12 @@ define([
             if (dojo.strGeoLocationMapPoint) {
                 urlStr += "$strGeoLocationMapPoint=" + dojo.strGeoLocationMapPoint;
             }
+            if (dojo.sortingData) {
+                urlStr += "$strSortingData=" + dojo.sortingData;
+            }
+            if (dojo.businessSortData) {
+                urlStr += "$strBusinessSortData=" + dojo.businessSortData.toString();
+            }
             try {
 
                 /**

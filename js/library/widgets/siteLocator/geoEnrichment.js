@@ -365,7 +365,7 @@ define([
             var geometryService, relationParams, standardGeoQueryURL, standardGeoQueryRequest;
             // If enrich data contain geometry call show buffer function
             if (geometry) {
-            // Checking for business workflow
+                // Checking for business workflow
                 if (workflowCount === 2) {
                     this.showBuffer(geometry);
                     this._clearBusinessData();
@@ -453,16 +453,16 @@ define([
         _enrichDataRequest: function (geometry, workflowCount, standardSearchCandidate) {
             var studyAreas, requestContent, enrichUrl, geoEnrichmentRequest, dataCollections, analysisVariables, i, isRetunrnGeometry = true;
             try {
-                // Setting study areas for Building, Sites and Business workflow
+                // Set the study areas for Building, Sites and Business workflow
                 if (geometry !== null && workflowCount !== 3) {
                     studyAreas = [{ "geometry": { "rings": geometry[0].rings, "spatialReference": { "wkid": this.map.spatialReference.wkid} }, "attributes": { "id": "Polygon 1", "name": "Optional Name 1"}}];
                     this.arrStudyAreas[this.workflowCount] = studyAreas;
                 }
                 enrichUrl = dojo.configData.GeoEnrichmentService + "/GeoEnrichment/enrich";
-                // Checking Workflow count for all workflows
+                // Check Workflow count for all workflows
                 switch (workflowCount) {
                 case 0:
-                    //Setting analysis variables for Building workflow
+                    //Set the analysis variables for Building workflow
                     analysisVariables = this._setAnalysisVariables(dojo.configData.Workflows[workflowCount].InfoPanelSettings.GeoEnrichmentContents.DisplayFields);
                     geoEnrichmentRequest = esriRequest({
                         url: enrichUrl,
@@ -477,7 +477,7 @@ define([
                     });
                     break;
                 case 1:
-                    //Setting analysis variables for Sites workflow
+                    //Set the analysis variables for Sites workflow
                     analysisVariables = this._setAnalysisVariables(dojo.configData.Workflows[workflowCount].InfoPanelSettings.GeoEnrichmentContents.DisplayFields);
                     geoEnrichmentRequest = esriRequest({
                         url: enrichUrl,
@@ -503,7 +503,7 @@ define([
                             studyAreas: JSON.stringify(studyAreas)
                         };
                     } else {
-                    //Set analysis variables for business tab in business workflow
+                        //Set analysis variables for business tab in business workflow
                         analysisVariables = {};
                         analysisVariables.analysisVariable = [];
                         for (i = 0; i < dojo.configData.Workflows[workflowCount].InfoPanelSettings.GeoEnrichmentContents[0].BusinessSummaryFields.length; i++) {
@@ -649,7 +649,7 @@ define([
                 if (this.businessTabScrollbar) {
                     this._getDemographyResult(data, dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[1], this.DemoInfoMainDivContent);
                 } else {
-                // Set the business data in business workflow
+                    // Set the business data in business workflow
                     this._setResultData(data);
                 }
             }
@@ -898,36 +898,40 @@ define([
             var i, resultpanel, content, countRevenueEmpPanel, esriContainerHeight, esriContainerStyle, countRevenueEmp, count, countName, countValue, revenue, revenueName, revenuevalue, employee, empName, empValue;
             this._showBusinessTab();
             this.currentBussinessData = arrData;
+            if (window.location.toString().split("$strBusinessSortData=").length > 1 && !this.isSharedSort) {
+                this.isSharedSort = true;
+                this.selectSortOption.set("value", window.location.toString().split("$strBusinessSortData=")[1].split("$")[0]);
+            }
             domConstruct.empty(node);
             domConstruct.empty(this.downloadDiv);
             this._downloadDropDown(dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.DownloadSettings, this.downloadDiv);
-            if (arrData) {
+            if (this.currentBussinessData) {
                 resultpanel = domConstruct.create("div", { "class": "esriCTSortPanelHead" }, node);
-                if (arrData.length !== 0) {
+                if (this.currentBussinessData.length !== 0) {
                     domStyle.set(this.divBusinessResult, "display", "block");
                     domStyle.set(this.sortByDiv, "display", "block");
                     domStyle.set(this.downloadDiv, "display", "block");
                     domStyle.set(this.resultDiv, "display", "block");
-                    for (i = 0; i < arrData.length; i++) {
+                    for (i = 0; i < this.currentBussinessData.length; i++) {
                         content = domConstruct.create("div", {}, resultpanel);
-                        content.innerHTML = arrData[i].DisplayField;
+                        content.innerHTML = this.currentBussinessData[i].DisplayField;
                         countRevenueEmpPanel = domConstruct.create("div", { "class": "esriCTCountRevenueEmpPanel" }, content);
                         countRevenueEmp = domConstruct.create("div", { "class": "esriCTCountRevenueEmp" }, countRevenueEmpPanel);
                         count = domConstruct.create("div", { "class": "esriCTCount" }, countRevenueEmp);
                         countName = domConstruct.create("div", {}, count);
                         countName.innerHTML = dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[0].DisplayTextForBusinessCount;
                         countValue = domConstruct.create("div", {}, count);
-                        countValue.innerHTML = number.format(arrData[i].Count, { places: 0 });
+                        countValue.innerHTML = number.format(this.currentBussinessData[i].Count, { places: 0 });
                         revenue = domConstruct.create("div", { "class": "esriCTRevenue" }, countRevenueEmp);
                         revenueName = domConstruct.create("div", {}, revenue);
                         revenueName.innerHTML = dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[0].BusinessSummaryFields[1].DisplayText;
                         revenuevalue = domConstruct.create("div", {}, revenue);
-                        revenuevalue.innerHTML = this._getUnit(enrichData, dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[0].BusinessSummaryFields[1].FieldName.split(".")[1]) + number.format(arrData[i].Revenue, { places: 0 });
+                        revenuevalue.innerHTML = this._getUnit(enrichData, dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[0].BusinessSummaryFields[1].FieldName.split(".")[1]) + number.format(this.currentBussinessData[i].Revenue, { places: 0 });
                         employee = domConstruct.create("div", { "class": "esriCTEmployee" }, countRevenueEmp);
                         empName = domConstruct.create("div", { "class": "esriCTNoOfEmployeeHeader" }, employee);
                         empName.innerHTML = dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.GeoEnrichmentContents[0].BusinessSummaryFields[2].DisplayText;
                         empValue = domConstruct.create("div", { "class": "esriCTNoOfEmployee" }, employee);
-                        empValue.innerHTML = number.format(arrData[i].Employees, { places: 0 });
+                        empValue.innerHTML = number.format(this.currentBussinessData[i].Employees, { places: 0 });
                     }
                     esriContainerHeight = document.documentElement.clientHeight - node.offsetTop;
                     esriContainerStyle = { height: esriContainerHeight + "px" };
@@ -950,6 +954,7 @@ define([
                     domStyle.set(this.downloadDiv, "display", "none");
                     domStyle.set(this.resultDiv, "display", "none");
                     dojo.toFromBussinessFilter = null;
+                    dojo.businessSortData = null;
                     alert(sharedNls.errorMessages.invalidSearch);
                 }
             }
@@ -1105,13 +1110,14 @@ define([
             // Removing graphic layer(Buffer) while generating report for buildings and sites tab
             for (i = 0; i < jsonObject.operationalLayers.length; i++) {
                 if (jsonObject.operationalLayers[i].id === "esriBufferGraphicsLayer") {
-                    jsonObject.operationalLayers.splice(jsonObject.operationalLayers.indexOf(jsonObject.operationalLayers[i]), 1);
+                    jsonObject.operationalLayers.splice(array.indexOf(jsonObject.operationalLayers, jsonObject.operationalLayers[i]), 1);
                     break;
                 }
             }
             jsonObject.exportOptions = { "outputSize": [1366, 412] };
             return jsonObject;
         },
+
 
         /**
         * Clears the Business tab data
