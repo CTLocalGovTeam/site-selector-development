@@ -164,8 +164,11 @@ define([
         * @param {object} check box node
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
-        chkQueryHandler: function (chkBoxNode) {
+        chkQueryHandler: function (chkBoxNode, isExecuteQuery) {
             var arrAndQuery = [], arrOrQuery = [];
+            if (!isExecuteQuery && isExecuteQuery !== false) {
+                isExecuteQuery = true;
+            }
             topic.publish("showProgressIndicator");
             dojo.sortingData = null;
             if (this.workflowCount === 0) {
@@ -183,7 +186,7 @@ define([
                 arrAndQuery = this.queryArraySitesAND;
                 arrOrQuery = this.queryArraySitesOR;
             }
-            if (chkBoxNode.target && chkBoxNode.target.checked) {
+            if (chkBoxNode && chkBoxNode.target && chkBoxNode.target.checked) {
                 if (chkBoxNode.target.parentElement.getAttribute("isRegularFilterOptionFields") === "true") {
                     if (array.indexOf(arrAndQuery, chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'") === -1) {
                         arrAndQuery.push(chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'");
@@ -193,14 +196,14 @@ define([
                         arrOrQuery.push("UPPER(" + chkBoxNode.target.name + ") LIKE UPPER('%" + chkBoxNode.target.value + "%')");
                     }
                 }
-            } else if (chkBoxNode.checked) {
+            } else if (chkBoxNode && chkBoxNode.checked) {
                 if (array.indexOf(arrOrQuery, "UPPER(" + chkBoxNode.name + ") LIKE UPPER('%" + chkBoxNode.value + "%')") === -1) {
                     arrOrQuery.push("UPPER(" + chkBoxNode.name + ") LIKE UPPER('%" + chkBoxNode.value + "%')");
                 }
             } else {
-                if (chkBoxNode.target.parentElement.getAttribute("isRegularFilterOptionFields") === "true") {
+                if (chkBoxNode && chkBoxNode.target.parentElement.getAttribute("isRegularFilterOptionFields") === "true") {
                     arrAndQuery.splice(array.indexOf(arrAndQuery, chkBoxNode.target.name + "='" + chkBoxNode.target.value + "'"), 1);
-                } else {
+                } else if (chkBoxNode) {
                     arrOrQuery.splice(array.indexOf(arrOrQuery, "UPPER(" + chkBoxNode.target.name + ") LIKE UPPER('%" + chkBoxNode.target.value + "%')"), 1);
                 }
             }
@@ -215,10 +218,9 @@ define([
             if (this.featureGeometry[this.workflowCount] && !this.lastGeometry[this.workflowCount]) {
                 topic.publish("hideProgressIndicator");
                 alert(sharedNls.errorMessages.bufferSliderValue);
-            } else {
+            } else if (isExecuteQuery) {
                 this._callAndOrQuery(arrAndQuery, arrOrQuery);
             }
-
         },
 
         /**
@@ -370,13 +372,20 @@ define([
                     domConstruct.empty(this.attachmentOuterDiv);
                     delete this.buildingTabData;
                     this.siteLocatorScrollbarAttributeBuilding = null;
-
+                    if (this.selectedValue) {
+                        this.selectedValue = null;
+                        this.selectBusinessSortForBuilding.set("value", sharedNls.titles.select);
+                    }
                 } else {
                     domStyle.set(this.outerDivForPeginationSites, "display", "none");
                     domConstruct.empty(this.outerResultContainerSites);
                     domConstruct.empty(this.attachmentOuterDivSites);
                     delete this.sitesTabData;
                     this.siteLocatorScrollbarSites = null;
+                    if (this.selectedValue) {
+                        this.selectedValue = null;
+                        this.selectBusinessSortForSites.set("value", sharedNls.titles.select);
+                    }
                 }
                 topic.publish("hideProgressIndicator");
                 alert(sharedNls.errorMessages.invalidSearch);
@@ -391,7 +400,7 @@ define([
         * @memberOf widgets/Sitelocator/FeatureQuery
         */
         performQuery: function (layer, featureSet, curentIndex) {
-            var onCompleteArray, i, arrIds = [], finalIndex, layerFeatureSet, layerAttachmentInfos, deferredListResult, j;
+            var onCompleteArray, i, arrIds = [], finalIndex, layerFeatureSet, layerAttachmentInfos = [], deferredListResult, j;
             try {
                 if (dojo.paginationIndex) {
                     dojo.paginationIndex[this.workflowCount] = curentIndex;
@@ -401,7 +410,6 @@ define([
                 }
                 if (featureSet.length !== 0) {
                     topic.publish("showProgressIndicator");
-                    this.count = 0;
                     onCompleteArray = [];
                     finalIndex = curentIndex + 10;
                     if (curentIndex + 10 > featureSet.length) {
@@ -409,14 +417,11 @@ define([
                     }
                     for (i = curentIndex; i < finalIndex; i++) {
                         arrIds.push(featureSet[i]);
-                    }
-                    if (layer.hasAttachments && dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.ShowAttachments) {
-                        this.count++;
-                        this.itemquery(null, featureSet[i], layer, onCompleteArray);
+                        if (layer.hasAttachments && dojo.configData.Workflows[this.workflowCount].InfoPanelSettings.ResultContents.ShowAttachments) {
+                            this.itemquery(null, featureSet[i], layer, onCompleteArray);
+                        }
                     }
                     this.itemquery(arrIds, null, layer, onCompleteArray);
-                    this.count++;
-                    layerAttachmentInfos = [];
                     deferredListResult = new DeferredList(onCompleteArray);
                     deferredListResult.then(lang.hitch(this, function (result) {
                         if (result) {
@@ -845,17 +850,17 @@ define([
             if (this.lastGeometry[this.workflowCount]) {
                 querySort.geometry = this.lastGeometry[this.workflowCount][0];
             }
-            if (this.queryArrayBuildingAND.length > 0) {
+            if (this.queryArrayBuildingAND.length > 0 && this.workflowCount === 0) {
                 andString = this.queryArrayBuildingAND.join(" AND ");
             }
-            if (this.queryArrayBuildingOR.length > 0) {
+            if (this.queryArrayBuildingOR.length > 0 && this.workflowCount === 0) {
                 orString = this.queryArrayBuildingOR.join(" OR ");
             }
-            if (this.queryArraySitesAND.length > 0) {
+            if (this.queryArraySitesAND.length > 0 && this.workflowCount === 1) {
                 andString = this.queryArraySitesAND.join(" AND ");
             }
 
-            if (this.queryArraySitesOR.length > 0) {
+            if (this.queryArraySitesOR.length > 0 && this.workflowCount === 1) {
                 andString = this.queryArraySitesOR.join(" OR ");
             }
 

@@ -98,6 +98,7 @@ define([
         featureGraphics: [null, null, null, null],
         arrReportDataJson: [null, null, null, null],
         isSharedExtent: false,
+        _isSharedDataAvailable: false,
 
         /**
         * create Site Locator widget
@@ -479,9 +480,11 @@ define([
                             if (this.workflowCount === 0) {
                                 this.selectBusinessSortForBuilding.reset();
                                 this.selectedValue = null;
+                                dojo.sortingData = null;
                             } else {
                                 this.selectBusinessSortForSites.reset();
                                 this.selectedValue = null;
+                                dojo.sortingData = null;
                             }
                             this._fromToQuery(txtFrom, txtTo, chkAreaSites);
                         }
@@ -502,11 +505,13 @@ define([
                                 if (this.selectBusinessSortForBuilding) {
                                     this.selectBusinessSortForBuilding.set("value", sharedNls.titles.select);
                                     this.selectedValue = null;
+                                    dojo.sortingData = null;
                                 }
                             } else {
                                 if (this.selectBusinessSortForSites) {
                                     this.selectBusinessSortForSites.set("value", sharedNls.titles.select);
                                     this.selectedValue = null;
+                                    dojo.sortingData = null;
                                 }
                             }
                             this._fromToQuery(txtFrom, txtTo, chkAreaSites);
@@ -552,6 +557,7 @@ define([
                 this.own(on(divHideOptionText, "click", lang.hitch(this, function (value) {
                     this._showHideMoreOption(additionalFieldsNode, divHideOptionText, node);
                 })));
+                this._isSharedDataAvailable = false;
                 // Create additional filter options UI(dynamic) for configurable fields in buildings and sites tab
                 for (j = 0; j < arrAdditionalFields.FilterOptions.length; j++) {
                     divAdditionalField = domConstruct.create("div", { "class": "esriCTDivAdditionalOpt" }, additionalFieldsNode);
@@ -562,12 +568,16 @@ define([
                     if (window.location.toString().replace(/%20/g, " ").replace(/%27/g, "'").split("UPPER('PERCENT" + arrAdditionalFields.FilterOptions[j].FieldValue + "PERCENT')").length > 1 && Number(window.location.toString().split("$workflowCount=")[1].split("$")[0]) === index) {
                         additionalCheckBox.checked = true;
                         isShowMoreOptionShared = true;
-                        this.chkQueryHandler(additionalCheckBox);
+                        this.chkQueryHandler(additionalCheckBox, false);
+                        this._isSharedDataAvailable = true;
                     }
                     additionalFieldCheckBox.setAttribute("isRegularFilterOptionFields", false);
                     additionalFieldDisplayText = domConstruct.create("div", { "class": "esriCTChkLabel" }, checkBoxAdditionalWithText);
                     domAttr.set(additionalFieldDisplayText, "innerHTML", arrAdditionalFields.FilterOptions[j].DisplayText);
                     this.own(on(additionalCheckBox, "click", lang.hitch(this, this.chkQueryHandler)));
+                }
+                if (this._isSharedDataAvailable) {
+                    this.chkQueryHandler(null, true);
                 }
                 // Execute when shared URL contain additional option fields, set show more options text and call the showHideMoreOption handler
                 if (isShowMoreOptionShared) {
@@ -645,7 +655,7 @@ define([
             var isSorted = false;
             dojo.businessSortData = value;
             if (this.currentBussinessData) {
-                    this.currentBussinessData.sort(lang.hitch(this, function (a, b) {
+                this.currentBussinessData.sort(lang.hitch(this, function (a, b) {
                     // a greater than b
                     if (a[value] > b[value]) {
                         isSorted = true;
